@@ -3,20 +3,20 @@ package ee.taltech.game.server;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import packets.Packet;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 public class GameServer {
 
     private Server server;
-    private Map<Integer, String> gameObjects = new HashMap<>();
 
     public GameServer() {
         server = new Server();
         server.start();
+
+        server.getKryo().register(Packet.class);
+
         try {
             server.bind(8080, 8081);
         } catch (IOException e) {
@@ -24,14 +24,12 @@ public class GameServer {
         }
         server.addListener(new Listener() {
             public void received (Connection connection, Object object) {
-                System.out.println(object);
-                if (object instanceof String) {
-                    gameObjects.put(connection.getID(), (String) object);
+                if (object instanceof Packet) {
+                    Packet packet = (Packet) object;
+                    packet.setId(connection.getID());
+                    System.out.println(connection.getID());
+                    server.sendToAllExceptUDP(packet.getId(), packet);
                 }
-                // Try sendToAllUDP except
-                server.sendToAllUDP(gameObjects.entrySet().stream()
-                        .map(entry -> entry.getKey() + ":" + entry.getValue())
-                        .collect(Collectors.joining("|")));
             }
         });
     }
