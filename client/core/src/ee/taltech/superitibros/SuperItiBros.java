@@ -29,8 +29,8 @@ public class SuperItiBros extends ApplicationAdapter {
 	@Override
 	public void create() {
 		batch = new SpriteBatch();
-		img = new Texture("badlogic.jpg");
-		opponentImg = new Texture("badlogic.jpg");
+		img = new Texture("Characters/TestCharacter.png");
+		opponentImg = new Texture("Characters/TestCharacter.png");
 
 		client = new Client();
 		client.start();
