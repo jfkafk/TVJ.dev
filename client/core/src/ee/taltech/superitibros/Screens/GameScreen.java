@@ -60,7 +60,7 @@ public class GameScreen implements Screen {
         // initially set gamecam to be centered correctly at the start of the map
         gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
 
-        world = new World(new Vector2(0,-200), true);
+        world = new World(new Vector2(0,-400), true);
         b2dr = new Box2DDebugRenderer();
 
         // Body definition
@@ -78,7 +78,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Create player
-        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 700, 20, 20, 100, this);
+        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 700, 20, 20, 200, this);
 
         // Create ground bodies/fixtures
         for(MapObject object: map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
