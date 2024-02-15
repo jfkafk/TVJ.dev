@@ -1,11 +1,9 @@
 package ee.taltech.superitibros.Characters;
 
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 
 public class Player {
 
@@ -14,9 +12,10 @@ public class Player {
 
     // player data
 
-    private float xPosition, yPosition;
-    private float width, height;
-    private int health;
+    private int xPosition, yPosition;
+    public float width;
+    public float height;
+
     private int movementSpeed;
 
     private Sprite playerSprite;
@@ -24,37 +23,37 @@ public class Player {
     // collision box
     Rectangle collisionBox;
 
-    public Player(String name, Sprite playerSprite,
-                  float xCentre, float yCentre,
+    public Player(Sprite playerSprite,
+                  int xPosition, int yPosition,
                   float width, float height,
-                  int movementSpeed, int health) {
+                  int movementSpeed) {
         this.playerSprite = playerSprite;
-        this.xPosition = xCentre - width / 2f;
-        this.yPosition = yCentre + height / 2f;
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
         this.width = width;
         this.height = height;
         this.movementSpeed = movementSpeed;
-        this.health = health;
 
         // initialize collision box
         this.collisionBox = new Rectangle(this.playerSprite.getX(), this.playerSprite.getY(), width, height);
     }
 
+    /**
+     * PlayerGameCharacter method for drawing the PlayerCharacter on the Screen.
+     *
+     * @param batch (Batch) is used to draw 2D rectangles
+     */
     public void draw(Batch batch) {
-        System.out.println("Drawing character");
-        System.out.println("char x: " + this.getXPosition() + ", char y: " + this.getYPosition());
-
-        this.playerSprite.setPosition(this.xPosition, this.yPosition);
-        Vector2 spriteCenter = new Vector2(playerSprite.getX() + playerSprite.getWidth() / 2, playerSprite.getY() + playerSprite.getHeight() / 2);
-
-        playerSprite.draw(batch);
-
-        // update collision box position
-        collisionBox.setPosition(xPosition, yPosition);
+        batch.draw(this.playerSprite, this.xPosition, this.yPosition, this.width, this.height);
     }
 
     public void moveYPosition() {
         this.yPosition += this.movementSpeed;
+        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+    }
+
+    public void moveYPositionDown() {
+        this.yPosition -= this.movementSpeed;
         this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
     }
 
@@ -63,32 +62,25 @@ public class Player {
         this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
     }
 
-    public void setXPosition(float xPosition) {
+    public void moveXPositionBack() {
+        this.xPosition -= this.movementSpeed;
+        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+    }
+
+    public void setXPosition(int xPosition) {
         this.xPosition = xPosition;
     }
 
-    public void setYPosition(float yPosition) {
+    public void setYPosition(int yPosition) {
         this.yPosition = yPosition;
     }
 
-    public void setHealth(int health) {
-        this.health = health;
-    }
-
-    public boolean stillAlive() {
-        return this.health > 0;
-    }
-
-    public float getYPosition() {
+    public int getYPosition() {
         return this.yPosition;
     }
 
-    public float getXPosition() {
+    public int getXPosition() {
         return this.xPosition;
-    }
-
-    public int getHealth() {
-        return this.health;
     }
 
     public void dispose() {
