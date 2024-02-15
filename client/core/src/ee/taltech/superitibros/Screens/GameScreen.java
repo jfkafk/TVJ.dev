@@ -125,6 +125,7 @@ public class GameScreen implements Screen {
         world.step(1/60f, 6, 2);
         gamecam.update();
         renderer.setView(gamecam);
+        myPlayer.updateState();
     }
 
     @Override

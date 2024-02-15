@@ -9,12 +9,19 @@ import ee.taltech.superitibros.Screens.GameScreen;
 
 public class Player {
 
+    // States
+    public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD };
+    public State currentState;
+    public State previousState;
+
     // Player data
     private int xPosition, yPosition;
     public float width;
     public float height;
 
     private int movementSpeed;
+
+    private boolean broIsDead;
 
     private Sprite playerSprite;
 
@@ -37,6 +44,8 @@ public class Player {
         this.width = width;
         this.height = height;
         this.movementSpeed = movementSpeed;
+        currentState = State.STANDING;
+        previousState = State.STANDING;
 
         // Body definition
         BodyDef bdef = new BodyDef();
@@ -62,6 +71,24 @@ public class Player {
         shape.dispose();
     }
 
+    public State getState(){
+        //Test to Box2D for velocity on the X and Y-Axis
+        //if mario is going positive in Y-Axis he is jumping... or if he just jumped and is falling remain in jump state
+        if(broIsDead)
+            return State.DEAD;
+        else if((b2body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
+            return State.JUMPING;
+            //if negative in Y-Axis mario is falling
+        else if(b2body.getLinearVelocity().y < 0)
+            return State.FALLING;
+            //if mario is positive or negative in the X axis he is running
+        else if(b2body.getLinearVelocity().x != 0)
+            return State.RUNNING;
+            //if none of these return then he must be standing
+        else
+            return State.STANDING;
+    }
+
     /**
      * PlayerGameCharacter method for drawing the PlayerCharacter on the Screen.
      *
@@ -78,7 +105,16 @@ public class Player {
 
 
     public void jump() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
+        if ( currentState != State.JUMPING ) {
+            this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
+            currentState = State.JUMPING;
+        }
+    }
+
+    public void updateState() {
+        if (b2body.getLinearVelocity().y == 0 && currentState == State.JUMPING) {
+            currentState = State.FALLING;
+        }
     }
 
     public void moveYPosition() {
