@@ -25,12 +25,6 @@ public class Player {
     public World world;
     public Body b2body;
 
-    // Adjust the magnitude of the impulse for a higher jump
-    private static final float JUMP_IMPULSE = 150f;
-
-    // collision box
-    Rectangle collisionBox;
-
     public Player(Sprite playerSprite,
                   int xPosition, int yPosition,
                   float width, float height,
@@ -48,10 +42,11 @@ public class Player {
         BodyDef bdef = new BodyDef();
         bdef.type = BodyDef.BodyType.DynamicBody;
         bdef.position.set(xPosition, yPosition);
+        bdef.fixedRotation = true; // Set fixedRotation to true to prevent rotation
 
         // Player shape
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(width / 2f, height + 6f);
+        shape.setAsBox(width / 4f, height / 2f);
 
         // Fixture definition
         FixtureDef fdef = new FixtureDef();
@@ -74,10 +69,13 @@ public class Player {
      */
     public void draw(Batch batch) {
         // Update sprite position based on the body's position
-        playerSprite.setPosition(b2body.getPosition().x - width - 5, b2body.getPosition().y - height - 11);
+        playerSprite.setSize(width, height);
+        playerSprite.setOrigin(width / 2, height / 2); // Set the origin to the center of the sprite
+        playerSprite.setPosition(b2body.getPosition().x - width / 2, b2body.getPosition().y - height / 2); // Adjust the position based on the center of the sprite
         playerSprite.setRotation((float) Math.toDegrees(b2body.getAngle()));
         playerSprite.draw(batch);
     }
+
 
     public void jump() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);

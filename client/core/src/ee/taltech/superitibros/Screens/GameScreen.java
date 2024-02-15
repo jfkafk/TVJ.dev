@@ -78,7 +78,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Create player
-        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 700, 40, 40, 100, this);
+        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 700, 20, 20, 100, this);
 
         // Create ground bodies/fixtures
         for(MapObject object: map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
@@ -143,9 +143,15 @@ public class GameScreen implements Screen {
         // Draw characters
         for (Map.Entry<Integer, ArrayList<Integer>> entry : SuperItiBros.characters.entrySet()) {
             ArrayList<Integer> coordinates = entry.getValue();
+
             int characterX = coordinates.get(0);
             int characterY = coordinates.get(1);
-            batch.draw(SuperItiBros.opponentImg, characterX, characterY);
+
+            // Specify the desired width and height for opponent textures
+            int opponentWidth = 20; // Specify the width you want
+            int opponentHeight = 20; // Specify the height you want
+
+            batch.draw(new Texture("Characters/TestCharacter.png"), characterX - opponentWidth / 2f, characterY - opponentHeight / 2f, opponentWidth, opponentHeight);
         }
 
         myPlayer.draw(batch); // Draw your player sprite
