@@ -12,7 +12,7 @@ public class Level1 {
     public MapObjects collisionBoxes;
 
     public Level1() {
-        this.tiledMap = new TmxMapLoader().load("Maps/level1.tmx");
+        this.tiledMap = new TmxMapLoader().load("Maps/level1/level1.tmx");
         this.tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
     }
 }

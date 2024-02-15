@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SuperItiBros extends Game {
-	public static final int V_WIDTH = 400;
-	public static final int V_HEIGHT = 208;
+	public static final int V_WIDTH = 2000;
+	public static final int V_HEIGHT = 1500;
 
 	public static SpriteBatch batch;
 	Texture img;

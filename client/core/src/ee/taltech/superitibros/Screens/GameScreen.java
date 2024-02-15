@@ -24,6 +24,7 @@ import com.esotericsoftware.kryonet.Client;
 import ee.taltech.superitibros.Characters.Player;
 import ee.taltech.superitibros.SuperItiBros;
 import ee.taltech.superitibros.Worlds.World1.Level1;
+import ee.taltech.superitibros.Worlds.World2.Level2;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -54,7 +55,7 @@ public class GameScreen implements Screen {
         gameport = new FitViewport((float) SuperItiBros.V_WIDTH, (float) SuperItiBros.V_HEIGHT, gamecam);
         // Load map ant setup renderer
         TmxMapLoader mapLoader = new TmxMapLoader();
-        TiledMap map = mapLoader.load("Maps/level1.tmx");
+        TiledMap map = mapLoader.load("Maps/level3/MagicLand.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1);
         // initially set gamecam to be centered correctly at the start of the map
         gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
