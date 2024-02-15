@@ -2,6 +2,7 @@ package ee.taltech.superitibros;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import ee.taltech.superitibros.Screens.GameScreen;
 import packets.Packet;
 
 import java.io.IOException;
@@ -16,15 +18,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SuperItiBros extends ApplicationAdapter {
-	SpriteBatch batch;
-	Texture img;
-	Texture opponentImg;
+public class SuperItiBros extends Game {
+	public static final int V_WIDTH = 400;
+	public static final int V_HEIGHT = 208;
 
-	private int x = 0, y = 0;
-	private int id;
-	private HashMap<Integer, ArrayList<Integer>> characters = new HashMap<>();
-	private Client client;
+	public static SpriteBatch batch;
+	Texture img;
+	public static Texture opponentImg;
+	public static HashMap<Integer, ArrayList<Integer>> characters = new HashMap<>();
+	private static Client client;
 
 	@Override
 	public void create() {
@@ -36,6 +38,8 @@ public class SuperItiBros extends ApplicationAdapter {
 		client.start();
 
 		client.getKryo().register(Packet.class);
+
+		setScreen(new GameScreen(this));
 
 		try {
 			client.connect(5000, "localhost", 8080, 8081);
@@ -60,40 +64,16 @@ public class SuperItiBros extends ApplicationAdapter {
 
 	@Override
 	public void render() {
-		ScreenUtils.clear(1, 0, 0, 1);
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-			x -= 10;
-			sendPositionInfoToServer(new Packet());
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-			x += 10;
-			sendPositionInfoToServer(new Packet());
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-			y += 10;
-			sendPositionInfoToServer(new Packet());
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-			y -= 10;
-			sendPositionInfoToServer(new Packet());
-		}
-		batch.begin();
-		batch.draw(img, x, y);
-		for (Map.Entry<Integer, ArrayList<Integer>> entry : characters.entrySet()) {
-			ArrayList<Integer> coordinates = entry.getValue();
-			int characterX = coordinates.get(0);
-			int characterY = coordinates.get(1);
-			batch.draw(opponentImg, characterX, characterY);
-		}
-		batch.end();
+		super.render(); // This line is missing
+
 	}
 
-	private void sendPositionInfoToServer(Packet info) {
-		info.setX(x);
-		info.setY(y);
-		System.out.println(client.getID());
-		client.sendUDP(info);
-	}
+	public static void sendPositionInfoToServer(int x, int y) {
+		Packet packet = new Packet();
+		packet.setX(x);
+		packet.setY(y);
+        client.sendUDP(packet);
+    }
 
 	@Override
 	public void dispose() {
