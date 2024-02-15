@@ -1,4 +1,4 @@
-package ee.taltech.game.server;
+package ee.taltech.game.Server;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
