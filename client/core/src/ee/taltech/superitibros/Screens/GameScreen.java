@@ -26,6 +26,7 @@ import ee.taltech.superitibros.SuperItiBros;
 import ee.taltech.superitibros.Worlds.World1.Level1;
 import ee.taltech.superitibros.Worlds.World2.Level2;
 
+import java.awt.geom.RectangularShape;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,16 +40,15 @@ public class GameScreen implements Screen {
     private final Viewport gameport;
     private OrthogonalTiledMapRenderer renderer;
 
-    Texture texture = new Texture("Characters/TestCharacter.png");
-    Sprite sprite = new Sprite(texture);
-
     private Player myPlayer;
 
     private World world;
+
     private Box2DDebugRenderer b2dr;
+
+    private final float PPM = 32;
+
     public GameScreen(SuperItiBros game) {
-        // Create player
-        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 50, 50, 40, 40, 3);
         // create cam used to follow mario through cam world
         gamecam = new OrthographicCamera();
         // create a FitViewport to maintain virtual aspect ratio despite screen size
@@ -60,18 +60,28 @@ public class GameScreen implements Screen {
         // initially set gamecam to be centered correctly at the start of the map
         gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
 
-        world = new World(new Vector2(0,-1), true);
+        world = new World(new Vector2(0,-200), true);
         b2dr = new Box2DDebugRenderer();
 
+        // Body definition
         BodyDef bdef = new BodyDef();
+        bdef.type = BodyDef.BodyType.StaticBody;
+
+        // Player shape
         PolygonShape shape = new PolygonShape();
+
+        // Fixture definition
         FixtureDef fdef = new FixtureDef();
+
         Body body;
 
         batch = new SpriteBatch();
 
+        // Create player
+        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 700, 40, 40, 100, this);
+
         // Create ground bodies/fixtures
-        for(MapObject object: map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
+        for(MapObject object: map.getLayers().get(1).getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = ((RectangleMapObject) object).getRectangle();
 
             bdef.type = BodyDef.BodyType.StaticBody;
@@ -89,6 +99,9 @@ public class GameScreen implements Screen {
     public void show() {}
 
     public void handleInput() {
+        // Reset the velocity before applying new forces
+        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
+
         // Your other rendering logic goes here
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
             myPlayer.moveXPositionBack();
@@ -97,7 +110,7 @@ public class GameScreen implements Screen {
             myPlayer.moveXPosition();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            myPlayer.moveYPosition();
+            myPlayer.jump();
         }
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             myPlayer.moveYPositionDown();
@@ -160,14 +173,19 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-
+        dispose();
     }
 
     @Override
     public void dispose() {
         // Dispose of resources used by GameScreen
         //SuperItiBros.batch.dispose();
-        texture.dispose();
         batch.dispose();
+        world.dispose();
+        b2dr.dispose();
+    }
+
+    public World getWorld() {
+        return world;
     }
 }

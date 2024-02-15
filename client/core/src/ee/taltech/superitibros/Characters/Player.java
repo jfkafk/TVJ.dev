@@ -1,17 +1,15 @@
 package ee.taltech.superitibros.Characters;
 
-
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.superitibros.Screens.GameScreen;
 
 public class Player {
 
-    // rows and columns of the sprite sheet
-    private static final int frameCols = 4, frameRows = 1;
-
-    // player data
-
+    // Player data
     private int xPosition, yPosition;
     public float width;
     public float height;
@@ -20,13 +18,25 @@ public class Player {
 
     private Sprite playerSprite;
 
+    // GameScreen reference
+    private GameScreen screen;
+
+    // 2D Box
+    public World world;
+    public Body b2body;
+
+    // Adjust the magnitude of the impulse for a higher jump
+    private static final float JUMP_IMPULSE = 150f;
+
     // collision box
     Rectangle collisionBox;
 
     public Player(Sprite playerSprite,
                   int xPosition, int yPosition,
                   float width, float height,
-                  int movementSpeed) {
+                  int movementSpeed, GameScreen screen) {
+        this.screen = screen;
+        this.world = screen.getWorld();
         this.playerSprite = playerSprite;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -34,8 +44,27 @@ public class Player {
         this.height = height;
         this.movementSpeed = movementSpeed;
 
-        // initialize collision box
-        this.collisionBox = new Rectangle(this.playerSprite.getX(), this.playerSprite.getY(), width, height);
+        // Body definition
+        BodyDef bdef = new BodyDef();
+        bdef.type = BodyDef.BodyType.DynamicBody;
+        bdef.position.set(xPosition, yPosition);
+
+        // Player shape
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(width / 2f, height + 6f);
+
+        // Fixture definition
+        FixtureDef fdef = new FixtureDef();
+        fdef.shape = shape;
+        fdef.density = 30f;
+        fdef.friction = .0f;
+        fdef.restitution = .0f;
+
+        b2body = world.createBody(bdef);
+        b2body.createFixture(fdef);
+        b2body.setUserData(playerSprite);
+
+        shape.dispose();
     }
 
     /**
@@ -44,45 +73,49 @@ public class Player {
      * @param batch (Batch) is used to draw 2D rectangles
      */
     public void draw(Batch batch) {
-        batch.draw(this.playerSprite, this.xPosition, this.yPosition, this.width, this.height);
+        // Update sprite position based on the body's position
+        playerSprite.setPosition(b2body.getPosition().x - width - 5, b2body.getPosition().y - height - 11);
+        playerSprite.setRotation((float) Math.toDegrees(b2body.getAngle()));
+        playerSprite.draw(batch);
+    }
+
+    public void jump() {
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
     }
 
     public void moveYPosition() {
-        this.yPosition += this.movementSpeed;
-        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
     }
 
     public void moveYPositionDown() {
-        this.yPosition -= this.movementSpeed;
-        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
     }
 
     public void moveXPosition() {
-        this.xPosition += this.movementSpeed;
-        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+        this.b2body.setLinearVelocity(movementSpeed, this.b2body.getLinearVelocity().y);
     }
 
     public void moveXPositionBack() {
-        this.xPosition -= this.movementSpeed;
-        this.collisionBox = new Rectangle(xPosition, yPosition, width, height);
+        this.b2body.setLinearVelocity(-movementSpeed, this.b2body.getLinearVelocity().y);
     }
 
     public void setXPosition(int xPosition) {
-        this.xPosition = xPosition;
+        this.b2body.setTransform(xPosition, this.b2body.getPosition().y, this.b2body.getAngle());
     }
 
     public void setYPosition(int yPosition) {
-        this.yPosition = yPosition;
+        this.b2body.setTransform(this.b2body.getPosition().x, yPosition, this.b2body.getAngle());
     }
 
     public int getYPosition() {
-        return this.yPosition;
+        return (int) this.b2body.getPosition().y;
     }
 
     public int getXPosition() {
-        return this.xPosition;
+        return (int) this.b2body.getPosition().x;
     }
 
     public void dispose() {
+        playerSprite.getTexture().dispose();
     }
 }
