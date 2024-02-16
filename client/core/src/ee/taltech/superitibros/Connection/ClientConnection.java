@@ -1,12 +1,6 @@
-package ee.taltech.superitibros;
+package ee.taltech.superitibros.Connection;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.utils.ScreenUtils;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -16,37 +10,34 @@ import packets.Packet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-public class SuperItiBros extends Game {
+public class ClientConnection extends Game {
+	// Game camera size
 	public static final int V_WIDTH = 400;
 	public static final int V_HEIGHT = 208;
 
-	public static SpriteBatch batch;
-	Texture img;
-	public static Texture opponentImg;
+	// Other players
 	public static HashMap<Integer, ArrayList<Integer>> characters = new HashMap<>();
 	private static Client client;
 
 	@Override
 	public void create() {
-		batch = new SpriteBatch();
-		img = new Texture("Characters/TestCharacter.png");
-		opponentImg = new Texture("Characters/TestCharacter.png");
 
 		client = new Client();
 		client.start();
-
 		client.getKryo().register(Packet.class);
 
+		// Set game screen
 		setScreen(new GameScreen(this));
 
+		// Connect to ports
 		try {
 			client.connect(5000, "localhost", 8080, 8081);
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 
+		// Listen for incoming packets from server
 		client.addListener(new Listener.ThreadedListener(new Listener() {
 			public void received(Connection connection, Object object) {
 				if (object instanceof Packet) {
@@ -64,10 +55,11 @@ public class SuperItiBros extends Game {
 
 	@Override
 	public void render() {
-		super.render(); // This line is missing
+		super.render();
 
 	}
 
+	// Send player position info to server
 	public static void sendPositionInfoToServer(int x, int y) {
 		Packet packet = new Packet();
 		packet.setX(x);
@@ -83,7 +75,5 @@ public class SuperItiBros extends Game {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		batch.dispose();
-		img.dispose();
 	}
 }

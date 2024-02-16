@@ -18,17 +18,16 @@ public class Player {
     private int xPosition, yPosition;
     public float width;
     public float height;
-
     private int movementSpeed;
-
     private boolean broIsDead;
 
+    // Player sprite
     private Sprite playerSprite;
 
     // GameScreen reference
     private GameScreen screen;
 
-    // 2D Box
+    // Box2D
     public World world;
     public Body b2body;
 
@@ -64,10 +63,12 @@ public class Player {
         fdef.friction = .0f;
         fdef.restitution = .0f;
 
+        // Body in the world
         b2body = world.createBody(bdef);
         b2body.createFixture(fdef);
         b2body.setUserData(playerSprite);
 
+        // Dispose
         shape.dispose();
     }
 
@@ -105,6 +106,7 @@ public class Player {
 
 
     public void jump() {
+        // Player can't jump if he is already in air
         if ( currentState != State.JUMPING ) {
             this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
             currentState = State.JUMPING;

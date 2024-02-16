@@ -1,4 +1,4 @@
-package ee.taltech.game.Server.Screens;
+package ee.taltech.game.Screens;
 
 public class GameScreen {
 }
