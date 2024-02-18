@@ -8,22 +8,17 @@ import ee.taltech.superitibros.Screens.GameScreen;
 public class Player {
 
     // States
-    public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD };
+    public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD }
     public State currentState;
     public State previousState;
 
-    // Player data
-    private int xPosition, yPosition;
     public float width;
     public float height;
-    private int movementSpeed;
+    private final int movementSpeed;
     private boolean broIsDead;
 
     // Player sprite
-    private Sprite playerSprite;
-
-    // GameScreen reference
-    private GameScreen screen;
+    private final Sprite playerSprite;
 
     // Box2D
     public World world;
@@ -33,11 +28,10 @@ public class Player {
                   int xPosition, int yPosition,
                   float width, float height,
                   int movementSpeed, GameScreen screen) {
-        this.screen = screen;
+        // GameScreen reference
         this.world = screen.getWorld();
         this.playerSprite = playerSprite;
-        this.xPosition = xPosition;
-        this.yPosition = yPosition;
+        // Player data
         this.width = width;
         this.height = height;
         this.movementSpeed = movementSpeed;
