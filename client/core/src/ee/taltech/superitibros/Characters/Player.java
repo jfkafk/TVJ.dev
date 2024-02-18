@@ -2,8 +2,6 @@ package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.Screens.GameScreen;
 
@@ -113,44 +111,49 @@ public class Player {
         }
     }
 
+    // Update state
     public void updateState() {
         if (b2body.getLinearVelocity().y == 0 && currentState == State.JUMPING) {
             currentState = State.FALLING;
         }
     }
 
-    public void moveYPosition() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
-    }
-
+    // Fall faster
     public void moveYPositionDown() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
     }
 
+    // Move right
     public void moveXPosition() {
         this.b2body.setLinearVelocity(movementSpeed, this.b2body.getLinearVelocity().y);
     }
 
+    // Move left
     public void moveXPositionBack() {
         this.b2body.setLinearVelocity(-movementSpeed, this.b2body.getLinearVelocity().y);
     }
 
+    // Set X coordinate
     public void setXPosition(int xPosition) {
         this.b2body.setTransform(xPosition, this.b2body.getPosition().y, this.b2body.getAngle());
     }
 
+    // Set Y coordinate
     public void setYPosition(int yPosition) {
         this.b2body.setTransform(this.b2body.getPosition().x, yPosition, this.b2body.getAngle());
     }
 
+    // Get Y coordinate
     public int getYPosition() {
         return (int) this.b2body.getPosition().y;
     }
 
+    // Get X coordinate
     public int getXPosition() {
         return (int) this.b2body.getPosition().x;
     }
 
+    // Dispose
     public void dispose() {
         playerSprite.getTexture().dispose();
     }

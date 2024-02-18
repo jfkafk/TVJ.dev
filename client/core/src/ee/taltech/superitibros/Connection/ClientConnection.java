@@ -18,11 +18,13 @@ public class ClientConnection extends Game {
 
 	// Other players
 	public static HashMap<Integer, ArrayList<Integer>> characters = new HashMap<>();
+
 	private static Client client;
 
 	@Override
 	public void create() {
 
+		// Create new client
 		client = new Client();
 		client.start();
 		client.getKryo().register(Packet.class);
@@ -43,9 +45,11 @@ public class ClientConnection extends Game {
 				if (object instanceof Packet) {
 					Packet packet = (Packet) object;
 					System.out.println(packet.getId());
+					// Add other player coordinates to array
 					ArrayList<Integer> coordinates = new ArrayList<>();
 					coordinates.add(packet.getX());
 					coordinates.add(packet.getY());
+					// Put other player id and coordinates to hashmap
 					characters.put(client.getID(), coordinates);
 					System.out.println(characters);
 				}
@@ -53,6 +57,7 @@ public class ClientConnection extends Game {
 		}));
 	}
 
+	// Render
 	@Override
 	public void render() {
 		super.render();
@@ -67,6 +72,7 @@ public class ClientConnection extends Game {
         client.sendUDP(packet);
     }
 
+	// Dispose
 	@Override
 	public void dispose() {
 		client.close();
