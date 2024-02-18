@@ -9,25 +9,32 @@ import java.io.IOException;
 
 public class GameServer {
 
-    private Server server;
+    private final Server server;
 
     public GameServer() {
         server = new Server();
+
+        // Start server
         server.start();
 
+        // Register packets
         server.getKryo().register(Packet.class);
 
+        // Connect to ports
         try {
             server.bind(8080, 8081);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        // Listen for incoming packets from clients
         server.addListener(new Listener() {
             public void received (Connection connection, Object object) {
-                if (object instanceof Packet) {
-                    Packet packet = (Packet) object;
+                if (object instanceof Packet packet) {
+                    // Set connection id to packet
                     packet.setId(connection.getID());
                     System.out.println(connection.getID());
+                    // Send packet to all clients except one who sent it to server
                     server.sendToAllExceptUDP(packet.getId(), packet);
                 }
             }
