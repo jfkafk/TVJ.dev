@@ -43,14 +43,14 @@ public class GameScreen implements Screen {
     // Pixels per meter
     private final float PPM = 32;
 
-    public GameScreen(ClientConnection game) {
+    public GameScreen(ClientConnection cC) {
         // create cam used to follow mario through cam world
         gamecam = new OrthographicCamera();
         // create a FitViewport to maintain virtual aspect ratio despite screen size
         gameport = new FitViewport((float) ClientConnection.V_WIDTH, (float) ClientConnection.V_HEIGHT, gamecam);
         // Load map ant setup renderer
         TmxMapLoader mapLoader = new TmxMapLoader();
-        TiledMap map = mapLoader.load("Maps/level1/level1.tmx");
+        TiledMap map = mapLoader.load("Maps/level3/MagicLand.tmx");
         renderer = new OrthogonalTiledMapRenderer(map, 1);
         // initially set gamecam to be centered correctly at the start of the map
         gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
@@ -74,7 +74,7 @@ public class GameScreen implements Screen {
         batch = new SpriteBatch();
 
         // Create player
-        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 100, 20, 20, 200, this);
+        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 1000, 1000, 20, 20, 200, this);
 
         // Create ground bodies/fixtures and make them "solid"
         for(RectangleMapObject object: map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
