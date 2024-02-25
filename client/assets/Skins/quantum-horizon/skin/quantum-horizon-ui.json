@@ -20,24 +20,9 @@ com.badlogic.gdx.graphics.Color: {
 		b: 0
 		a: 1
 	}
-	color: {
-		r: 0.98611116
-		g: 0
-		b: 1
-		a: 1
-	}
-	pressed: {
-		r: 0.985234
-		g: 0.5
-		b: 1
-		a: 1
-	}
-	selection: {
-		r: 0
-		g: 0.4897771
-		b: 1
-		a: 1
-	}
+	color: { a: 1.0, b: 1.0, g: 0.64705884, r: 0.7490196 }
+	pressed: { a: 1.0, b: 0.79607844, g: 0.4862745, r: 1.0 }
+	selection: { a: 1.0, b: 1.0, g: 0.4745098, r: 0.92156863 }
 	touch-cursor: {
 		r: 0
 		g: 0
