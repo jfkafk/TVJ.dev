@@ -31,11 +31,10 @@ public class GameServer {
         server.addListener(new Listener() {
             public void received (Connection connection, Object object) {
                 if (object instanceof Packet packet) {
-                    // Set connection id to packet
+                    // Send packet to all clients except one who sent it to server
                     packet.setId(connection.getID());
                     System.out.println(connection.getID());
-                    // Send packet to all clients except one who sent it to server
-                    server.sendToAllExceptUDP(packet.getId(), packet);
+                    server.sendToAllExceptUDP(connection.getID(), packet);
                 }
             }
         });
