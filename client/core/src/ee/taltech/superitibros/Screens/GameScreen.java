@@ -75,6 +75,7 @@ public class GameScreen implements Screen {
 
         // Create player
         myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 100, 100, 20, 20, 200, this);
+        ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
 
         // Create ground bodies/fixtures and make them "solid"
         for(RectangleMapObject object: map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
@@ -95,8 +96,6 @@ public class GameScreen implements Screen {
     public void show() {}
 
     public void handleInput() {
-        // Reset the velocity before applying new forces
-        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
 
         // Move character to left
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -114,10 +113,12 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             myPlayer.moveYPositionDown();
         }
-        // If player moves, send player position to server
-        if (myPlayer.b2body.getLinearVelocity().y != 0 || myPlayer.b2body.getLinearVelocity().x != 0) {
+        // If player moves (has non-zero velocity in x or y direction), send player position to server
+        if (myPlayer.b2body.getLinearVelocity().x != 0 || myPlayer.b2body.getLinearVelocity().y != 0) {
             ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
         }
+        // Reset the velocity before applying new forces
+        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
     }
 
     public void update() {
