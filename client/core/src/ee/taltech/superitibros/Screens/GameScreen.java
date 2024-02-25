@@ -56,7 +56,7 @@ public class GameScreen implements Screen {
         gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
 
         // Create new world with gravitation and Box2D
-        world = new World(new Vector2(0,-400), true);
+        world = new World(new Vector2(0,-250), true);
         b2dr = new Box2DDebugRenderer();
 
         // Body definition
@@ -95,8 +95,6 @@ public class GameScreen implements Screen {
     public void show() {}
 
     public void handleInput() {
-        // Reset the velocity before applying new forces
-        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
 
         // Move character to left
         if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -114,9 +112,12 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             myPlayer.moveYPositionDown();
         }
-        // After input, send player position to server
-        ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
-
+        // If player moves (has non-zero velocity in x or y direction), send player position to server
+        if (myPlayer.b2body.getLinearVelocity().x != 0 || myPlayer.b2body.getLinearVelocity().y != 0) {
+            ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
+        }
+        // Reset the velocity before applying new forces
+        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
     }
 
     public void update() {

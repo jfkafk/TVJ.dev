@@ -23,7 +23,6 @@ public class ClientConnection extends Game {
 
 	@Override
 	public void create() {
-
 		// Create new client
 		client = new Client();
 		client.start();
@@ -50,7 +49,7 @@ public class ClientConnection extends Game {
 					coordinates.add(packet.getX());
 					coordinates.add(packet.getY());
 					// Put other player id and coordinates to hashmap
-					characters.put(client.getID(), coordinates);
+					characters.put(packet.getId(), coordinates);
 					System.out.println(characters);
 				}
 			}
@@ -61,7 +60,6 @@ public class ClientConnection extends Game {
 	@Override
 	public void render() {
 		super.render();
-
 	}
 
 	// Send player position info to server
@@ -69,8 +67,9 @@ public class ClientConnection extends Game {
 		Packet packet = new Packet();
 		packet.setX(x);
 		packet.setY(y);
-        client.sendUDP(packet);
-    }
+		// Use playerId generated for this client
+		client.sendUDP(packet);
+	}
 
 	// Dispose
 	@Override
