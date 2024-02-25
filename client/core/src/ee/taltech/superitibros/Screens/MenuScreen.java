@@ -84,6 +84,7 @@ public class MenuScreen implements Screen {
                 clientConnection.create();
                 // Create a new player to server.
                 ((Game) Gdx.app.getApplicationListener()).setScreen(launchMulti);
+                mainTable.remove();
             }
 
         });

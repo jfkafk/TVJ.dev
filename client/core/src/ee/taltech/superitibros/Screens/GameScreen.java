@@ -114,6 +114,11 @@ public class GameScreen implements Screen {
         if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
             myPlayer.moveYPositionDown();
         }
+        // Exit game by pressing esc.
+        if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+            dispose();
+
+        }
         // After input, send player position to server
         ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
 
