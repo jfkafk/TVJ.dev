@@ -17,10 +17,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.superitibros.Connection.ClientConnection;
 
 
-public class MenuScreen implements Screen {
+public class Lobby implements Screen {
 
     private SpriteBatch batch;
     protected Stage stage;
@@ -33,9 +32,9 @@ public class MenuScreen implements Screen {
      * Constructor for the Menu class.
      * Define texture
      */
-    public MenuScreen() {
+    public Lobby() {
         int worldWidth = 1600;
-        int worldHeight = 1100;
+        int worldHeight = 1000;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/quantum-horizon/skin/quantum-horizon-ui.json"), atlas);
         batch = new SpriteBatch();
@@ -54,7 +53,6 @@ public class MenuScreen implements Screen {
     @Override
     public void show() {
 
-        //Stage should check input:
         Gdx.input.setInputProcessor(stage);
 
         //Create Table
@@ -66,31 +64,23 @@ public class MenuScreen implements Screen {
 
         //Create game title
         Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
+        Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         //Create buttons
         TextButton multiplayerButton = new TextButton("Multiplayer", skin);
-        TextButton singlePlayerButton = new TextButton("Single Player", skin);
 
         TextButton optionsButton = new TextButton("Options", skin);
 
-        TextButton exitButton = new TextButton("Exit Game", skin);
+        TextButton back = new TextButton("Back", skin);
+
 
         //Add listeners to buttons
-        singlePlayerButton.addListener(new ClickListener() {
+
+        back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ClientConnection clientConnection = new ClientConnection();
-                GameScreen launchMulti = new GameScreen(clientConnection);
-                clientConnection.create();
-                // Create a new player to server.
-                ((Game) Gdx.app.getApplicationListener()).setScreen(launchMulti);
-            }
-
-        });
-        multiplayerButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                Lobby lobby = new Lobby();
-                ((Game) Gdx.app.getApplicationListener()).setScreen(lobby);
+                MenuScreen menuScreen = new MenuScreen();
+                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
         optionsButton.addListener(new ClickListener() {
@@ -100,24 +90,19 @@ public class MenuScreen implements Screen {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
         });
-        exitButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
-            }
-        });
-        int buttonLocationPadding = 7;
-        mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
+        int buttonLocationPadding = 5;
+        mainTable.add(gameLabel).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(multiplayerButton).pad(buttonLocationPadding);
+        mainTable.add(menuLabel).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(singlePlayerButton).pad(buttonLocationPadding);
+        mainTable.add(back).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(optionsButton).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(exitButton).pad(buttonLocationPadding);
+        mainTable.add(back).pad(buttonLocationPadding);
         //Add table to stage
         stage.addActor(mainTable);
+
     }
 
     /**
@@ -127,7 +112,6 @@ public class MenuScreen implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         stage.act();
         stage.draw();
     }
@@ -160,5 +144,4 @@ public class MenuScreen implements Screen {
         atlas.dispose();
     }
 }
-
 
