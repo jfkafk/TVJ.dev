@@ -2,6 +2,7 @@ package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.Screens.GameScreen;
 
@@ -51,7 +52,7 @@ public class Player {
         // Fixture definition
         FixtureDef fdef = new FixtureDef();
         fdef.shape = shape;
-        fdef.density = 30f;
+        fdef.density = 10f;
         fdef.friction = .0f;
         fdef.restitution = .0f;
 
@@ -99,8 +100,10 @@ public class Player {
 
     public void jump() {
         // Player can't jump if he is already in air
-        if ( currentState != State.JUMPING ) {
-            this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, movementSpeed);
+        if (currentState != State.JUMPING) {
+            // Apply an impulse upwards to simulate the jump
+            float jumpImpulse = 500000.0F; // Define your jump impulse here
+            this.b2body.applyLinearImpulse(0, jumpImpulse, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             currentState = State.JUMPING;
         }
     }
@@ -119,12 +122,14 @@ public class Player {
 
     // Move right
     public void moveXPosition() {
-        this.b2body.setLinearVelocity(movementSpeed, this.b2body.getLinearVelocity().y);
+        // Apply a force to the right
+        this.b2body.applyForceToCenter(new Vector2(9999999, 0), true);
     }
 
     // Move left
     public void moveXPositionBack() {
-        this.b2body.setLinearVelocity(-movementSpeed, this.b2body.getLinearVelocity().y);
+        // Apply a force to the left
+        this.b2body.applyForceToCenter(new Vector2(-9999999, 0), true);
     }
 
     // Set X coordinate
