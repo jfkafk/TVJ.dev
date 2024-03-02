@@ -10,10 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -52,6 +49,12 @@ public class Options implements Screen {
         //Set alignment of contents in the table.
         mainTable.center();
 
+        // Volume.
+        Table volumeSlider = new Table(skin);
+        volumeSlider.setFillParent(true);
+        Slider slider = new Slider(0F, 100F, 1F, false, skin);
+        volumeSlider.bottom().left();
+
         //Create game title
         Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
         Label optionsLabel = new Label("Options", skin, "title", Color.CYAN);
@@ -69,12 +72,22 @@ public class Options implements Screen {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
+        // Back.
         int buttonLocationPadding = 7;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
         mainTable.row();
         mainTable.add(optionsLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(slider);
+
+        // Volume.
+        int settingsPadding = 20;
+        volumeSlider.add("Volume").padBottom(settingsPadding);
+        volumeSlider.add();
+        volumeSlider.add(slider);
+        stage.addActor(volumeSlider);
         stage.addActor(mainTable);
     }
 
