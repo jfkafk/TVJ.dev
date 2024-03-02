@@ -17,11 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-<<<<<<< HEAD
-=======
 import ee.taltech.superitibros.GameInfo.GameClient;
->>>>>>> 87a3f93 (Gradle build error.)
-
 
 public class MenuScreen implements Screen {
 
@@ -31,14 +27,12 @@ public class MenuScreen implements Screen {
     private OrthographicCamera camera;
     private TextureAtlas atlas;
     protected Skin skin;
-    GameClient gameClient;
 
     /**
      * Constructor for the Menu class.
      * Define texture
      */
-    public MenuScreen(GameClient gameClient) {
-        this.gameClient = gameClient;
+    public MenuScreen() {
         int worldWidth = 1600;
         int worldHeight = 1100;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
@@ -84,7 +78,7 @@ public class MenuScreen implements Screen {
         singlePlayerButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                SinglePlayerMenu singlePlayerMenu = new SinglePlayerMenu(gameClient);
+                SinglePlayerMenu singlePlayerMenu = new SinglePlayerMenu();
                 // Create a new player to server.
                 ((Game) Gdx.app.getApplicationListener()).setScreen(singlePlayerMenu);
             }
@@ -92,14 +86,14 @@ public class MenuScreen implements Screen {
         });
         multiplayerButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Lobby lobby = new Lobby(gameClient);
+                Lobby lobby = new Lobby();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(lobby);
             }
         });
         optionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Options options = new Options(gameClient);
+                Options options = new Options();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
         });
