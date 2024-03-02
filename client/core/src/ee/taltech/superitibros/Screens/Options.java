@@ -26,7 +26,6 @@ public class Options implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
 
-
     public Options() {
         int worldWidth = 1600;
         int worldHeight = 1100;

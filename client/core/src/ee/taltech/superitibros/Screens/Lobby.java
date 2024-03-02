@@ -144,4 +144,3 @@ public class Lobby implements Screen {
         atlas.dispose();
     }
 }
-

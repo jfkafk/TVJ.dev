@@ -203,7 +203,6 @@ public class GameScreen implements Screen {
         world.dispose();
         b2dr.dispose();
     }
-
     public World getWorld() {
         return world;
     }

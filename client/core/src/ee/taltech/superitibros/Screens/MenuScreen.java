@@ -160,5 +160,3 @@ public class MenuScreen implements Screen {
         atlas.dispose();
     }
 }
-
-
