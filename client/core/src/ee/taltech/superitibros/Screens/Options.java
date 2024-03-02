@@ -17,11 +17,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.superitibros.Connection.ClientConnection;
 
-
-public class MenuScreen implements Screen {
-
+public class Options implements Screen {
     private SpriteBatch batch;
     protected Stage stage;
     private Viewport viewport;
@@ -29,11 +26,7 @@ public class MenuScreen implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
 
-    /**
-     * Constructor for the Menu class.
-     * Define texture
-     */
-    public MenuScreen() {
+    public Options() {
         int worldWidth = 1600;
         int worldHeight = 1100;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
@@ -47,13 +40,8 @@ public class MenuScreen implements Screen {
         stage = new Stage(viewport, batch);
     }
 
-    /**
-     * Show menu screen
-     * Create table and add buttons to the table
-     */
     @Override
     public void show() {
-
         //Stage should check input:
         Gdx.input.setInputProcessor(stage);
 
@@ -66,63 +54,30 @@ public class MenuScreen implements Screen {
 
         //Create game title
         Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
-
-        //Create buttons
-        TextButton multiplayerButton = new TextButton("Multiplayer", skin);
-        TextButton singlePlayerButton = new TextButton("Single Player", skin);
-
-        TextButton optionsButton = new TextButton("Options", skin);
-
-        TextButton exitButton = new TextButton("Exit Game", skin);
-
-        //Add listeners to buttons
-        singlePlayerButton.addListener(new ClickListener() {
-            @Override
+        Label optionsLabel = new Label("Options", skin, "title", Color.CYAN);
+        TextButton back = new TextButton("back", skin);
+        back.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                ClientConnection clientConnection = new ClientConnection();
-                GameScreen launchMulti = new GameScreen(clientConnection);
-                clientConnection.create();
-                // Create a new player to server.
-                ((Game) Gdx.app.getApplicationListener()).setScreen(launchMulti);
-            }
-
-        });
-        multiplayerButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                Lobby lobby = new Lobby();
-                ((Game) Gdx.app.getApplicationListener()).setScreen(lobby);
+                MainMenu mainMenu = new MainMenu();
+                mainMenu.create();
             }
         });
-        optionsButton.addListener(new ClickListener() {
+        back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Options options = new Options();
-                ((Game) Gdx.app.getApplicationListener()).setScreen(options);
-            }
-        });
-        exitButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Gdx.app.exit();
+                MenuScreen menuScreen = new MenuScreen();
+                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
         int buttonLocationPadding = 7;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(multiplayerButton).pad(buttonLocationPadding);
+        mainTable.add(optionsLabel).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(singlePlayerButton).pad(buttonLocationPadding);
-        mainTable.row();
-        mainTable.add(optionsButton).pad(buttonLocationPadding);
-        mainTable.row();
-        mainTable.add(exitButton).pad(buttonLocationPadding);
-        //Add table to stage
+        mainTable.add(back).pad(buttonLocationPadding);
         stage.addActor(mainTable);
     }
 
-    /**
-     * Render (creates stage)
-     */
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
@@ -132,31 +87,28 @@ public class MenuScreen implements Screen {
         stage.draw();
     }
 
-    /**
-     * Resize
-     */
     @Override
     public void resize(int width, int height) {
-        viewport.update(width, height);
-        camera.position.set(camera.viewportWidth / 2, camera.viewportHeight / 2, 1);
-        camera.update();
+
     }
 
     @Override
     public void pause() {
+
     }
 
     @Override
     public void resume() {
+
     }
 
     @Override
     public void hide() {
+
     }
 
     @Override
     public void dispose() {
-        skin.dispose();
-        atlas.dispose();
+
     }
 }
