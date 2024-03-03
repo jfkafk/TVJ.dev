@@ -2,11 +2,13 @@ package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.Screens.GameScreen;
 
-public class Player {
+public class PlayerGameCharacter extends GameCharacter{
 
     // States
     public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD }
@@ -15,27 +17,30 @@ public class Player {
 
     public float width;
     public float height;
-    private final int movementSpeed;
+    private final float movementSpeed;
     private boolean broIsDead;
 
     // Player sprite
-    private final Sprite playerSprite;
+    private TextureRegion characterTexture;
 
     // Box2D
     public World world;
     public Body b2body;
+    private final PolygonShape shape;
+    private int playerGameCharacterId;
 
-    public Player(Sprite playerSprite,
-                  int xPosition, int yPosition,
-                  float width, float height,
-                  int movementSpeed, GameScreen screen) {
-        // GameScreen reference
-        this.world = screen.getWorld();
-        this.playerSprite = playerSprite;
-        // Player data
+
+    public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
+                               float yPosition, float width, float height) {
+        super(movementSpeed, boundingBox, xPosition, yPosition, width, height);
+        this.movementSpeed = movementSpeed;
+        this.boundingBox = boundingBox;
+        this.xPosition = xPosition;
+        this.yPosition = yPosition;
         this.width = width;
         this.height = height;
-        this.movementSpeed = movementSpeed;
+
+        // Player data
         currentState = State.STANDING;
         previousState = State.STANDING;
 
@@ -46,7 +51,7 @@ public class Player {
         bdef.fixedRotation = true; // Set fixedRotation to true to prevent rotation
 
         // Player shape
-        PolygonShape shape = new PolygonShape();
+        shape = new PolygonShape();
         shape.setAsBox(width / 4f, height / 2f);
 
         // Fixture definition
@@ -59,15 +64,48 @@ public class Player {
         // Body in the world
         b2body = world.createBody(bdef);
         b2body.createFixture(fdef);
-        b2body.setUserData(playerSprite);
+    }
 
-        // Dispose
-        shape.dispose();
+    public void setPlayerGameCharacterId(int playerGameCharacterId) {
+        this.playerGameCharacterId = playerGameCharacterId;
+    }
+
+    public int getPlayerGameCharacterId() {
+        return playerGameCharacterId;
+    }
+
+    public void setCharacterTexture(TextureRegion texture) {
+        this.characterTexture = texture;
+    }
+
+    /**
+     * PlayerGameCharacter static method for creating a new PlayerGameCharacter instance.
+     *
+     * @param x coordinate of the PlayerGameCharacter (float)
+     * @param y coordinate of the PlayerGameCharacter (float)
+     * @return new PlayerGameCharacter instance
+     */
+    public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, int id) {
+        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 10f);
+        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(2f, playerGameCharacterRectangle, x, y, 10f, 10f);
+        newGameCharacter.setPlayerGameCharacterId(id);
+        return newGameCharacter;
+    }
+
+
+    private boolean isGrounded() {
+        // Implement your logic to check if the player is on the ground
+        // For example, you can check if the player's Y velocity is 0 or if it's colliding with the ground
+        // You can use Box2D methods like getLinearVelocity() or check collisions with fixtures
+
+        // Update isGrounded based on whether the player's Y velocity is 0
+        return Math.abs(b2body.getLinearVelocity().y) < 0.01; // Adjust the threshold as needed
     }
 
     public State getState(){
         //Test to Box2D for velocity on the X and Y-Axis
         //if mario is going positive in Y-Axis he is jumping... or if he just jumped and is falling remain in jump state
+        // Update the grounded status based on current conditions
         if(broIsDead)
             return State.DEAD;
         else if((b2body.getLinearVelocity().y > 0 && currentState == State.JUMPING) || (b2body.getLinearVelocity().y < 0 && previousState == State.JUMPING))
@@ -90,23 +128,20 @@ public class Player {
      */
     public void draw(Batch batch) {
         // Update sprite position based on the body's position
-        playerSprite.setSize(width, height);
-        playerSprite.setOrigin(width / 2, height / 2); // Set the origin to the center of the sprite
-        playerSprite.setPosition(b2body.getPosition().x - width / 2, b2body.getPosition().y - height / 2); // Adjust the position based on the center of the sprite
-        playerSprite.setRotation((float) Math.toDegrees(b2body.getAngle()));
-        playerSprite.draw(batch);
+        batch.draw(characterTexture, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight());
     }
 
 
     public void jump() {
-        // Player can't jump if he is already in air
-        if (currentState != State.JUMPING) {
-            // Apply an impulse upwards to simulate the jump
+        if (isGrounded()) {
+            // Apply the jump impulse only if the player is grounded
             int jumpImpulse = 50000000; // Define your jump impulse here
             this.b2body.applyLinearImpulse(0, jumpImpulse, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             currentState = State.JUMPING;
+            // Reset the grounded status to prevent consecutive jumps until the player hits the ground again
         }
     }
+
 
     // Update state
     public void updateState() {
@@ -154,6 +189,6 @@ public class Player {
 
     // Dispose
     public void dispose() {
-        playerSprite.getTexture().dispose();
+        shape.dispose(); // Dispose the PolygonShape object
     }
 }

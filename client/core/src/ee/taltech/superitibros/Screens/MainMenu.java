@@ -2,6 +2,7 @@ package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.Game;
 import ee.taltech.superitibros.Connection.ClientConnection;
+import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class MainMenu extends Game {
     GameScreen gameScreen;
@@ -9,8 +10,6 @@ public class MainMenu extends Game {
 
     @Override
     public void create() {
-        MenuScreen menuScreen = new MenuScreen();
-        setScreen(menuScreen);
     }
 
     @Override

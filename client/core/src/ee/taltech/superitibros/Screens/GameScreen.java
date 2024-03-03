@@ -1,204 +1,265 @@
 package ee.taltech.superitibros.Screens;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.superitibros.Characters.Player;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import ee.taltech.superitibros.Characters.PlayerGameCharacter;
+import ee.taltech.superitibros.GameInfo.ClientWorld;
+
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, InputProcessor {
 
-    // Sprites
+    // Screen
+    private final OrthographicCamera camera;
+    private final OrthographicCamera scoreCam;
+    private FitViewport fitViewport;
+    boolean buttonHasBeenPressed;
+    private Integer counter = 0;
+
+    // Graphics and Texture
     private final SpriteBatch batch;
+    private TextureAtlas textureAtlas;
+    private TiledMap tiledMap;
+    private TiledMapRenderer tiledMapRenderer;
 
-    // Screen stuff
-    private final OrthographicCamera gamecam;
-    private final Viewport gameport;
-    private final OrthogonalTiledMapRenderer renderer;
+    // Pools, bullets and lives
+    private boolean playerGameCharactersHaveLives = true;
 
-    // Player class
-    private final Player myPlayer;
+    private boolean isRenderingBullets = false;
 
-    // World stuff
-    private final World world;
-    private final Box2DDebugRenderer b2dr;
+    // World parameters
+    private final float WORLD_WIDTH = 300;
+    private final float WORLD_HEIGHT = 200;
 
-    // Pixels per meter
-    private final float PPM = 32;
+    // Client's connection, world
+    private ClientConnection clientConnection;
+    private ClientWorld clientWorld;
 
-    public GameScreen(ClientConnection cC) {
-        // create cam used to follow mario through cam world
-        gamecam = new OrthographicCamera();
-        // create a FitViewport to maintain virtual aspect ratio despite screen size
-        gameport = new FitViewport((float) ClientConnection.V_WIDTH, (float) ClientConnection.V_HEIGHT, gamecam);
-        // Load map ant setup renderer
-        TmxMapLoader mapLoader = new TmxMapLoader();
-        TiledMap map = mapLoader.load("Maps/level3/MagicLand.tmx");
-        renderer = new OrthogonalTiledMapRenderer(map, 1);
-        // initially set gamecam to be centered correctly at the start of the map
-        gamecam.position.set((float) gameport.getScreenWidth() / 2,  (float) gameport.getScreenHeight() / 2, 0);
+    /**
+     * GameScreen constructor
+     *
+     * @param clientWorld client's world
+     */
+    public GameScreen (ClientWorld clientWorld) {
 
-        // Create new world with gravitation and Box2D
-        world = new World(new Vector2(0,-250), true);
-        b2dr = new Box2DDebugRenderer();
+        this.clientWorld = clientWorld;
 
-        // Body definition
-        BodyDef bdef = new BodyDef();
-        bdef.type = BodyDef.BodyType.StaticBody;
+        // Cameras and screen
+        float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
+        camera = new OrthographicCamera(WORLD_HEIGHT * aspectRatio, WORLD_HEIGHT);
+        buttonHasBeenPressed = false;
+        if (clientWorld.getMyPlayerGameCharacter() != null) {
+            camera.position.set(clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX(),
+                    clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY(), 0);
+        } else {
+            camera.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
+        }
+        scoreCam = new OrthographicCamera(WORLD_HEIGHT * aspectRatio, WORLD_HEIGHT);
+        scoreCam.position.set(WORLD_WIDTH / 2f, WORLD_HEIGHT / 2f, 0);
+        this.fitViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        fitViewport.setCamera(scoreCam);
 
-        // Player shape
-        PolygonShape shape = new PolygonShape();
-
-        // Fixture definition
-        FixtureDef fdef = new FixtureDef();
-
-        Body body;
+        // TextureAtlas and background texture
+        tiledMap = new TmxMapLoader().load("Maps/level1/level1.tmx");
+        tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
 
         batch = new SpriteBatch();
-
-        // Create player
-        myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 1000, 1000, 20, 20, 200, this);
-
-        // Create ground bodies/fixtures and make them "solid".
-        for(RectangleMapObject object: map.getLayers().get("ground").getObjects().getByType(RectangleMapObject.class)) {
-            Rectangle rect = object.getRectangle();
-            bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 5);
-
-            body = world.createBody(bdef);
-
-            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
-            fdef.shape = shape;
-            body.createFixture(fdef);
-        }
+        batch.setProjectionMatrix(camera.combined);
     }
 
-    @Override
-    public void show() {}
-
-    public void handleInput() {
-
-        // Move character to left
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            myPlayer.moveXPositionBack();
-        }
-        // Move character to right
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            myPlayer.moveXPosition();
-        }
-        // Make character to jump
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            myPlayer.jump();
-        }
-        // Make character to fall down faster
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            myPlayer.moveYPositionDown();
-        }
-        // If player moves (has non-zero velocity in x or y direction), send player position to server
-        if (myPlayer.b2body.getLinearVelocity().x != 0 || myPlayer.b2body.getLinearVelocity().y != 0) {
-            ClientConnection.sendPositionInfoToServer(myPlayer.getXPosition(), myPlayer.getYPosition());
-        }
-        // Reset the velocity before applying new forces
-        myPlayer.b2body.setLinearVelocity(0, myPlayer.b2body.getLinearVelocity().y);
+    public void setPlayerGameCharactersHaveLives(boolean playerGameCharactersHaveLives) {
+        this.playerGameCharactersHaveLives = playerGameCharactersHaveLives;
+    }
+    public void registerClientConnection(ClientConnection clientConnection) {
+        this.clientConnection = clientConnection;
     }
 
-    public void update() {
-        // Check if there is input
-        handleInput();
-        // Set gamecam position, so player would be at the center
-        gamecam.position.set(myPlayer.getXPosition() + myPlayer.width / 2, myPlayer.getYPosition() + 4 * myPlayer.height / 2, 0);
-        // Framerate with what gravitation works
-        world.step(1/60f, 6, 2);
-        // Update gamecam
-        gamecam.update();
-        renderer.setView(gamecam);
-        // Update player state
-        myPlayer.updateState();
+    public boolean isRenderingBullets() {
+        return isRenderingBullets;
     }
 
+    /**
+     * Method for drawing textures, heads-up display and handling camera positioning
+     * @param delta time
+     */
     @Override
     public void render(float delta) {
-        update();
-        // Clear the game screen with black
-        Gdx.gl.glClearColor(0, 0, 0, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        // Begin rendering with the SpriteBatch
-        batch.begin();
-
-        // Render your sprites here
-        renderer.render(); // Render the tiled map
-
-        // Draw characters
-        for (Map.Entry<Integer, ArrayList<Integer>> entry : ClientConnection.characters.entrySet()) {
-            ArrayList<Integer> coordinates = entry.getValue();
-
-            int characterX = coordinates.get(0);
-            int characterY = coordinates.get(1);
-
-            // Specify the desired width and height for opponent textures
-            int opponentWidth = 20; // Specify the width you want
-            int opponentHeight = 20; // Specify the height you want
-
-            // Draw other character
-            batch.draw(new Texture("Characters/TestCharacter.png"), characterX - opponentWidth / 2f, characterY - opponentHeight / 2f, opponentWidth, opponentHeight);
+        if (clientWorld.getMyPlayerGameCharacter() != null && buttonHasBeenPressed) {
+            camera.position.set(clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX(),
+                    clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY(), 0);
+        } else if (clientWorld.getMyPlayerGameCharacter() != null && counter < 10) {
+            clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().getMovementSpeed(),
+                    clientWorld.getMyPlayerGameCharacter().getMovementSpeed());
+            camera.position.set(clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX(), clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY(), 0);
+            counter++;
         }
 
-        // Draw my player sprite
-        myPlayer.draw(batch);
+        camera.update();
+        tiledMapRenderer.setView(camera);
+        tiledMapRenderer.render();
+        batch.setProjectionMatrix(camera.combined);
 
-        // End rendering with the SpriteBatch
+        // Sets game over screen when PlayerGameCharacters don't have lives
+        if (!playerGameCharactersHaveLives) {
+            clientConnection.getGameClient().setScreenToGameOver();
+        }
+
+        batch.begin();
+
+        detectInput();
+
+        // Drawing characters, bullets and zombies
+        drawPlayerGameCharacters();
+
+        // Ends displaying textures
+        batch.setProjectionMatrix(camera.combined);
+
+        // HUD rendering
+        batch.setProjectionMatrix(fitViewport.getCamera().combined);
+
         batch.end();
-
-        // Optionally, render Box2D debug renderer
-        b2dr.render(world, gamecam.combined);
     }
 
+    /**
+     * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
+     */
+    private void detectInput(){
+        System.out.println(clientWorld.getMyPlayerGameCharacter() != null);
+        if (clientWorld.getMyPlayerGameCharacter() != null) {
+            float movementSpeed = clientWorld.getMyPlayerGameCharacter().getMovementSpeed();
+
+            if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
+                buttonHasBeenPressed = true;
+            }
+
+            if ((Gdx.input.isKeyPressed(Input.Keys.W) && Gdx.input.isKeyPressed(Input.Keys.D)) || (Gdx.input.isKeyPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.RIGHT))) {
+                clientConnection.sendPlayerInformation(movementSpeed, movementSpeed);
+            }
+            else if ((Gdx.input.isKeyPressed(Input.Keys.S) && Gdx.input.isKeyPressed(Input.Keys.D)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.RIGHT))) {
+                clientConnection.sendPlayerInformation(movementSpeed, -movementSpeed);
+            }
+            else if ((Gdx.input.isKeyPressed(Input.Keys.W) && Gdx.input.isKeyPressed(Input.Keys.A)) || (Gdx.input.isKeyPressed(Input.Keys.UP) && Gdx.input.isKeyPressed(Input.Keys.LEFT))) {
+                clientConnection.sendPlayerInformation(-movementSpeed, movementSpeed);
+            }
+            else if ((Gdx.input.isKeyPressed(Input.Keys.S) && Gdx.input.isKeyPressed(Input.Keys.A)) || (Gdx.input.isKeyPressed(Input.Keys.DOWN) && Gdx.input.isKeyPressed(Input.Keys.LEFT))) {
+                clientConnection.sendPlayerInformation(-movementSpeed, -movementSpeed);
+            }
+            else if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                clientConnection.sendPlayerInformation(0, movementSpeed);
+            }
+            else if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                clientConnection.sendPlayerInformation(-movementSpeed, 0);
+            }
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.S) || Gdx.input.isKeyJustPressed(Input.Keys.DOWN)) {
+                System.out.println("S");
+                clientConnection.sendPlayerInformation(0, -movementSpeed);
+            }
+            else if (Gdx.input.isKeyJustPressed(Input.Keys.D) || Gdx.input.isKeyJustPressed(Input.Keys.RIGHT)) {
+                clientConnection.sendPlayerInformation(movementSpeed, 0);
+            }
+        }
+    }
+
+    /**
+     * Method for drawing PlayerGameCharacters.
+     */
+    public void drawPlayerGameCharacters() {
+        List<PlayerGameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
+        for (PlayerGameCharacter character : characterValues) {
+            character.draw(batch);
+        }
+    }
+
+    /**
+     * Resizing the camera.
+     */
     @Override
     public void resize(int width, int height) {
-        gameport.update(width, height);
-        gamecam.position.set(gameport.getWorldWidth() / 2, gameport.getWorldHeight() / 2, 0);
+        batch.setProjectionMatrix(camera.combined);
+        camera.update();
     }
 
-    @Override
-    public void pause() {}
-
-    @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void hide() {
-        dispose();
-    }
-
+    /**
+     * Disposing the batch.
+     */
     @Override
     public void dispose() {
-        // Dispose of resources used by GameScreen
-        //SuperItiBros.batch.dispose();
         batch.dispose();
-        world.dispose();
-        b2dr.dispose();
     }
-    public World getWorld() {
-        return world;
+
+    @Override
+    public void pause() { }
+
+    @Override
+    public void resume() { }
+
+    @Override
+    public void hide() { }
+
+    @Override
+    public void show() { }
+
+    @Override
+    public boolean keyDown(int i) {
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        return false;
+    }
+
+    @Override
+    public boolean keyTyped(char character) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+        return false;
+    }
+
+    @Override
+    public boolean touchCancelled(int i, int i1, int i2, int i3) {
+        return false;
+    }
+
+    @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        return false;
+    }
+
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        return false;
+    }
+
+    @Override
+    public boolean scrolled(float amountX, float amountY) {
+        return false;
     }
 }

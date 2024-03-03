@@ -3,7 +3,9 @@ package ee.taltech.superitibros;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
+import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Screens.MainMenu;
+import ee.taltech.superitibros.Screens.MenuScreen;
 
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
 public class DesktopLauncher {
@@ -16,7 +18,7 @@ public class DesktopLauncher {
 		config.setResizable(true);
 		config.setForegroundFPS(60);
 		config.setTitle("Super ITI Bros.");
-		MainMenu mainM = new MainMenu();
-		new Lwjgl3Application(mainM, config);
+		GameClient gameClient = new GameClient();
+		new Lwjgl3Application(gameClient, config);
 	}
 }

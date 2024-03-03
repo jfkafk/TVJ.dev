@@ -10,6 +10,11 @@ repositories {
 }
 
 dependencies {
+    implementation "com.badlogicgames.gdx-controllers:gdx-controllers-desktop:2.0.1"
+    implementation "com.badlogicgames.gdx:gdx-box2d:1.9.12" // LibGDX Box2D extension
+    implementation "com.badlogicgames.gdx:gdx:1.9.12"  // LibGDX core
+    implementation "com.badlogicgames.gdx:gdx-backend-lwjgl3:1.9.12"  // LibGDX LWJGL3 backend
+    implementation "com.badlogicgames.gdx:gdx-platform:1.9.12:natives-desktop" // LibGDX native libraries for desktop
     implementation group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
