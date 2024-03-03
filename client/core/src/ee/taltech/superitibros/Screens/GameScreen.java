@@ -76,12 +76,11 @@ public class GameScreen implements Screen {
         // Create player
         myPlayer = new Player(new Sprite(new Texture("Characters/TestCharacter.png")), 1000, 1000, 20, 20, 200, this);
 
-        // Create ground bodies/fixtures and make them "solid"
-        for(RectangleMapObject object: map.getLayers().get(2).getObjects().getByType(RectangleMapObject.class)) {
+        // Create ground bodies/fixtures and make them "solid".
+        for(RectangleMapObject object: map.getLayers().get("ground").getObjects().getByType(RectangleMapObject.class)) {
             Rectangle rect = object.getRectangle();
-
             bdef.type = BodyDef.BodyType.StaticBody;
-            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
+            bdef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 5);
 
             body = world.createBody(bdef);
 
@@ -124,7 +123,7 @@ public class GameScreen implements Screen {
         // Check if there is input
         handleInput();
         // Set gamecam position, so player would be at the center
-        gamecam.position.set(myPlayer.getXPosition() + myPlayer.width / 2, myPlayer.getYPosition() + 2 * myPlayer.height / 3, 0);
+        gamecam.position.set(myPlayer.getXPosition() + myPlayer.width / 2, myPlayer.getYPosition() + 4 * myPlayer.height / 2, 0);
         // Framerate with what gravitation works
         world.step(1/60f, 6, 2);
         // Update gamecam

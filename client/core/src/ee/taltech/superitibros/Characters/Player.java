@@ -102,7 +102,7 @@ public class Player {
         // Player can't jump if he is already in air
         if (currentState != State.JUMPING) {
             // Apply an impulse upwards to simulate the jump
-            float jumpImpulse = 500000.0F; // Define your jump impulse here
+            int jumpImpulse = 50000000; // Define your jump impulse here
             this.b2body.applyLinearImpulse(0, jumpImpulse, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             currentState = State.JUMPING;
         }
