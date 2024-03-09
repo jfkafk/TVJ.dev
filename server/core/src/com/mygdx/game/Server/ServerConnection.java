@@ -120,7 +120,8 @@ public class ServerConnection {
 	 */
 	public void sendUpdatedGameCharacter(int Id, float xPos, float yPos) {
 		PlayerGameCharacter character = serverWorld.getGameCharacter(Id);
-		System.out.println(character);
+		character.xPosition = xPos;
+		character.yPosition = yPos;
 		// Send updated PlayerGameCharacter's info to all connections.
 		System.out.println("sent " + xPos);
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, xPos, yPos);

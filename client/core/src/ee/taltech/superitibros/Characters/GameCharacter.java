@@ -157,7 +157,6 @@ public class GameCharacter {
 
         boundingBox.x = b2body.getPosition().x;
         boundingBox.y = b2body.getPosition().y;
-        System.out.println("INside draw x: " + b2body.getPosition().x);
 
         // Draw the sprite
         sprite.draw(batch);

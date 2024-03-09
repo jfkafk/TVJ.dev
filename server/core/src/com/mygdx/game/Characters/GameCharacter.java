@@ -13,7 +13,8 @@ public class GameCharacter {
     protected int health;
 
     // Position & dimension.
-    protected float xPosition, yPosition; // Lower-left corner
+    public float xPosition;
+    public float yPosition; // Lower-left corner
     protected float width, height;
     protected Rectangle boundingBox;
 
