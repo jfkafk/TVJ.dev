@@ -12,7 +12,7 @@ public class MyServer {
 
 
     /**
-     * Modified filehandle that is built on libGDX's filehandler.
+     * Modified filehandle that is built on libGDX's filehandler
      */
     public static class MyFileHandleResolver implements  FileHandleResolver{
         @Override
