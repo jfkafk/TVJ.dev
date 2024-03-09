@@ -11,14 +11,8 @@ import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 
-import java.util.Map;
 import java.util.HashMap;
-import java.util.List;
-import java.util.LinkedList;
-import java.util.Arrays;
-
 
 public class ClientWorld {
 

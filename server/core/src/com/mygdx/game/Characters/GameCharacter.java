@@ -1,12 +1,8 @@
 package com.mygdx.game.Characters;
 
-import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.World.World;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
 

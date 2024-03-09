@@ -2,10 +2,7 @@ package com.mygdx.game.World;
 
 import com.mygdx.game.Characters.PlayerGameCharacter;
 
-import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 public class World {
 
