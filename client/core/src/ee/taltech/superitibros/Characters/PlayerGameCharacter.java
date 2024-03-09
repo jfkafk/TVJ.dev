@@ -1,5 +1,6 @@
 package ee.taltech.superitibros.Characters;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -26,7 +27,6 @@ public class PlayerGameCharacter extends GameCharacter{
     // Box2D
     public World world;
     public Body b2body;
-    private final PolygonShape shape;
     private int playerGameCharacterId;
 
 
@@ -43,27 +43,6 @@ public class PlayerGameCharacter extends GameCharacter{
         // Player data
         currentState = State.STANDING;
         previousState = State.STANDING;
-
-        // Body definition
-        BodyDef bdef = new BodyDef();
-        bdef.type = BodyDef.BodyType.DynamicBody;
-        bdef.position.set(xPosition, yPosition);
-        bdef.fixedRotation = true; // Set fixedRotation to true to prevent rotation
-
-        // Player shape
-        shape = new PolygonShape();
-        shape.setAsBox(width / 4f, height / 2f);
-
-        // Fixture definition
-        FixtureDef fdef = new FixtureDef();
-        fdef.shape = shape;
-        fdef.density = 10f;
-        fdef.friction = .0f;
-        fdef.restitution = .0f;
-
-        // Body in the world
-        b2body = world.createBody(bdef);
-        b2body.createFixture(fdef);
     }
 
     public void setPlayerGameCharacterId(int playerGameCharacterId) {
@@ -128,6 +107,7 @@ public class PlayerGameCharacter extends GameCharacter{
      */
     public void draw(Batch batch) {
         // Update sprite position based on the body's position
+        characterTexture = new Sprite(new Texture("Characters/TestCharacter.png"));
         batch.draw(characterTexture, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight());
     }
 
@@ -189,6 +169,5 @@ public class PlayerGameCharacter extends GameCharacter{
 
     // Dispose
     public void dispose() {
-        shape.dispose(); // Dispose the PolygonShape object
     }
 }

@@ -22,10 +22,11 @@ public class GameClient extends Game {
     public void createClient(GameScreen gameScreen) throws IOException {
         clientConnection = new ClientConnection();
         clientConnection.setGameScreen(gameScreen);
+        clientConnection.setClientWorld(clientWorld);
         clientConnection.setGameClient(this);
-        clientWorld.registerClient(clientConnection);
         clientConnection.sendPacketConnect();
-        setScreen(gameScreen);
+        gameScreen.registerClientConnection(clientConnection);
+        clientWorld.registerClient(clientConnection);
     }
 
     /**

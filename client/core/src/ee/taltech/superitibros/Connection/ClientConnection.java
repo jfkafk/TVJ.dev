@@ -1,7 +1,5 @@
 package ee.taltech.superitibros.Connection;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.Rectangle;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -38,7 +36,7 @@ public class ClientConnection {
 		String ip = "127.0.0.1";
 		// Server 193.40.255.23
 		// local  127.0.0.1
-		int udpPort = 8081, tcpPort = 8080;
+		int udpPort = 5007, tcpPort = 5008;
 
 
 		client = new Client(49152, 49152);
@@ -49,10 +47,11 @@ public class ClientConnection {
 		client.getKryo().register(PacketConnect.class);
 		client.getKryo().register(PacketAddCharacter.class);
 		client.getKryo().register(GameCharacter.class);
-		client.getKryo().register(PacketMoveCharacter.class);
+		client.getKryo().register(PacketUpdateCharacterInformation.class);
 		client.getKryo().register(PacketCreator.class);
-		client.getKryo().register(GameCharacter.class);
-		client.getKryo().register(PlayerGameCharacter.class);
+		client.getKryo().register(ArrayList.class);
+		client.getKryo().register(Rectangle.class);
+		client.getKryo().register(HashMap.class);
 
 
 		// Add a listener to handle receiving objects.
@@ -72,8 +71,8 @@ public class ClientConnection {
 							clientWorld.setMyPlayerGameCharacter(newGameCharacter);
 						}
 
-					} else  if (object instanceof PacketMoveCharacter) {
-						PacketMoveCharacter packetUpdateCharacterInformation = (PacketMoveCharacter) object;
+					} else  if (object instanceof PacketUpdateCharacterInformation) {
+						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId())) {
 							// Update PlayerGameCharacter's coordinates, direction and health.
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
@@ -112,7 +111,7 @@ public class ClientConnection {
 	 */
 	public void sendPlayerInformation(float xChange, float yChange) {
 		System.out.println("Send player info");
-		PacketMoveCharacter packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), xChange, yChange);
+		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), xChange, yChange);
 		client.sendUDP(packet);
 	}
 

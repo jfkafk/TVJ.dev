@@ -8,17 +8,14 @@ public class PacketCreator {
     /**
      * Create a PacketUpdateCharacterInformation.
      *
-     * @param id of the player's connection (int)
-     * @param xPos change of player's x coordinate (float)
-     * @param yPos change of player's y coordinate (float)
      * @return new PacketUpdateCharacterInformation
      */
-    public static PacketMoveCharacter createPacketUpdateCharacterInformation(int id, float xPos, float yPos) {
-        PacketMoveCharacter packetMoveCharacter = new PacketMoveCharacter();
-        packetMoveCharacter.setId(id);
-        packetMoveCharacter.setX(xPos);
-        packetMoveCharacter.setY(yPos);
-        return packetMoveCharacter;
+    public static PacketUpdateCharacterInformation createPacketUpdateCharacterInformation(int id, float xPos, float yPos) {
+        PacketUpdateCharacterInformation packetUpdateCharacterInformation = new PacketUpdateCharacterInformation();
+        packetUpdateCharacterInformation.setId(id);
+        packetUpdateCharacterInformation.setX(xPos);
+        packetUpdateCharacterInformation.setY(yPos);
+        return packetUpdateCharacterInformation;
     }
 
     /**
@@ -26,9 +23,7 @@ public class PacketCreator {
      *
      * @return new PacketConnect
      */
-    public static PacketConnect createPacketConnect() {
-        return new PacketConnect();
-    }
+    public static PacketConnect createPacketConnect() { return new PacketConnect(); }
 
     /**
      * Create a PacketAddCharacter.

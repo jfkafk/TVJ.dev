@@ -3,7 +3,7 @@ package packets;
 /**
  * Packet superclass.
  */
-public class PacketMoveCharacter extends Packet {
+public class PacketUpdateCharacterInformation extends Packet {
 
     private int id;
 

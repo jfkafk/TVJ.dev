@@ -4,7 +4,6 @@ package packets;
  * Packet that is used to add existing PlayerGameCharacters to the new player's world and to add the new PlayerGameCharacter to existing players' worlds.
  */
 public class PacketAddCharacter extends Packet {
-
     private int id;  // Connection id.
     private float x;
     private float y;
