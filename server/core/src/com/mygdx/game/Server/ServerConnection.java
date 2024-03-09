@@ -7,7 +7,6 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.Characters.GameCharacter;
 import com.mygdx.game.Characters.PlayerGameCharacter;
-import com.mygdx.game.World.Headless;
 import com.mygdx.game.World.World;
 import packets.*;
 
@@ -15,11 +14,7 @@ import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.HashMap;
-import java.util.AbstractMap;
-import java.util.Arrays;
-import java.util.stream.Collectors;
 
 
 public class ServerConnection {
@@ -32,9 +27,6 @@ public class ServerConnection {
 	private float playerGameCharacterY = 250f;
 	private int playerCount = 0;
 
-	private static final float INCREASE_X_COORDINATE = 30f;
-	private static final int SCORE_COEFFICIENT = 100;
-
 	/**
 	 * Server connection.
 	 */
@@ -46,7 +38,6 @@ public class ServerConnection {
 
 			// Starts the game (create a new World instance for the game).
 			this.serverWorld = new World();
-			Headless.loadHeadless(serverWorld);
 
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(null, "Can not start the Server.");
@@ -72,7 +63,6 @@ public class ServerConnection {
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
 					PacketConnect packetConnect = (PacketConnect) object;
-					playerCount += 1;
 
 					// Creates new PlayerGameCharacter instance for the connection.
 					PlayerGameCharacter newPlayerGameCharacter = PlayerGameCharacter
@@ -82,7 +72,7 @@ public class ServerConnection {
 					addCharacterToClientsGame(connection, newPlayerGameCharacter);
 
 				} else if (object instanceof PacketUpdateCharacterInformation) {
-					System.out.println("got packed update info");
+					System.out.println("got packet update");
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 					// Update PlayerGameCharacter's coordinates and direction.
 					// Send PlayerGameCharacter's new coordinate and direction to all connections.
@@ -129,12 +119,12 @@ public class ServerConnection {
 	 * @param yPos new y coordinate of the PlayerGameCharacter (float)
 	 */
 	public void sendUpdatedGameCharacter(int Id, float xPos, float yPos) {
-		serverWorld.movePlayerGameCharacter(Id, xPos, yPos);  // Update given PlayerGameCharacter.
 		PlayerGameCharacter character = serverWorld.getGameCharacter(Id);
 		System.out.println(character);
 		// Send updated PlayerGameCharacter's info to all connections.
-		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, character.getBoundingBox().getX(), character.getBoundingBox().getY());
-		server.sendToAllUDP(packet);
+		System.out.println("sent " + xPos);
+		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, xPos, yPos);
+		server.sendToAllExceptUDP(Id, packet);
 	}
 
 	/**

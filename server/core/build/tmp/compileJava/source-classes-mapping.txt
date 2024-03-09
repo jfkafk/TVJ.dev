@@ -2,33 +2,18 @@ packets/Packet.java
  packets.Packet
 packets/PacketCreator.java
  packets.PacketCreator
-com/mygdx/game/TMXLoaders/MyServer.java
- com.mygdx.game.TMXLoaders.MyServer
- com.mygdx.game.TMXLoaders.MyServer$MyFileHandleResolver
-com/mygdx/game/World/World.java
- com.mygdx.game.World.World
-com/mygdx/game/Characters/PlayerGameCharacter.java
- com.mygdx.game.Characters.PlayerGameCharacter
-com/mygdx/game/TMXLoaders/HijackedTmxLoader.java
- com.mygdx.game.TMXLoaders.HijackedTmxLoader
- com.mygdx.game.TMXLoaders.HijackedTmxLoader$Parameters
-packets/PacketConnect.java
- packets.PacketConnect
-com/mygdx/game/TMXLoaders/HijackedStaticTiledMap.java
- com.mygdx.game.TMXLoaders.HijackedStaticTiledMap
 packets/PacketAddCharacter.java
  packets.PacketAddCharacter
-com/mygdx/game/TMXLoaders/HijackedBaseTmxMapLoader.java
- com.mygdx.game.TMXLoaders.HijackedBaseTmxMapLoader
- com.mygdx.game.TMXLoaders.HijackedBaseTmxMapLoader$Parameters
+com/mygdx/game/World/World.java
+ com.mygdx.game.World.World
 com/mygdx/game/Characters/GameCharacter.java
  com.mygdx.game.Characters.GameCharacter
+com/mygdx/game/Characters/PlayerGameCharacter.java
+ com.mygdx.game.Characters.PlayerGameCharacter
 packets/PacketUpdateCharacterInformation.java
  packets.PacketUpdateCharacterInformation
 com/mygdx/game/Server/ServerConnection.java
  com.mygdx.game.Server.ServerConnection
  com.mygdx.game.Server.ServerConnection$1
-com/mygdx/game/TMXLoaders/HijackedMapImageLayer.java
- com.mygdx.game.TMXLoaders.HijackedMapImageLayer
-com/mygdx/game/World/Headless.java
- com.mygdx.game.World.Headless
+packets/PacketConnect.java
+ packets.PacketConnect

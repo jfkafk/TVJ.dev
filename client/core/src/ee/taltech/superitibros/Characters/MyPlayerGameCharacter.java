@@ -3,32 +3,30 @@ package ee.taltech.superitibros.Characters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.physics.box2d.Body;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-import ee.taltech.superitibros.Screens.GameScreen;
 
-public class PlayerGameCharacter extends GameCharacter{
+public class MyPlayerGameCharacter extends GameCharacter {
 
     public float width;
+
     public float height;
     private final float movementSpeed;
-    private boolean broIsDead;
+    int id;
 
     // Player sprite
     private TextureRegion characterTexture;
 
     // Box2D
     public ClientWorld world;
-    public Body b2body;
-    private int playerGameCharacterId;
 
+    private int myPlayerGameCharacterId;
 
-    public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
-                               float yPosition, float width, float height, ClientWorld world) {
+    public MyPlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
+                               float yPosition, float width, float height, int id, ClientWorld world) {
         super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
         this.movementSpeed = movementSpeed;
         this.boundingBox = boundingBox;
@@ -36,16 +34,17 @@ public class PlayerGameCharacter extends GameCharacter{
         this.yPosition = yPosition;
         this.width = width;
         this.height = height;
+        this.id = id;
         this.world = world;
         defineCharacter();
     }
 
-    public void setPlayerGameCharacterId(int playerGameCharacterId) {
-        this.playerGameCharacterId = playerGameCharacterId;
+    public void setMyPlayerGameCharacterId(int playerGameCharacterId) {
+        this.myPlayerGameCharacterId = playerGameCharacterId;
     }
 
-    public int getPlayerGameCharacterId() {
-        return playerGameCharacterId;
+    public int getMyPlayerGameCharacterId() {
+        return myPlayerGameCharacterId;
     }
 
     public void setCharacterTexture(TextureRegion texture) {
@@ -59,11 +58,9 @@ public class PlayerGameCharacter extends GameCharacter{
      * @param y coordinate of the PlayerGameCharacter (float)
      * @return new PlayerGameCharacter instance
      */
-    public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, int id, ClientWorld world) {
-        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 20f);
-        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(10f, playerGameCharacterRectangle, x, y, playerGameCharacterRectangle.width, playerGameCharacterRectangle.height, world);
-        newGameCharacter.setPlayerGameCharacterId(id);
-        return newGameCharacter;
+    public static MyPlayerGameCharacter createMyPlayerGameCharacter(float x, float y, int id, ClientWorld world) {
+        Rectangle myPlayerGameCharacterRectangle = new Rectangle(x, y, 10, 20);
+        return new MyPlayerGameCharacter(100f, myPlayerGameCharacterRectangle, x, y, myPlayerGameCharacterRectangle.width, myPlayerGameCharacterRectangle.height, id, world);
     }
 
     // Dispose
