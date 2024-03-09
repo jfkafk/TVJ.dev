@@ -166,10 +166,6 @@ public class GameScreen implements Screen, InputProcessor {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
             }
 
-            System.out.println(clientWorld.getMyPlayerGameCharacter().xPosition);
-            // Send position info to server
-            clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
-
             // Reset the velocity before applying new forces
             clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
 
