@@ -22,6 +22,7 @@ import ee.taltech.superitibros.Connection.ClientConnection;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
+
 public class SinglePlayerMenu implements Screen {
 
     private SpriteBatch batch;

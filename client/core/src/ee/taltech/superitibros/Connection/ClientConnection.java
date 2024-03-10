@@ -6,6 +6,7 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
 import ee.taltech.superitibros.Characters.GameCharacter;
+import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
@@ -16,6 +17,7 @@ import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ClientConnection {
@@ -52,7 +54,7 @@ public class ClientConnection {
 		client.getKryo().register(ArrayList.class);
 		client.getKryo().register(Rectangle.class);
 		client.getKryo().register(HashMap.class);
-
+		client.getKryo().register(PacketClientDisconnect.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -62,23 +64,29 @@ public class ClientConnection {
 				if (object instanceof Packet) {
 					if (object instanceof PacketAddCharacter) {
 						PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
-						// Create a new PlayerGameCharacter instance from received info.
-						PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId());
-						// Add new PlayerGameCharacter to client's game.
-						clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
-						if (packetAddCharacter.getId() == connection.getID()) {
-							// If new PlayerGameCharacter is client's PlayerGameCharacter.
-							clientWorld.setMyPlayerGameCharacter(newGameCharacter);
+						if (connection.getID() == ((PacketAddCharacter) object).getId()) {
+							MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+							// Add new PlayerGameCharacter to client's game.
+							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
+						} else {
+							// Create a new PlayerGameCharacter instance from received info.
+							PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+							// Add new PlayerGameCharacter to client's game.
+							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 						}
-
 					} else  if (object instanceof PacketUpdateCharacterInformation) {
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
-						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId())) {
-							// Update PlayerGameCharacter's coordinates, direction and health.
+						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
+							// Update PlayerGameCharacter's coordinates.
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
 						}
 
+					} else if (object instanceof PacketClientDisconnect) {
+						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
+						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
+						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
+						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 					}
 				}
 			}
@@ -106,12 +114,12 @@ public class ClientConnection {
 	/**
 	 * Send client's PlayerGameCharacter new coordinates and direction to the server.
 	 *
-	 * @param xChange of the PlayerGameCharacters x coordinate (float)
-	 * @param yChange of the PlayerGameCharacters y coordinate (float)
+	 * @param x of the PlayerGameCharacters x coordinate (float)
+	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
-	public void sendPlayerInformation(float xChange, float yChange) {
+	public void sendPlayerInformation(float x, float y) {
 		System.out.println("Send player info");
-		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), xChange, yChange);
+		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
 		client.sendUDP(packet);
 	}
 

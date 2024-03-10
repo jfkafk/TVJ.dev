@@ -10,24 +10,17 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.badlogic.gdx.utils.viewport.StretchViewport;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 
 public class GameScreen implements Screen, InputProcessor {
 
@@ -81,7 +74,6 @@ public class GameScreen implements Screen, InputProcessor {
         this.fitViewport = new FitViewport(desiredCameraWidth, WORLD_HEIGHT, camera);
 
         batch = new SpriteBatch();
-
         batch.setProjectionMatrix(camera.combined);
     }
 
@@ -148,6 +140,9 @@ public class GameScreen implements Screen, InputProcessor {
     /**
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
+    /**
+     * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
+     */
     private void detectInput(){
         System.out.println(clientWorld.getMyPlayerGameCharacter() != null);
         if (clientWorld.getMyPlayerGameCharacter() != null) {
@@ -160,7 +155,6 @@ public class GameScreen implements Screen, InputProcessor {
                 clientWorld.getMyPlayerGameCharacter().jump();
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                System.out.println("lefttt");
                 clientWorld.getMyPlayerGameCharacter().moveLeft();
             }
             if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
@@ -174,16 +168,12 @@ public class GameScreen implements Screen, InputProcessor {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
             }
 
-            System.out.println(clientWorld.getMyPlayerGameCharacter().xPosition);
-            // Send position info to server
-            clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
-
             // Reset the velocity before applying new forces
             clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
-
-
         }
     }
+
+
 
     /**
      * Method for drawing PlayerGameCharacters.

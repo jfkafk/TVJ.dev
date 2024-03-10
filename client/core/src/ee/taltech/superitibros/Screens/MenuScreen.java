@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
+
 public class MenuScreen implements Screen {
 
     private SpriteBatch batch;

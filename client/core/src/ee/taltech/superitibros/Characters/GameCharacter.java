@@ -16,7 +16,6 @@ public class GameCharacter {
 
     // Character characteristics.
     protected float movementSpeed; // world units per second
-    protected int health;
 
     // Position & dimension.
     public float xPosition;
@@ -72,6 +71,9 @@ public class GameCharacter {
             shape.setAsBox(boundingBox.width, boundingBox.height);
             fixtureDef.shape = shape;
 
+            fixtureDef.filter.categoryBits = CollisionBits.CATEGORY_PLAYER;
+            fixtureDef.filter.maskBits = CollisionBits.MASK_PLAYER;
+
             b2body.createFixture(fixtureDef);
             shape.dispose();
 
@@ -102,9 +104,10 @@ public class GameCharacter {
     }
 
     public void jump() {
-        // Apply the jump impulse only if the player is grounded
+        // Player can't jump if he is already in air
         if (isGrounded()) {
-            b2body.applyLinearImpulse(0, 100f, b2body.getWorldCenter().x, b2body.getWorldCenter().y, true);
+            // Apply an impulse upwards to simulate the jump
+            this.b2body.applyLinearImpulse(0, 7000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
         }
     }
 
@@ -115,24 +118,13 @@ public class GameCharacter {
 
     // Move right
     public void moveRight() {
-        // Apply a force to the right
-        b2body.applyForceToCenter(new Vector2(movementSpeed * 1000, b2body.getLinearVelocity().y), true);
+        this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
     // Move left
     public void moveLeft() {
         // Apply a force to the left
-        b2body.applyForceToCenter(new Vector2(-movementSpeed * 1000, b2body.getLinearVelocity().y), true);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        GameCharacter that = (GameCharacter) o;
-        return Float.compare(that.movementSpeed, movementSpeed) == 0 && health == that.health && Float.compare(that.xPosition, xPosition) == 0
-                && Float.compare(that.yPosition, yPosition) == 0 && Float.compare(that.width, width) == 0
-                && Float.compare(that.height, height) == 0 && Objects.equals(characterTexture, that.characterTexture);
+        this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
     public boolean isGrounded() {
@@ -141,7 +133,7 @@ public class GameCharacter {
 
     @Override
     public int hashCode() {
-        return Objects.hash(movementSpeed, health, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
+        return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
     public void draw(SpriteBatch batch) {
@@ -157,9 +149,18 @@ public class GameCharacter {
 
         boundingBox.x = b2body.getPosition().x;
         boundingBox.y = b2body.getPosition().y;
-        System.out.println("INside draw x: " + b2body.getPosition().x);
 
         // Draw the sprite
         sprite.draw(batch);
+    }
+
+    /**
+     * Remove the Box2D body from the game world.
+     */
+    public void removeBodyFromWorld() {
+        if (b2body != null) {
+            clientWorld.getGdxWorld().destroyBody(b2body);
+            b2body = null; // Set the reference to null to indicate that the body has been destroyed
+        }
     }
 }
