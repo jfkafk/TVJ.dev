@@ -4,16 +4,18 @@ packets/PacketCreator.java
  packets.PacketCreator
 packets/PacketAddCharacter.java
  packets.PacketAddCharacter
-packets/PacketConnect.java
- packets.PacketConnect
-packets/PacketUpdateCharacterInformation.java
- packets.PacketUpdateCharacterInformation
 com/mygdx/game/World/World.java
  com.mygdx.game.World.World
+packets/PacketClientDisconnect.java
+ packets.PacketClientDisconnect
 com/mygdx/game/Characters/GameCharacter.java
  com.mygdx.game.Characters.GameCharacter
 com/mygdx/game/Characters/PlayerGameCharacter.java
  com.mygdx.game.Characters.PlayerGameCharacter
+packets/PacketUpdateCharacterInformation.java
+ packets.PacketUpdateCharacterInformation
 com/mygdx/game/Server/ServerConnection.java
  com.mygdx.game.Server.ServerConnection
  com.mygdx.game.Server.ServerConnection$1
+packets/PacketConnect.java
+ packets.PacketConnect

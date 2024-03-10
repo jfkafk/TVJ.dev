@@ -42,4 +42,15 @@ public class PacketCreator {
         packetAddCharacter.setY(yPos);
         return packetAddCharacter;
     }
+
+    /**
+     * Create a PacketClientDisconnect.
+     *
+     * @return new PacketClientDisconnect
+     */
+    public static PacketClientDisconnect createPacketClientDisconnect(int id) {
+        PacketClientDisconnect packetClientDisconnect = new PacketClientDisconnect();
+        packetClientDisconnect.setId(id);
+        return packetClientDisconnect;
+    }
 }

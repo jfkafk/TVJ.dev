@@ -17,6 +17,7 @@ import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ClientConnection {
@@ -53,7 +54,7 @@ public class ClientConnection {
 		client.getKryo().register(ArrayList.class);
 		client.getKryo().register(Rectangle.class);
 		client.getKryo().register(HashMap.class);
-
+		client.getKryo().register(PacketClientDisconnect.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -76,11 +77,16 @@ public class ClientConnection {
 					} else  if (object instanceof PacketUpdateCharacterInformation) {
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
-							// Update PlayerGameCharacter's coordinates, direction and health.
+							// Update PlayerGameCharacter's coordinates.
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
 						}
 
+					} else if (object instanceof PacketClientDisconnect) {
+						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
+						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
+						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
+						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 					}
 				}
 			}

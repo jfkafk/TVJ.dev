@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 
 public class ServerConnection {
@@ -55,6 +56,7 @@ public class ServerConnection {
 		server.getKryo().register(ArrayList.class);
 		server.getKryo().register(Rectangle.class);
 		server.getKryo().register(HashMap.class);
+		server.getKryo().register(PacketClientDisconnect.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -71,14 +73,37 @@ public class ServerConnection {
 					// Add new PlayerGameCharacter instance to all connections.
 					addCharacterToClientsGame(connection, newPlayerGameCharacter);
 
+					// Send connected player position to other players
+					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY);
+
+					// Send other players positions to joined player
+					for (Map.Entry<Integer, PlayerGameCharacter> entry : serverWorld.getClients().entrySet()) {
+						if (entry.getKey() != connection.getID()) {
+							PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(entry.getKey(), entry.getValue().xPosition, entry.getValue().yPosition);
+							server.sendToUDP(connection.getID(), packet);
+						}
+					}
+
 				} else if (object instanceof PacketUpdateCharacterInformation) {
 					System.out.println("got packet update");
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
-					// Update PlayerGameCharacter's coordinates and direction.
+					// Update PlayerGameCharacter's coordinates.
+					serverWorld.getClients().get(connection.getID()).xPosition = packet.getX();
+					serverWorld.getClients().get(connection.getID()).yPosition = packet.getY();
 					// Send PlayerGameCharacter's new coordinate and direction to all connections.
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY());
 
 				}
+			}
+
+			// Client disconnects from the Server.
+			public void disconnected (Connection c) {
+				PacketClientDisconnect packetClientDisconnect = PacketCreator.createPacketClientDisconnect(c.getID());
+				System.out.println("Client " + c.getID() + " disconnected.");
+				// Remove client from the game.
+				serverWorld.removeClient(c.getID());
+				// Send to other connections that client has disconnected from the game.
+				server.sendToAllExceptTCP(c.getID(), packetClientDisconnect);
 			}
 		});
 

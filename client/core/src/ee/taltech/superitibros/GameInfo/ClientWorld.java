@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import ee.taltech.superitibros.Characters.CollisionBits;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
@@ -43,14 +44,37 @@ public class ClientWorld {
         Body body;
 
         Array<RectangleMapObject> objects = mapLayer.getObjects().getByType(RectangleMapObject.class);
-        for (int i = 0; i < objects.size; i++) {
-            RectangleMapObject obj = objects.get(i);
+        for (RectangleMapObject obj : objects) {
             Rectangle rect = obj.getRectangle();
             bodyDef.type = BodyDef.BodyType.StaticBody;
-            bodyDef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.height / 2);
+            bodyDef.position.set(rect.getX() + rect.getWidth() / 2, rect.getY() + rect.getHeight() / 2);
             body = this.gdxWorld.createBody(bodyDef);
             polygonShape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
             fixtureDef.shape = polygonShape;
+
+            // Define collision categories and masks for player, enemies, and obstacles
+            short playerCategory = CollisionBits.CATEGORY_PLAYER;
+            short enemyCategory = CollisionBits.CATEGORY_ENEMY;
+            short obstacleCategory = CollisionBits.CATEGORY_OBSTACLE;
+            short playerMask = CollisionBits.MASK_PLAYER;
+            short enemyMask = CollisionBits.MASK_ENEMY;
+            short obstacleMask = CollisionBits.MASK_OBSTACLE;
+
+            // Determine the type of object and set category and mask bits accordingly
+            String type = obj.getProperties().get("type", String.class);
+            if ("player".equals(type)) {
+                fixtureDef.filter.categoryBits = playerCategory;
+                fixtureDef.filter.maskBits = playerMask;
+            } else if ("enemy".equals(type)) {
+                fixtureDef.filter.categoryBits = enemyCategory;
+                fixtureDef.filter.maskBits = enemyMask;
+            } else {
+                fixtureDef.filter.categoryBits = obstacleCategory;
+                fixtureDef.filter.maskBits = obstacleMask;
+            }
+
+            // Set friction for the ground
+            fixtureDef.friction = 0.5f;
             body.createFixture(fixtureDef);
         }
     }
