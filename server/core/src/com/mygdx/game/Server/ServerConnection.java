@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.Characters.GameCharacter;
 import com.mygdx.game.Characters.PlayerGameCharacter;
+import com.mygdx.game.World.Headless;
 import com.mygdx.game.World.World;
 import packets.*;
 
@@ -14,8 +15,11 @@ import javax.swing.JOptionPane;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.AbstractMap;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 
 public class ServerConnection {
@@ -28,6 +32,9 @@ public class ServerConnection {
 	private float playerGameCharacterY = 250f;
 	private int playerCount = 0;
 
+	private static final float INCREASE_X_COORDINATE = 30f;
+	private static final int SCORE_COEFFICIENT = 100;
+
 	/**
 	 * Server connection.
 	 */
@@ -39,6 +46,7 @@ public class ServerConnection {
 
 			// Starts the game (create a new World instance for the game).
 			this.serverWorld = new World();
+			Headless.loadHeadless(serverWorld);
 
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(null, "Can not start the Server.");
@@ -56,7 +64,6 @@ public class ServerConnection {
 		server.getKryo().register(ArrayList.class);
 		server.getKryo().register(Rectangle.class);
 		server.getKryo().register(HashMap.class);
-		server.getKryo().register(PacketClientDisconnect.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -65,6 +72,7 @@ public class ServerConnection {
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
 					PacketConnect packetConnect = (PacketConnect) object;
+					playerCount += 1;
 
 					// Creates new PlayerGameCharacter instance for the connection.
 					PlayerGameCharacter newPlayerGameCharacter = PlayerGameCharacter
@@ -73,37 +81,14 @@ public class ServerConnection {
 					// Add new PlayerGameCharacter instance to all connections.
 					addCharacterToClientsGame(connection, newPlayerGameCharacter);
 
-					// Send connected player position to other players
-					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY);
-
-					// Send other players positions to joined player
-					for (Map.Entry<Integer, PlayerGameCharacter> entry : serverWorld.getClients().entrySet()) {
-						if (entry.getKey() != connection.getID()) {
-							PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(entry.getKey(), entry.getValue().xPosition, entry.getValue().yPosition);
-							server.sendToUDP(connection.getID(), packet);
-						}
-					}
-
 				} else if (object instanceof PacketUpdateCharacterInformation) {
-					System.out.println("got packet update");
+					System.out.println("got packed update info");
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
-					// Update PlayerGameCharacter's coordinates.
-					serverWorld.getClients().get(connection.getID()).xPosition = packet.getX();
-					serverWorld.getClients().get(connection.getID()).yPosition = packet.getY();
+					// Update PlayerGameCharacter's coordinates and direction.
 					// Send PlayerGameCharacter's new coordinate and direction to all connections.
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY());
 
 				}
-			}
-
-			// Client disconnects from the Server.
-			public void disconnected (Connection c) {
-				PacketClientDisconnect packetClientDisconnect = PacketCreator.createPacketClientDisconnect(c.getID());
-				System.out.println("Client " + c.getID() + " disconnected.");
-				// Remove client from the game.
-				serverWorld.removeClient(c.getID());
-				// Send to other connections that client has disconnected from the game.
-				server.sendToAllExceptTCP(c.getID(), packetClientDisconnect);
 			}
 		});
 
@@ -144,13 +129,12 @@ public class ServerConnection {
 	 * @param yPos new y coordinate of the PlayerGameCharacter (float)
 	 */
 	public void sendUpdatedGameCharacter(int Id, float xPos, float yPos) {
+		serverWorld.movePlayerGameCharacter(Id, xPos, yPos);  // Update given PlayerGameCharacter.
 		PlayerGameCharacter character = serverWorld.getGameCharacter(Id);
-		character.xPosition = xPos;
-		character.yPosition = yPos;
+		System.out.println(character);
 		// Send updated PlayerGameCharacter's info to all connections.
-		System.out.println("sent " + xPos);
-		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, xPos, yPos);
-		server.sendToAllExceptUDP(Id, packet);
+		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, character.getBoundingBox().getX(), character.getBoundingBox().getY());
+		server.sendToAllUDP(packet);
 	}
 
 	/**

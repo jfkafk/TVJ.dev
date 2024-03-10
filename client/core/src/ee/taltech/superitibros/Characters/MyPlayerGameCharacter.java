@@ -1,7 +1,17 @@
 package ee.taltech.superitibros.Characters;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+=======
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+>>>>>>> 07dcc50 (World and physics are on client side. TODO: Disconnect packet. Physics is right now weird. Game screen also sometimes glitches.)
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class MyPlayerGameCharacter extends GameCharacter {

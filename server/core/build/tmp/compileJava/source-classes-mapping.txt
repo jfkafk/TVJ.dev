@@ -6,8 +6,6 @@ packets/PacketAddCharacter.java
  packets.PacketAddCharacter
 com/mygdx/game/World/World.java
  com.mygdx.game.World.World
-packets/PacketClientDisconnect.java
- packets.PacketClientDisconnect
 com/mygdx/game/Characters/GameCharacter.java
  com.mygdx.game.Characters.GameCharacter
 com/mygdx/game/Characters/PlayerGameCharacter.java
