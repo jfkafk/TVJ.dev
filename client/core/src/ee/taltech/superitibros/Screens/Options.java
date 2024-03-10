@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class Options implements Screen {
     private SpriteBatch batch;
@@ -22,8 +23,10 @@ public class Options implements Screen {
     private OrthographicCamera camera;
     private TextureAtlas atlas;
     protected Skin skin;
+    GameClient gameClient;
 
-    public Options() {
+    public Options(GameClient gameClient) {
+        this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1100;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
@@ -68,7 +71,7 @@ public class Options implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MenuScreen menuScreen = new MenuScreen();
+                MenuScreen menuScreen = new MenuScreen(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
