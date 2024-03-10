@@ -1,20 +1,11 @@
 package ee.taltech.superitibros.Characters;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.superitibros.Screens.GameScreen;
+import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class PlayerGameCharacter extends GameCharacter{
-
-    // States
-    public enum State { FALLING, JUMPING, STANDING, RUNNING, DEAD }
-    public State currentState;
-    public State previousState;
 
     public float width;
     public float height;
@@ -25,24 +16,22 @@ public class PlayerGameCharacter extends GameCharacter{
     private TextureRegion characterTexture;
 
     // Box2D
-    public World world;
+    public ClientWorld world;
     public Body b2body;
     private int playerGameCharacterId;
 
 
     public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
-                               float yPosition, float width, float height) {
-        super(movementSpeed, boundingBox, xPosition, yPosition, width, height);
+                               float yPosition, float width, float height, ClientWorld world) {
+        super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
         this.movementSpeed = movementSpeed;
         this.boundingBox = boundingBox;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
         this.width = width;
         this.height = height;
-
-        // Player data
-        currentState = State.STANDING;
-        previousState = State.STANDING;
+        this.world = world;
+        defineCharacter();
     }
 
     public void setPlayerGameCharacterId(int playerGameCharacterId) {
@@ -64,13 +53,12 @@ public class PlayerGameCharacter extends GameCharacter{
      * @param y coordinate of the PlayerGameCharacter (float)
      * @return new PlayerGameCharacter instance
      */
-    public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, int id) {
-        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 10f);
-        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(2f, playerGameCharacterRectangle, x, y, 10f, 10f);
+    public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, int id, ClientWorld world) {
+        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 20f);
+        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(10f, playerGameCharacterRectangle, x, y, playerGameCharacterRectangle.width, playerGameCharacterRectangle.height, world);
         newGameCharacter.setPlayerGameCharacterId(id);
         return newGameCharacter;
     }
-
 
     private boolean isGrounded() {
         // Implement your logic to check if the player is on the ground
@@ -113,14 +101,8 @@ public class PlayerGameCharacter extends GameCharacter{
 
 
     public void jump() {
-<<<<<<< HEAD:client/core/src/ee/taltech/superitibros/Characters/Player.java
-        // Player can't jump if he is already in air
-        if (currentState != State.JUMPING) {
-            // Apply an impulse upwards to simulate the jump
-=======
         if (isGrounded()) {
             // Apply the jump impulse only if the player is grounded
->>>>>>> 87a3f93 (Gradle build error.):client/core/src/ee/taltech/superitibros/Characters/PlayerGameCharacter.java
             int jumpImpulse = 50000000; // Define your jump impulse here
             this.b2body.applyLinearImpulse(0, jumpImpulse, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             currentState = State.JUMPING;

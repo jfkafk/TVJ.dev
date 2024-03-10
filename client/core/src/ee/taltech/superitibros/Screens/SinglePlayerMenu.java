@@ -19,11 +19,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.superitibros.Connection.ClientConnection;
-<<<<<<< HEAD
-=======
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.GameInfo.GameClient;
->>>>>>> 87a3f93 (Gradle build error.)
 
 public class SinglePlayerMenu implements Screen {
 
