@@ -1,98 +1,20 @@
-buildscript {
-    
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        maven { url "https://mvnrepository.com/artifact/org.mapeditor/libtiled"}
-        maven { url "https://plugins.gradle.org/m2/" }
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://mvnrepository.com/artifact/org.mockito/mockito-all"}
-        google()
-    }
-    dependencies {
-        
-
-    }
+plugins {
+    id 'java'
 }
 
-allprojects {
-    apply plugin: "eclipse"
+group = 'org.example'
+version = 'unspecified'
 
-    version = '1.0'
-    ext {
-        appName = "BoxServer"
-        gdxVersion = '1.9.14'
-        roboVMVersion = '2.3.12'
-        box2DLightsVersion = '1.5'
-        ashleyVersion = '1.7.3'
-        aiVersion = '1.8.2'
-        gdxControllersVersion = '2.1.0'
-    }
-
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-        maven { url "https://oss.sonatype.org/content/repositories/releases/" }
-    }
+repositories {
+    mavenCentral()
 }
 
-project(":desktop") {
-    apply plugin: "java-library"
-
-
-    dependencies {
-        implementation project(":core")
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        
-    }
+dependencies {
+    implementation group: 'com.esotericsoftware', name: 'kryonet', version: '2.22.0-RC1'
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
-project(":core") {
-    apply plugin: "java-library"
-
-    dependencies {  compile "org.mapeditor:libtiled:1.2.3"
-        compile "org.mockito:mockito-all:1.10.19"
-    }
-    dependencies {
-        // JAX-B dependencies for JDK 9+
-        implementation "jakarta.xml.bind:jakarta.xml.bind-api:2.3.2"
-        implementation "org.glassfish.jaxb:jaxb-runtime:2.3.2"
-    }
-
-
-    dependencies {
-        compile "com.esotericsoftware:kryo:3.0.1"
-        compile ("com.esotericsoftware:kryonet:2.22.0-RC1") {
-            exclude module : 'kryo'
-        }
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-bullet-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-        api "com.badlogicgames.gdx:gdx-tools:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        api "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
-        api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
-        api "com.badlogicgames.ashley:ashley:$ashleyVersion"
-        api "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-    }
+test {
+    useJUnitPlatform()
 }

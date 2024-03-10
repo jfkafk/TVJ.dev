@@ -27,12 +27,14 @@ public class MenuScreen implements Screen {
     private OrthographicCamera camera;
     private TextureAtlas atlas;
     protected Skin skin;
+    GameClient gameClient;
 
     /**
      * Constructor for the Menu class.
      * Define texture
      */
-    public MenuScreen() {
+    public MenuScreen(GameClient gameClient) {
+        this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1100;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
@@ -78,7 +80,7 @@ public class MenuScreen implements Screen {
         singlePlayerButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                SinglePlayerMenu singlePlayerMenu = new SinglePlayerMenu();
+                SinglePlayerMenu singlePlayerMenu = new SinglePlayerMenu(gameClient);
                 // Create a new player to server.
                 ((Game) Gdx.app.getApplicationListener()).setScreen(singlePlayerMenu);
             }
@@ -86,14 +88,14 @@ public class MenuScreen implements Screen {
         });
         multiplayerButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Lobby lobby = new Lobby();
+                Lobby lobby = new Lobby(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(lobby);
             }
         });
         optionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Options options = new Options();
+                Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
         });

@@ -1,5 +1,6 @@
 package ee.taltech.superitibros.GameInfo;
 
+<<<<<<< HEAD
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -94,6 +95,26 @@ public class ClientWorld {
     public com.badlogic.gdx.physics.box2d.World getGdxWorld() {
         return gdxWorld;
     }
+=======
+import ee.taltech.superitibros.Connection.ClientConnection;
+import com.badlogic.gdx.math.Rectangle;
+import ee.taltech.superitibros.Characters.PlayerGameCharacter;
+
+import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Arrays;
+
+
+public class ClientWorld {
+
+    private ClientConnection clientConnection;
+    private PlayerGameCharacter myPlayerGameCharacter;
+    private final HashMap<Integer, PlayerGameCharacter> worldGameCharactersMap = new HashMap<>();
+    private int score = 0;
+    private int waveCount = 0;
+>>>>>>> 2785de8 (Gradle build error.)
 
     /**
      * This adds the instance of ClientConnection to this class.
@@ -102,11 +123,35 @@ public class ClientWorld {
         this.clientConnection = clientConnection;
     }
 
+<<<<<<< HEAD
     public void setMyPlayerGameCharacter(MyPlayerGameCharacter myPlayerGameCharacter) {
         this.myPlayerGameCharacter = myPlayerGameCharacter;
     }
 
     public MyPlayerGameCharacter getMyPlayerGameCharacter() {
+=======
+    public void setScore(int score) {
+        this.score = score;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public void setWaveCount(int waveCount) {
+        this.waveCount = waveCount;
+    }
+
+    public int getWaveCount() {
+        return waveCount;
+    }
+
+    public void setMyPlayerGameCharacter(PlayerGameCharacter myPlayerGameCharacter) {
+        this.myPlayerGameCharacter = myPlayerGameCharacter;
+    }
+
+    public PlayerGameCharacter getMyPlayerGameCharacter() {
+>>>>>>> 2785de8 (Gradle build error.)
         return myPlayerGameCharacter;
     }
 
@@ -115,11 +160,19 @@ public class ClientWorld {
      *
      * Key: id, value: PlayerGameCharacter
      */
+<<<<<<< HEAD
     public HashMap<Integer, GameCharacter> getWorldGameCharactersMap() {
         return worldGameCharactersMap;
     }
 
     public GameCharacter getGameCharacter(Integer id){
+=======
+    public HashMap<Integer, PlayerGameCharacter> getWorldGameCharactersMap() {
+        return worldGameCharactersMap;
+    }
+
+    public PlayerGameCharacter getGameCharacter(Integer id){
+>>>>>>> 2785de8 (Gradle build error.)
         return worldGameCharactersMap.get(id);
     }
 
@@ -127,12 +180,18 @@ public class ClientWorld {
      * Add a PlayerGameCharacter to the characters map.
      *
      * @param id of the PlayerGameCharacter
+<<<<<<< HEAD
      * @param newCharacter GameCharacter
      */
     public void addGameCharacter(Integer id, GameCharacter newCharacter) {
         if (newCharacter instanceof MyPlayerGameCharacter) {
             setMyPlayerGameCharacter((MyPlayerGameCharacter) newCharacter);
         }
+=======
+     * @param newCharacter PlayerGameCharacter
+     */
+    public void addGameCharacter(Integer id, PlayerGameCharacter newCharacter) {
+>>>>>>> 2785de8 (Gradle build error.)
         worldGameCharactersMap.put(id, newCharacter);
     }
 
@@ -141,8 +200,16 @@ public class ClientWorld {
      *
      * Also updates PlayerGameCharacter's weapons coordinates.
      * @param id of the moving character - id is key in worldGameCharactersMap.
+<<<<<<< HEAD
      */
     public void movePlayerGameCharacter(Integer id, float xPos, float yPos) {
         getGameCharacter(id).moveToNewPos(xPos, yPos);
+=======
+     * @param xPosChange the change of x
+     * @param yPosChange the change of y
+     */
+    public void movePlayerGameCharacter(Integer id, float xPosChange, float yPosChange) {
+        getGameCharacter(id).moveToNewPos(xPosChange, yPosChange);
+>>>>>>> 2785de8 (Gradle build error.)
     }
 }
