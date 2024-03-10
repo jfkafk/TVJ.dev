@@ -105,9 +105,10 @@ public class GameCharacter {
     }
 
     public void jump() {
-        // Apply the jump impulse only if the player is grounded
+        // Player can't jump if he is already in air
         if (isGrounded()) {
-            b2body.applyLinearImpulse(0, 100f, b2body.getWorldCenter().x, b2body.getWorldCenter().y, true);
+            // Apply an impulse upwards to simulate the jump
+            this.b2body.applyLinearImpulse(0, 1000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
         }
     }
 
@@ -118,14 +119,13 @@ public class GameCharacter {
 
     // Move right
     public void moveRight() {
-        // Apply a force to the right
-        b2body.applyForceToCenter(new Vector2(movementSpeed * 1000, b2body.getLinearVelocity().y), true);
+        this.b2body.applyForceToCenter(new Vector2(movementSpeed * 10, b2body.getLinearVelocity().y), true);
     }
 
     // Move left
     public void moveLeft() {
         // Apply a force to the left
-        b2body.applyForceToCenter(new Vector2(-movementSpeed * 1000, b2body.getLinearVelocity().y), true);
+        this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 10, b2body.getLinearVelocity().y), true);
     }
 
     public boolean isGrounded() {

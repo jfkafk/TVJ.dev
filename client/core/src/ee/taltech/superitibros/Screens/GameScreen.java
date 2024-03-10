@@ -140,36 +140,52 @@ public class GameScreen implements Screen, InputProcessor {
     /**
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
-    private void detectInput(){
-        System.out.println(clientWorld.getMyPlayerGameCharacter() != null);
+    private void detectInput() {
         if (clientWorld.getMyPlayerGameCharacter() != null) {
+            boolean isLeftPressed = Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT);
+            boolean isRightPressed = Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT);
+            boolean isUpPressed = Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP);
 
-            if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
-                buttonHasBeenPressed = true;
-            }
+            // Check if only one direction key is pressed
+            if ((isLeftPressed && !isRightPressed) || (!isLeftPressed && isRightPressed)) {
+                if (isUpPressed) {
+                    // Move left or right and jump
+                    if (isLeftPressed) {
+                        clientWorld.getMyPlayerGameCharacter().moveLeft();
+                    } else {
+                        clientWorld.getMyPlayerGameCharacter().moveRight();
+                    }
+                    clientWorld.getMyPlayerGameCharacter().jump();
+                } else {
+                    // Handle movement without jump
+                    if (isLeftPressed) {
+                        clientWorld.getMyPlayerGameCharacter().moveLeft();
+                    } else if (isRightPressed) {
+                        clientWorld.getMyPlayerGameCharacter().moveRight();
+                    }
+                }
+            } else {
+                // Handle other cases as before
+                if (isUpPressed) {
+                    clientWorld.getMyPlayerGameCharacter().jump();
+                }
+                if (isLeftPressed) {
+                    clientWorld.getMyPlayerGameCharacter().moveLeft();
+                }
+                if (isRightPressed) {
+                    clientWorld.getMyPlayerGameCharacter().moveRight();
+                }
+                if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                    clientWorld.getMyPlayerGameCharacter().fallDown();
+                }
+                // If player moves (has non-zero velocity in x or y direction), send player position to server
+                if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
+                    clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
+                }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
-                clientWorld.getMyPlayerGameCharacter().jump();
+                // Reset the velocity before applying new forces
+                clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
             }
-            if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-                System.out.println("lefttt");
-                clientWorld.getMyPlayerGameCharacter().moveLeft();
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.S) || Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-                clientWorld.getMyPlayerGameCharacter().fallDown();
-            }
-            if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-                clientWorld.getMyPlayerGameCharacter().moveRight();
-            }
-            // If player moves (has non-zero velocity in x or y direction), send player position to server
-            if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
-            }
-
-            // Reset the velocity before applying new forces
-            clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
-
-
         }
     }
 
