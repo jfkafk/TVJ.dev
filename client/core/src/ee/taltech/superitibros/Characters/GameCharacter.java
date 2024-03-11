@@ -23,7 +23,8 @@ public class GameCharacter extends Sprite{
     private AssetManager assetManager;
     Sprite sprite;
     Sprite spriteArrow;
-    Animation playerIdle;
+    Animation<TextureRegion> runningAnimation;
+
 
 
     // Character characteristics.
@@ -191,7 +192,12 @@ public class GameCharacter extends Sprite{
         boundingBox.y = b2body.getPosition().y;
 
         // Draw the sprite
-        sprite.draw(batch);
+        TextureRegion animation = runningAnimation.getKeyFrame(stateTime, true);
+        batch.draw(animation, b2body.getPosition().x, b2body.getPosition().y, 20, 20);
+//        sprite.draw(batch);
+
+
+
     }
 
     /**
