@@ -1,22 +1,29 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class GameCharacter {
+public class GameCharacter extends Sprite{
 
     SpriteBatch batch;
     TextureAtlas textureAtlas;
     Animation<Sprite> animation;
-    float stateTime = 0;
+    float stateTime;
+    private AssetManager assetManager;
+    Sprite sprite;
+    Sprite spriteArrow;
+    Animation playerIdle;
 
 
     // Character characteristics.
@@ -169,9 +176,9 @@ public class GameCharacter {
      * @param batch batch.
      */
     public void draw(SpriteBatch batch) {
-        // Create a sprite with the texture
-        stateTime += Gdx.graphics.getDeltaTime();
-        Sprite sprite = animation.getKeyFrame(stateTime,true);
+//        // Create a sprite with the texture
+//        stateTime += Gdx.graphics.getDeltaTime();
+//        Sprite sprite = animation.getKeyFrame(stateTime,true);
 //        sprite.setX(stateTime * 250 % (Gdx.graphics.getWidth() + 400) - 200);
 
         // Set the position of the sprite to match the physics body
