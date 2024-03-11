@@ -1,22 +1,29 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class GameCharacter {
+public class GameCharacter extends Sprite{
 
     SpriteBatch batch;
     TextureAtlas textureAtlas;
     Animation<Sprite> animation;
-    float stateTime = 0;
+    float stateTime;
+    private AssetManager assetManager;
+    Sprite sprite;
+    Sprite spriteArrow;
+    Animation playerIdle;
 
 
     // Character characteristics.
@@ -57,9 +64,22 @@ public class GameCharacter {
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
         defineCharacter();
-        textureAtlas = new TextureAtlas("Characters/packed images/Skeleton pack data.txt");
-        animation = new Animation<>(066f, textureAtlas.createSprites("walking"),
-                Animation.PlayMode.LOOP);
+
+        stateTime = 0;
+
+        Array<TextureRegion> frames = new Array<TextureRegion>();
+
+        textureAtlas = new TextureAtlas("assets/Characters/packed images/Skeleton pack data.txt");
+//        animation = new Animation<>(066f, textureAtlas.createSprites(),
+//                Animation.PlayMode.LOOP);
+        for (int i = 1; i < 6; i++) {
+            frames.add(new TextureRegion(textureAtlas.findRegion("Idle"), i * 115, 115, 115, 115));
+        }
+        playerIdle = new Animation<>(0.1f, frames);
+
+        frames.clear();
+
+
 
     }
 
@@ -145,10 +165,15 @@ public class GameCharacter {
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
+    public TextureRegion getFrame(float dt){
+        TextureRegion region;
+        region = playerIdle.getKeyFrame(stateTime,true)
+    }
+
     public void draw(SpriteBatch batch) {
-        // Create a sprite with the texture
-        stateTime += Gdx.graphics.getDeltaTime();
-        Sprite sprite = animation.getKeyFrame(stateTime,true);
+//        // Create a sprite with the texture
+//        stateTime += Gdx.graphics.getDeltaTime();
+//        Sprite sprite = animation.getKeyFrame(stateTime,true);
 //        sprite.setX(stateTime * 250 % (Gdx.graphics.getWidth() + 400) - 200);
 
         // Set the position of the sprite to match the physics body
