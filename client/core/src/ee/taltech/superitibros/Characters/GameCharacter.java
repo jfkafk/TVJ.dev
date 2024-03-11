@@ -16,7 +16,12 @@ public class GameCharacter {
     SpriteBatch batch;
     TextureAtlas textureAtlas;
     Animation<Sprite> animation;
-    float stateTime = 0;
+    float stateTime;
+    private AssetManager assetManager;
+    Sprite sprite;
+    Sprite spriteArrow;
+    Animation<TextureRegion> runningAnimation;
+
 
 
     // Character characteristics.
@@ -145,6 +150,10 @@ public class GameCharacter {
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 52d1b19 (animating character second push)
     public void draw(SpriteBatch batch) {
         // Create a sprite with the texture
         stateTime += Gdx.graphics.getDeltaTime();
@@ -161,7 +170,12 @@ public class GameCharacter {
         boundingBox.y = b2body.getPosition().y;
 
         // Draw the sprite
-        sprite.draw(batch);
+        TextureRegion animation = runningAnimation.getKeyFrame(stateTime, true);
+        batch.draw(animation, b2body.getPosition().x, b2body.getPosition().y, 20, 20);
+//        sprite.draw(batch);
+
+
+
     }
 
     /**
