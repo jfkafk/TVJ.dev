@@ -23,7 +23,8 @@ public class GameCharacter extends Sprite{
     private AssetManager assetManager;
     Sprite sprite;
     Sprite spriteArrow;
-    Animation playerIdle;
+    Animation<TextureRegion> runningAnimation;
+
 
 
     // Character characteristics.
@@ -65,19 +66,23 @@ public class GameCharacter extends Sprite{
         this.clientWorld = clientWorld;
         defineCharacter();
 
-        stateTime = 0;
+        Texture runningTexture = new Texture(Gdx.files.internal("C:\\Users\\Lenna\\IdeaProjects\\iti0301-2024-tvj-dev\\client\\assets\\Characters\\Walking.png"));
+        TextureRegion[][] runningFrames = TextureRegion.split(runningTexture, 363, 458);
+        runningAnimation = new Animation<>(0.05f, runningFrames[0]); // Assuming all frames are in the first row
 
-        Array<TextureRegion> frames = new Array<TextureRegion>();
-
-        textureAtlas = new TextureAtlas("assets/Characters/packed images/Skeleton pack data.txt");
-//        animation = new Animation<>(066f, textureAtlas.createSprites(),
-//                Animation.PlayMode.LOOP);
-        for (int i = 1; i < 6; i++) {
-            frames.add(new TextureRegion(textureAtlas.findRegion("Idle"), i * 115, 115, 115, 115));
-        }
-        playerIdle = new Animation<>(0.1f, frames);
-
-        frames.clear();
+//        stateTime = 0;
+//
+//        Array<TextureRegion> frames = new Array<TextureRegion>();
+//
+//        textureAtlas = new TextureAtlas("assets/Characters/packed images/Skeleton pack data.txt");
+////        animation = new Animation<>(066f, textureAtlas.createSprites(),
+////                Animation.PlayMode.LOOP);
+//        for (int i = 1; i < 6; i++) {
+//            frames.add(new TextureRegion(textureAtlas.findRegion("Idle"), i * 115, 115, 115, 115));
+//        }
+//        playerIdle = new Animation<>(0.1f, frames);
+//
+//        frames.clear();
 
 
 
@@ -165,10 +170,6 @@ public class GameCharacter extends Sprite{
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
-    public TextureRegion getFrame(float dt){
-        TextureRegion region;
-        region = playerIdle.getKeyFrame(stateTime,true)
-    }
 
     public void draw(SpriteBatch batch) {
 //        // Create a sprite with the texture
@@ -186,7 +187,12 @@ public class GameCharacter extends Sprite{
         boundingBox.y = b2body.getPosition().y;
 
         // Draw the sprite
-        sprite.draw(batch);
+        TextureRegion animation = runningAnimation.getKeyFrame(stateTime, true);
+        batch.draw(animation, b2body.getPosition().x, b2body.getPosition().y, 20, 20);
+//        sprite.draw(batch);
+
+
+
     }
 
     /**
