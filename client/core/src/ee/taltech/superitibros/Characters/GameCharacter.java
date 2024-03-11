@@ -68,7 +68,7 @@ public class GameCharacter {
 
     public void createFrames() {
         // Sprite
-        Texture walksheet = new Texture("Characters/Idle.png");
+        Texture walksheet = new Texture("Characters/Walking.png");
         TextureRegion[][] tmp = TextureRegion.split(walksheet, walksheet.getWidth() / 5, walksheet.getHeight());
         TextureRegion[] walkFrames = new TextureRegion[5];
 
@@ -82,7 +82,7 @@ public class GameCharacter {
             walkFrames[j] = croppedRegion;
         }
 
-        walkAnimation = new Animation<TextureRegion>(0.3f, walkFrames);
+        walkAnimation = new Animation<TextureRegion>(0.1f, walkFrames);
 
         animationCreated = true;
     }
@@ -200,11 +200,15 @@ public class GameCharacter {
         TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = b2body.getPosition().x - boundingBox.getHeight() + 2;
+        float frameX = b2body.getPosition().x - boundingBox.getHeight();
         float frameY = b2body.getPosition().y - boundingBox.getHeight();
 
+        //Bounding box
+        boundingBox.x = b2body.getPosition().x;
+        boundingBox.y = b2body.getPosition().y;
+
         // Draw the current frame at the Box2D body position
-        batch.draw(currentFrame, frameX, frameY, 75, 75);
+        batch.draw(currentFrame, frameX + 5, frameY, 50, 50);
     }
 
     /**
