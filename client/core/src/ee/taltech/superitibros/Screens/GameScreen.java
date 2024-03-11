@@ -72,7 +72,6 @@ public class GameScreen implements Screen, InputProcessor {
         float desiredCameraWidth = 400; // Set the desired width of the camera
         float desiredCameraHeight = desiredCameraWidth * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
-        camera.position.set(50, 100, 0);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, WORLD_HEIGHT, camera);
 
@@ -106,8 +105,7 @@ public class GameScreen implements Screen, InputProcessor {
         clientWorld.getGdxWorld().step(delta, 6, 2);
 
         // Update camera position
-        //updateCameraPosition();
-        camera.position.set(50, 100, 0);
+        updateCameraPosition();
 
         // Detect input
         detectInput();

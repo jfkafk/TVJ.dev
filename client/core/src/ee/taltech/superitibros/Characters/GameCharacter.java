@@ -1,5 +1,6 @@
 package ee.taltech.superitibros.Characters;
 
+import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
@@ -14,18 +15,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 
-public class GameCharacter extends Sprite{
-
-    SpriteBatch batch;
-    TextureAtlas textureAtlas;
-    Animation<Sprite> animation;
-    float stateTime;
-    private AssetManager assetManager;
-    Sprite sprite;
-    Sprite spriteArrow;
-    Animation<TextureRegion> runningAnimation;
-
-
+public class GameCharacter {
 
     // Character characteristics.
     protected float movementSpeed; // world units per second
@@ -33,18 +23,26 @@ public class GameCharacter extends Sprite{
     // Position & dimension.
     public float xPosition;
     public float yPosition; // Lower-left corner
+
     protected float width, height;
     protected Rectangle boundingBox;
-
-    // Textures
-    private TextureRegion characterTexture;
 
     // World where physics are applied
     ClientWorld clientWorld;
     public Body b2body;
-
     private boolean bodyDefined = false;
     Vector2 newPosition;
+
+    // Textures
+    Animation<TextureRegion> walkAnimation; // Must declare frame type (TextureRegion)
+    Texture walkSheet;
+    SpriteBatch spriteBatch;
+
+    // A variable for tracking elapsed time for the animation
+    float stateTime;
+
+    // Animation
+    boolean animationCreated = false;
 
     /**
      * GameCharacter constructor.
@@ -65,6 +63,28 @@ public class GameCharacter extends Sprite{
         this.height = height;
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
+        defineCharacter();
+    }
+
+    public void createFrames() {
+        // Sprite
+        Texture walksheet = new Texture("Characters/Idle.png");
+        TextureRegion[][] tmp = TextureRegion.split(walksheet, walksheet.getWidth() / 5, walksheet.getHeight());
+        TextureRegion[] walkFrames = new TextureRegion[5];
+
+        // Define the desired width and height for the cropped frames
+        int croppedWidth = 128; // Adjust as needed
+        int croppedHeight = 128; // Adjust as needed
+
+        for (int j = 0; j < 5; j++) {
+            // Crop each frame to the desired size
+            TextureRegion croppedRegion = new TextureRegion(tmp[0][j], 0, 0, croppedWidth, croppedHeight);
+            walkFrames[j] = croppedRegion;
+        }
+
+        walkAnimation = new Animation<TextureRegion>(0.3f, walkFrames);
+
+        animationCreated = true;
     }
 
     /**
@@ -132,7 +152,7 @@ public class GameCharacter extends Sprite{
         // Player can't jump if he is already in air
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
-            this.b2body.applyLinearImpulse(0, 7000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
+            this.b2body.applyLinearImpulse(0, 1000000000f, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
         }
     }
 
@@ -167,37 +187,24 @@ public class GameCharacter extends Sprite{
         return b2body.getLinearVelocity().y == 0;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
-    }
-
-    /**
-     * Method for drawing character.
-     * @param batch batch.
-     */
     public void draw(SpriteBatch batch) {
-//        // Create a sprite with the texture
-//        stateTime += Gdx.graphics.getDeltaTime();
-//        Sprite sprite = animation.getKeyFrame(stateTime,true);
-//        sprite.setX(stateTime * 250 % (Gdx.graphics.getWidth() + 400) - 200);
 
-        // Set the position of the sprite to match the physics body
-        sprite.setPosition((b2body.getPosition().x - boundingBox.width), (b2body.getPosition().y - boundingBox.height));
+        if (!animationCreated) {
+            createFrames();
+        }
 
-        xPosition = b2body.getPosition().x;
-        yPosition = b2body.getPosition().y;
+        // Update the animation state time
+        stateTime += Gdx.graphics.getDeltaTime();
 
-        boundingBox.x = b2body.getPosition().x;
-        boundingBox.y = b2body.getPosition().y;
+        // Get the current frame of the animation
+        TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
 
-        // Draw the sprite
-        TextureRegion animation = runningAnimation.getKeyFrame(stateTime, true);
-        batch.draw(animation, b2body.getPosition().x, b2body.getPosition().y, 20, 20);
-//        sprite.draw(batch);
+        // Set the position of the current frame to match the position of the Box2D body
+        float frameX = b2body.getPosition().x - boundingBox.getHeight() + 2;
+        float frameY = b2body.getPosition().y - boundingBox.getHeight();
 
-
-
+        // Draw the current frame at the Box2D body position
+        batch.draw(currentFrame, frameX, frameY, 75, 75);
     }
 
     /**
