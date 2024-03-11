@@ -19,6 +19,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.esotericsoftware.kryonet.Server;
 import ee.taltech.superitibros.Connection.ClientConnection;
+import ee.taltech.superitibros.GameInfo.ClientWorld;
+import ee.taltech.superitibros.GameInfo.GameClient;
 
 
 public class SinglePlayerMenu implements Screen {
@@ -29,12 +31,14 @@ public class SinglePlayerMenu implements Screen {
     private OrthographicCamera camera;
     private TextureAtlas atlas;
     protected Skin skin;
+    GameClient gameClient;
 
     /**
      * Constructor for the Menu class.
      * Define texture
      */
-    public SinglePlayerMenu() {
+    public SinglePlayerMenu(GameClient gameClient) {
+        this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1100;
         atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
@@ -83,13 +87,7 @@ public class SinglePlayerMenu implements Screen {
         chapter1.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                ClientConnection clientConnection = new ClientConnection();
-                GameScreen launchMulti = new GameScreen(clientConnection);
-                Server server = new Server();
-                server.start();
-                clientConnection.create();
-                // Create a new player to server.
-                ((Game) Gdx.app.getApplicationListener()).setScreen(launchMulti);
+                gameClient.startGame();
             }
 
         });
@@ -113,14 +111,14 @@ public class SinglePlayerMenu implements Screen {
         });
         optionsButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                Options options = new Options();
+                Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
         });
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MenuScreen menuScreen = new MenuScreen();
+                MenuScreen menuScreen = new MenuScreen(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
