@@ -1,9 +1,8 @@
 package ee.taltech.superitibros.Characters;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -13,6 +12,12 @@ import java.util.Objects;
 
 
 public class GameCharacter {
+
+    SpriteBatch batch;
+    TextureAtlas textureAtlas;
+    Animation<Sprite> animation;
+    float stateTime = 0;
+
 
     // Character characteristics.
     protected float movementSpeed; // world units per second
@@ -165,8 +170,9 @@ public class GameCharacter {
      */
     public void draw(SpriteBatch batch) {
         // Create a sprite with the texture
-        Sprite sprite = new Sprite(new Texture("Characters/TestCharacter.png"));
-        sprite.setSize((boundingBox.width) * 2, (boundingBox.height) * 2);
+        stateTime += Gdx.graphics.getDeltaTime();
+        Sprite sprite = animation.getKeyFrame(stateTime,true);
+//        sprite.setX(stateTime * 250 % (Gdx.graphics.getWidth() + 400) - 200);
 
         // Set the position of the sprite to match the physics body
         sprite.setPosition((b2body.getPosition().x - boundingBox.width), (b2body.getPosition().y - boundingBox.height));
