@@ -27,7 +27,7 @@ public class ClientWorld {
 
     public ClientWorld() {
         // Map and physics
-        gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -500), true);
+        gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -300), true);
         b2dr = new Box2DDebugRenderer();
         gdxWorld.step(1/60f, 6, 2);
         initializeMap();
