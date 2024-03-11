@@ -36,7 +36,6 @@ public class GameCharacter {
     public Body b2body;
 
     private boolean bodyDefined = false;
-    Vector2 newPosition;
 
     /**
      * GameCharacter constructor.
@@ -61,6 +60,7 @@ public class GameCharacter {
         textureAtlas = new TextureAtlas("Characters/packed images/Skeleton pack data.txt");
         animation = new Animation<>(066f, textureAtlas.createSprites("walking"),
                 Animation.PlayMode.LOOP);
+
     }
 
     /**
@@ -88,9 +88,11 @@ public class GameCharacter {
 
             // Set the flag to true to indicate that the body has been defined
             bodyDefined = true;
-
-            newPosition = new Vector2();
         }
+    }
+
+    public float getMovementSpeed() {
+        return this.movementSpeed;
     }
 
     public Rectangle getBoundingBox() {
@@ -106,24 +108,10 @@ public class GameCharacter {
     public void moveToNewPos(float xPos, float yPos) {
         this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
         if (b2body != null) {
-            // Store the new position for later update
-            this.newPosition.set(xPos, yPos);
+            b2body.setTransform(xPos, yPos, b2body.getAngle());
         }
     }
 
-    /**
-     * Update the position of the Box2D body.
-     * This method should be called outside the physics simulation loop.
-     */
-    public void updatePosition() {
-        if (b2body != null && newPosition != null) {
-            b2body.setTransform(newPosition, b2body.getAngle());
-        }
-    }
-
-    /**
-     * Method for jumping.
-     */
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
@@ -132,33 +120,22 @@ public class GameCharacter {
         }
     }
 
-    /**
-     * Method for faster falling.
-     */
+    // Fall faster
     public void fallDown() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
     }
 
-    /**
-     * Method for moving right.
-     */
     // Move right
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
-    /**
-     * Method for moving left.
-     */
+    // Move left
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
-    /**
-     * Method for checking if player is grounded.
-     * @return true if grounded, otherwise false.
-     */
     public boolean isGrounded() {
         return b2body.getLinearVelocity().y == 0;
     }
@@ -168,10 +145,6 @@ public class GameCharacter {
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
-    /**
-     * Method for drawing character.
-     * @param batch batch.
-     */
     public void draw(SpriteBatch batch) {
         // Create a sprite with the texture
         stateTime += Gdx.graphics.getDeltaTime();
