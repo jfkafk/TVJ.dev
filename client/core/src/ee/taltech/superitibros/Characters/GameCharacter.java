@@ -1,24 +1,22 @@
 package ee.taltech.superitibros.Characters;
 
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Array;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-
-import java.util.ArrayList;
-import java.util.Objects;
 
 
 public class GameCharacter {
 
     // Character characteristics.
     protected float movementSpeed; // world units per second
+
+    private enum State {IDLE, WALKING, JUMPING, FALL}
+
+    private boolean facingRight = true;
 
     // Position & dimension.
     public float xPosition;
@@ -34,7 +32,14 @@ public class GameCharacter {
 
     // Textures
     Animation<TextureRegion> walkAnimation; // Must declare frame type (TextureRegion)
+    Animation<TextureRegion> idleAnimation;
+    Animation<TextureRegion> jumpAnimation;
+    Animation<TextureRegion> fallAnimation;
+
     Texture walkSheet;
+    Texture idleSheet;
+    Texture fallSheet;
+    Texture jumpSheet;
     SpriteBatch spriteBatch;
 
     // A variable for tracking elapsed time for the animation
@@ -47,11 +52,11 @@ public class GameCharacter {
      * GameCharacter constructor.
      *
      * @param movementSpeed of the PlayerGameCharacter (float)
-     * @param boundingBox encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
-     * @param xPosition of the PlayerGameCharacter (float)
-     * @param yPosition of the PlayerGameCharacter (float)
-     * @param width of the PlayerGameCharacter (float)
-     * @param height of the PlayerGameCharacter (float)
+     * @param boundingBox   encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
+     * @param xPosition     of the PlayerGameCharacter (float)
+     * @param yPosition     of the PlayerGameCharacter (float)
+     * @param width         of the PlayerGameCharacter (float)
+     * @param height        of the PlayerGameCharacter (float)
      */
     public GameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width,
                          float height, ClientWorld clientWorld) {
@@ -66,24 +71,113 @@ public class GameCharacter {
     }
 
     public void createFrames() {
+        createFramesIdle();
+        createFramesWalking();
+        createFramesFalling();
+        createFramesJumping();
+        animationCreated = true;
+
+    }
+
+    public void createFramesIdle() {
         // Sprite
-        Texture walksheet = new Texture("Characters/Walking.png");
-        TextureRegion[][] tmp = TextureRegion.split(walksheet, walksheet.getWidth() / 5, walksheet.getHeight());
-        TextureRegion[] walkFrames = new TextureRegion[5];
+        // Idle
+        Texture idlesheet = new Texture("Characters/Skeleton sprites/IDLE 64 frames.png");
+        TextureRegion[][] tmpIdle = TextureRegion.split(idlesheet, idlesheet.getWidth() / 8,
+                idlesheet.getHeight() / 8);
+        TextureRegion[] idleFrames = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
         int croppedWidth = 128; // Adjust as needed
         int croppedHeight = 128; // Adjust as needed
 
-        for (int j = 0; j < 5; j++) {
-            // Crop each frame to the desired size
-            TextureRegion croppedRegion = new TextureRegion(tmp[0][j], 0, 0, croppedWidth, croppedHeight);
-            walkFrames[j] = croppedRegion;
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Calculate the index in the 1D array
+                int index = i * 8 + j;
+                // Crop each frame to the desired size
+                TextureRegion croppedRegion = new TextureRegion(tmpIdle[i][j], 90, 0, croppedWidth, croppedHeight);
+                idleFrames[index] = croppedRegion;
+            }
+        }
+        // making IDLE ANIMATION
+        idleAnimation = new Animation<TextureRegion>(0.025f, idleFrames);
+    }
+
+    public void createFramesWalking() {
+        // Sprite
+
+        // Walking
+        Texture walksheet = new Texture("Characters/Skeleton sprites/WALK 64 frames.png");
+        TextureRegion[][] tmpwalk = TextureRegion.split(walksheet, walksheet.getWidth() / 8, walksheet.getHeight() / 8);
+        TextureRegion[] walkFrames = new TextureRegion[64];
+
+        // Define the desired width and height for the cropped frames
+        int croppedWidth = 128; // Adjust as needed
+        int croppedHeight = 128; // Adjust as needed
+
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Calculate the index in the 1D array
+                int index = i * 8 + j;
+                // Crop each frame to the desired size
+                TextureRegion croppedRegion = new TextureRegion(tmpwalk[i][j], 90, 0, croppedWidth, croppedHeight);
+                walkFrames[index] = croppedRegion;
+            }
         }
 
-        walkAnimation = new Animation<TextureRegion>(0.1f, walkFrames);
+        walkAnimation = new Animation<TextureRegion>(0.015f, walkFrames);
+    }
 
-        animationCreated = true;
+    public void createFramesFalling() {
+        // Sprite
+        // Idle
+        Texture fallSheet = new Texture("Characters/Skeleton sprites/FALL 64 frames.png");
+        TextureRegion[][] tmpFall = TextureRegion.split(fallSheet, fallSheet.getWidth() / 8,
+                fallSheet.getHeight() / 8);
+        TextureRegion[] fallFrames = new TextureRegion[64];
+
+        // Define the desired width and height for the cropped frames
+        int croppedWidth = 128; // Adjust as needed
+        int croppedHeight = 128; // Adjust as needed
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Calculate the index in the 1D array
+                int index = i * 8 + j;
+                // Crop each frame to the desired size
+                TextureRegion croppedRegion = new TextureRegion(tmpFall[i][j], 90, 0, croppedWidth, croppedHeight);
+                fallFrames[index] = croppedRegion;
+            }
+        }
+        // making IDLE ANIMATION
+        fallAnimation = new Animation<TextureRegion>(0.025f, fallFrames);
+    }
+
+    public void createFramesJumping() {
+        // Sprite
+        // Idle
+        Texture jumpSheet = new Texture("Characters/Skeleton sprites/JUMP 64 frames.png");
+        TextureRegion[][] tmpJump = TextureRegion.split(jumpSheet, jumpSheet.getWidth() / 8,
+                jumpSheet.getHeight() / 8);
+        TextureRegion[] jumpFrames = new TextureRegion[64];
+
+        // Define the desired width and height for the cropped frames
+        int croppedWidth = 128; // Adjust as needed
+        int croppedHeight = 128; // Adjust as needed
+
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Calculate the index in the 1D array
+                int index = i * 8 + j;
+                // Crop each frame to the desired size
+                TextureRegion croppedRegion = new TextureRegion(tmpJump[i][j], 90, 0, croppedWidth, croppedHeight);
+                jumpFrames[index] = croppedRegion;
+            }
+        }
+        // making IDLE ANIMATION
+        jumpAnimation = new Animation<TextureRegion>(0.025f, jumpFrames);
     }
 
     /**
@@ -163,6 +257,23 @@ public class GameCharacter {
         return b2body.getLinearVelocity().y == 0;
     }
 
+    public State getState() {
+        if((b2body.getLinearVelocity().y > 0)) {
+            return State.JUMPING;
+        }
+            //if negative in Y-Axis mario is falling
+        else if(b2body.getLinearVelocity().y < 0)
+            return State.FALL;
+            //if mario is positive or negative in the X axis he is running
+        else if(b2body.getLinearVelocity().x != 0 && isGrounded())
+            return State.WALKING;
+            //if none of these return then he must be standing
+        else if (b2body.getLinearVelocity().x == 0)
+            return State.IDLE;
+        return State.IDLE;
+    }
+
+
     public void draw(SpriteBatch batch) {
 
         if (!animationCreated) {
@@ -172,8 +283,33 @@ public class GameCharacter {
         // Update the animation state time
         stateTime += Gdx.graphics.getDeltaTime();
 
-        // Get the current frame of the animation
-        TextureRegion currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+        // Get which state is player currently in
+        State currentState = getState(); // Muuda olekut vastavalt vajadusele
+
+        b2body.setLinearVelocity(0, b2body.getLinearVelocity().y);
+
+        TextureRegion currentFrame;
+        // getting the state of the character
+        switch (currentState) {
+            case IDLE:
+                currentFrame = idleAnimation.getKeyFrame(stateTime, true);
+                System.out.println("IDLE,IDLE");
+                break;
+            case WALKING:
+                currentFrame = walkAnimation.getKeyFrame(stateTime, true);
+                System.out.println("WALKING");
+                break;
+            case FALL:
+                currentFrame = fallAnimation.getKeyFrame(stateTime, true);
+                System.out.println("FALLING");
+                break;
+            case JUMPING:
+                currentFrame = jumpAnimation.getKeyFrame(stateTime, true);
+                System.out.println("Jumping");
+            default:
+                currentFrame = fallAnimation.getKeyFrame(stateTime, true);
+                System.out.println("DEFAULT DEFAULT");
+        }
 
         // Set the position of the current frame to match the position of the Box2D body
         float frameX = b2body.getPosition().x - boundingBox.getHeight();
@@ -184,16 +320,21 @@ public class GameCharacter {
         boundingBox.y = b2body.getPosition().y;
 
         // Draw the current frame at the Box2D body position
-        batch.draw(currentFrame, frameX + 5, frameY, 50, 50);
+        if (currentFrame != null) {
+            batch.draw(currentFrame, frameX + 5, frameY, 50, 50);
+        }
     }
 
+
     /**
-     * Remove the Box2D body from the game world.
-     */
+         * Remove the Box2D body from the game world.
+         */
     public void removeBodyFromWorld() {
         if (b2body != null) {
             clientWorld.getGdxWorld().destroyBody(b2body);
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
+
     }
 }
+

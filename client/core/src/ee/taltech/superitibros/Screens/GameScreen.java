@@ -169,7 +169,7 @@ public class GameScreen implements Screen, InputProcessor {
             }
 
             // Reset the velocity before applying new forces
-            clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
+//            clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
         }
     }
 
@@ -180,6 +180,7 @@ public class GameScreen implements Screen, InputProcessor {
      */
     public void drawPlayerGameCharacters() {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
+        System.out.println(clientWorld.getWorldGameCharactersMap());
         for (GameCharacter character : characterValues) {
             character.draw(batch);
         }
