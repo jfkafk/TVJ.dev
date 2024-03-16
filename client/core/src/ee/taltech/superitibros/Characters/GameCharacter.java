@@ -15,8 +15,8 @@ public class GameCharacter {
     protected float movementSpeed; // world units per second
 
     private enum State {IDLE, WALKING, JUMPING, FALL}
-
-    private boolean facingRight = true;
+    private boolean facingRight;
+    private float stateTimer;
 
     // Position & dimension.
     public float xPosition;
@@ -32,10 +32,18 @@ public class GameCharacter {
     Vector2 newPosition;
 
     // Textures
-    Animation<TextureRegion> walkAnimation; // Must declare frame type (TextureRegion)
-    Animation<TextureRegion> idleAnimation;
-    Animation<TextureRegion> jumpAnimation;
-    Animation<TextureRegion> fallAnimation;
+    Animation<TextureRegion> walkAnimationRight; // Must declare frame type (TextureRegion)
+    Animation<TextureRegion> walkAnimationLeft;
+    Animation<TextureRegion> idleAnimationRight;
+    Animation<TextureRegion> idleAnimationLeft;
+    Animation<TextureRegion> jumpAnimationRight;
+    Animation<TextureRegion> jumpAnimationLeft;
+    Animation<TextureRegion> fallAnimationRight;
+    Animation<TextureRegion> fallAnimationLeft;
+    TextureRegion currentFrame;
+    public State currentState;
+    public State previousState;
+
 
     Texture walkSheet;
     Texture idleSheet;
@@ -68,6 +76,8 @@ public class GameCharacter {
         this.height = height;
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
+        facingRight = true;
+        stateTimer = 0;
         defineCharacter();
     }
 
@@ -79,6 +89,10 @@ public class GameCharacter {
         animationCreated = true;
 
     }
+    public boolean isFacingRight() {
+        System.out.println(b2body.getLinearVelocity().x);
+        return b2body.getLinearVelocity().x > 0;
+    }
 
     public void createFramesIdle() {
         // Sprite
@@ -86,7 +100,8 @@ public class GameCharacter {
         Texture idlesheet = new Texture("Characters/Skeleton sprites/IDLE 64 frames.png");
         TextureRegion[][] tmpIdle = TextureRegion.split(idlesheet, idlesheet.getWidth() / 8,
                 idlesheet.getHeight() / 8);
-        TextureRegion[] idleFrames = new TextureRegion[64];
+        TextureRegion[] idleFramesRight = new TextureRegion[64];
+        TextureRegion[] idleFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
         int croppedWidth = 128; // Adjust as needed
@@ -97,12 +112,17 @@ public class GameCharacter {
                 // Calculate the index in the 1D array
                 int index = i * 8 + j;
                 // Crop each frame to the desired size
-                TextureRegion croppedRegion = new TextureRegion(tmpIdle[i][j], 90, 0, croppedWidth, croppedHeight);
-                idleFrames[index] = croppedRegion;
+                TextureRegion croppedRegionRight = new TextureRegion(tmpIdle[i][j], 90, 0, croppedWidth, croppedHeight);
+                idleFramesRight[index] = croppedRegionRight;
+
+                TextureRegion croppedRegionLeft = new TextureRegion(tmpIdle[i][j], 40, 0, croppedWidth, croppedHeight);
+                croppedRegionLeft.flip(true, false); // Flip horizontally
+                idleFramesLeft[index] = croppedRegionLeft;
             }
         }
         // making IDLE ANIMATION
-        idleAnimation = new Animation<TextureRegion>(0.025f, idleFrames);
+        idleAnimationRight = new Animation<TextureRegion>(0.025f, idleFramesRight);
+        idleAnimationLeft = new Animation<TextureRegion>(0.025f, idleFramesLeft);
     }
 
     public void createFramesWalking() {
@@ -111,7 +131,9 @@ public class GameCharacter {
         // Walking
         Texture walksheet = new Texture("Characters/Skeleton sprites/WALK 64 frames.png");
         TextureRegion[][] tmpwalk = TextureRegion.split(walksheet, walksheet.getWidth() / 8, walksheet.getHeight() / 8);
-        TextureRegion[] walkFrames = new TextureRegion[64];
+
+        TextureRegion[] walkFramesRight = new TextureRegion[64];
+        TextureRegion[] walkFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
         int croppedWidth = 128; // Adjust as needed
@@ -123,12 +145,17 @@ public class GameCharacter {
                 // Calculate the index in the 1D array
                 int index = i * 8 + j;
                 // Crop each frame to the desired size
-                TextureRegion croppedRegion = new TextureRegion(tmpwalk[i][j], 90, 0, croppedWidth, croppedHeight);
-                walkFrames[index] = croppedRegion;
+                TextureRegion croppedRegionRight = new TextureRegion(tmpwalk[i][j], 90, 0, croppedWidth, croppedHeight);
+                walkFramesRight[index] = croppedRegionRight;
+
+                TextureRegion croppedRegionLeft = new TextureRegion(tmpwalk[i][j], 40, 0, croppedWidth, croppedHeight);
+                croppedRegionLeft.flip(true, false); // Flip horizontally
+                walkFramesLeft[index] = croppedRegionLeft;
             }
         }
 
-        walkAnimation = new Animation<TextureRegion>(0.015f, walkFrames);
+        walkAnimationRight = new Animation<TextureRegion>(0.015f, walkFramesRight);
+        walkAnimationLeft = new Animation<TextureRegion>(0.015f, walkFramesLeft);
     }
 
     public void createFramesFalling() {
@@ -137,7 +164,8 @@ public class GameCharacter {
         Texture fallSheet = new Texture("Characters/Skeleton sprites/FALL 64 frames.png");
         TextureRegion[][] tmpFall = TextureRegion.split(fallSheet, fallSheet.getWidth() / 8,
                 fallSheet.getHeight() / 8);
-        TextureRegion[] fallFrames = new TextureRegion[64];
+        TextureRegion[] fallFramesRight = new TextureRegion[64];
+        TextureRegion[] fallFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
         int croppedWidth = 128; // Adjust as needed
@@ -148,12 +176,17 @@ public class GameCharacter {
                 // Calculate the index in the 1D array
                 int index = i * 8 + j;
                 // Crop each frame to the desired size
-                TextureRegion croppedRegion = new TextureRegion(tmpFall[i][j], 90, 0, croppedWidth, croppedHeight);
-                fallFrames[index] = croppedRegion;
+                TextureRegion croppedRegionRight = new TextureRegion(tmpFall[i][j], 90, 0, croppedWidth, croppedHeight);
+                fallFramesRight[index] = croppedRegionRight;
+
+                TextureRegion croppedRegionLeft = new TextureRegion(tmpFall[i][j], 40, 0, croppedWidth, croppedHeight);
+                croppedRegionLeft.flip(true, false); // Flip horizontally
+                fallFramesLeft[index] = croppedRegionLeft;
             }
         }
         // making IDLE ANIMATION
-        fallAnimation = new Animation<TextureRegion>(0.025f, fallFrames);
+        fallAnimationRight = new Animation<TextureRegion>(0.025f, fallFramesRight);
+        fallAnimationLeft = new Animation<TextureRegion>(0.025f, fallFramesLeft);
     }
 
     public void createFramesJumping() {
@@ -162,7 +195,8 @@ public class GameCharacter {
         Texture jumpSheet = new Texture("Characters/Skeleton sprites/JUMP 64 frames.png");
         TextureRegion[][] tmpJump = TextureRegion.split(jumpSheet, jumpSheet.getWidth() / 8,
                 jumpSheet.getHeight() / 8);
-        TextureRegion[] jumpFrames = new TextureRegion[64];
+        TextureRegion[] jumpFramesRight = new TextureRegion[64];
+        TextureRegion[] jumpFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
         int croppedWidth = 128; // Adjust as needed
@@ -173,12 +207,17 @@ public class GameCharacter {
                 // Calculate the index in the 1D array
                 int index = i * 8 + j;
                 // Crop each frame to the desired size
-                TextureRegion croppedRegion = new TextureRegion(tmpJump[i][j], 90, 0, croppedWidth, croppedHeight);
-                jumpFrames[index] = croppedRegion;
+                TextureRegion croppedRegionRight = new TextureRegion(tmpJump[i][j], 90, 0, croppedWidth, croppedHeight);
+                jumpFramesRight[index] = croppedRegionRight;
+
+                TextureRegion croppedRegionLeft = new TextureRegion(tmpJump[i][j], 40, 0, croppedWidth, croppedHeight);
+                croppedRegionLeft.flip(true, false); // Flip horizontally
+                jumpFramesLeft[index] = croppedRegionLeft;
             }
         }
         // making IDLE ANIMATION
-        jumpAnimation = new Animation<TextureRegion>(0.025f, jumpFrames);
+        jumpAnimationRight = new Animation<TextureRegion>(0.025f, jumpFramesRight);
+        jumpAnimationLeft = new Animation<TextureRegion>(0.025f, jumpFramesLeft);
     }
 
     /**
@@ -281,7 +320,7 @@ public class GameCharacter {
         return b2body.getLinearVelocity().y == 0;
     }
 
-    public State getState() {
+    private State getState() {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
         }
@@ -289,11 +328,10 @@ public class GameCharacter {
         else if(b2body.getLinearVelocity().y < 0)
             return State.FALL;
             //if mario is positive or negative in the X axis he is running
-        else if(b2body.getLinearVelocity().x != 0 && isGrounded())
+        else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
             return State.WALKING;
+        }
             //if none of these return then he must be standing
-        else if (b2body.getLinearVelocity().x == 0)
-            return State.IDLE;
         return State.IDLE;
     }
 
@@ -312,27 +350,39 @@ public class GameCharacter {
 
         b2body.setLinearVelocity(0, b2body.getLinearVelocity().y);
 
-        TextureRegion currentFrame;
         // getting the state of the character
+        isFacingRight();
         switch (currentState) {
             case IDLE:
-                currentFrame = idleAnimation.getKeyFrame(stateTime, true);
+                currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
                 System.out.println("IDLE,IDLE");
                 break;
             case WALKING:
-                currentFrame = walkAnimation.getKeyFrame(stateTime, true);
-                System.out.println("WALKING");
-                break;
-            case FALL:
-                currentFrame = fallAnimation.getKeyFrame(stateTime, true);
-                System.out.println("FALLING");
+                if (facingRight) {
+                    currentFrame = walkAnimationRight.getKeyFrame(stateTime, true);
+                    System.out.println("WALKING RIGHT");
+                } else {
+                    currentFrame = walkAnimationLeft.getKeyFrame(stateTime, true);
+                    System.out.println("WALKING LEFT");
+                }
                 break;
             case JUMPING:
-                currentFrame = jumpAnimation.getKeyFrame(stateTime, true);
-                System.out.println("Jumping");
+                if (facingRight) {
+                    currentFrame = jumpAnimationRight.getKeyFrame(stateTime, true);
+                    System.out.println("JUMPING RIGHT");
+                } else {
+                    currentFrame = jumpAnimationLeft.getKeyFrame(stateTime, true);
+                    System.out.println("JUMPING LEFT");
+                }
+                break;
             default:
-                currentFrame = fallAnimation.getKeyFrame(stateTime, true);
-                System.out.println("DEFAULT DEFAULT");
+                if (facingRight) {
+                    currentFrame = fallAnimationRight.getKeyFrame(stateTime, true);
+                    System.out.println("FALLING RIGHT");
+                } else {
+                    currentFrame = fallAnimationLeft.getKeyFrame(stateTime, true);
+                    System.out.println("FALLING LEFT");
+                }
         }
 
         // Set the position of the current frame to match the position of the Box2D body
