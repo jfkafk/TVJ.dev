@@ -51,4 +51,34 @@ public class PacketCreator {
         packetClientDisconnect.setId(id);
         return packetClientDisconnect;
     }
+
+    /**
+     * Create a PacketUpdateEnemy.
+     *
+     * @param botHash npc's botHash
+     * @return new PacketUpdateEnemy
+     */
+    public static PacketUpdateEnemy createPacketUpdateZombies(String botHash, float xPositon, float yPosition) {
+        PacketUpdateEnemy packetEnemy = new PacketUpdateEnemy();
+        packetEnemy.setBotHash(botHash);
+        packetEnemy.setxPosition(xPositon);
+        packetEnemy.setyPosition(yPosition);
+        return packetEnemy;
+    }
+
+    /**
+     * Create a PacketNewEnemy.
+     *
+     * @param botHash botHash
+     * @param xPosition x coordinate
+     * @param yPosition y coordinate
+     * @return new PacketNewEnemy
+     */
+    public static PacketNewEnemy createPacketNewZombies(String botHash, float xPosition, float yPosition) {
+        PacketNewEnemy packetNewEnemy = new PacketNewEnemy();
+        packetNewEnemy.setBotHash(botHash);
+        packetNewEnemy.setxPosition(xPosition);
+        packetNewEnemy.setyPosition(yPosition);
+        return packetNewEnemy;
+    }
 }

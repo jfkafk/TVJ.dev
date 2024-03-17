@@ -5,6 +5,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
@@ -26,9 +27,6 @@ public class ClientConnection {
 	private ClientWorld clientWorld;
 	private GameClient gameClient;
 	private static Client client;
-	private String playerName;
-
-	private static final int SCORE_COEFFICIENT = 100;
 
 	/**
 	 * Client connection.
@@ -55,6 +53,8 @@ public class ClientConnection {
 		client.getKryo().register(Rectangle.class);
 		client.getKryo().register(HashMap.class);
 		client.getKryo().register(PacketClientDisconnect.class);
+		client.getKryo().register(PacketNewEnemy.class);
+		client.getKryo().register(PacketUpdateEnemy.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -66,6 +66,7 @@ public class ClientConnection {
 						PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
 						if (connection.getID() == ((PacketAddCharacter) object).getId()) {
 							MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+							newGameCharacter.defineCharacter();
 							// Add new PlayerGameCharacter to client's game.
 							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 						} else {
@@ -75,6 +76,7 @@ public class ClientConnection {
 							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 						}
 					} else  if (object instanceof PacketUpdateCharacterInformation) {
+						System.out.println("update other player");
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
@@ -87,6 +89,19 @@ public class ClientConnection {
 						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
 						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
+
+					} else if (object instanceof PacketNewEnemy) {
+						System.out.println("new enemy");
+						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
+						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
+						clientWorld.addEnemy(enemy);
+
+					} else if (object instanceof PacketUpdateEnemy) {
+						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
+						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
+							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).setxPosition(packetUpdateEnemy.getxPosition());
+							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).setyPosition(packetUpdateEnemy.getyPosition());
+						}
 					}
 				}
 			}
@@ -118,7 +133,6 @@ public class ClientConnection {
 	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
 	public void sendPlayerInformation(float x, float y) {
-		System.out.println("Send player info");
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
 		client.sendUDP(packet);
 	}
@@ -142,10 +156,6 @@ public class ClientConnection {
 
 	public GameClient getGameClient() {
 		return gameClient;
-	}
-
-	public void setPlayerName(String playerName) {
-		this.playerName = playerName;
 	}
 
 	public static void main(String[] args) {

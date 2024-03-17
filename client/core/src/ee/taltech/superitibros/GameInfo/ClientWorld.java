@@ -8,12 +8,14 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.superitibros.Characters.CollisionBits;
+import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ClientWorld {
 
@@ -23,6 +25,7 @@ public class ClientWorld {
     private ClientConnection clientConnection;
     private MyPlayerGameCharacter myPlayerGameCharacter;
     private final HashMap<Integer, GameCharacter> worldGameCharactersMap = new HashMap<>();
+    private Map<String, Enemy> enemyMap = new HashMap<>();
     public final Box2DDebugRenderer b2dr;
 
     public ClientWorld() {
@@ -144,5 +147,22 @@ public class ClientWorld {
      */
     public void movePlayerGameCharacter(Integer id, float xPos, float yPos) {
         getGameCharacter(id).moveToNewPos(xPos, yPos);
+        getGameCharacter(id).updatePosition();
+    }
+
+    public Map<String, Enemy> getEnemyMap() {
+        return enemyMap;
+    }
+
+    public void addEnemy(Enemy enemy) {
+        enemyMap.put(enemy.getBotHash(), enemy);
+    }
+
+    public void removeEnemy(Enemy enemy) {
+        enemyMap.remove(enemy.getBotHash());
+    }
+
+    public Enemy getEnemy(String botHash) {
+        return enemyMap.get(botHash);
     }
 }

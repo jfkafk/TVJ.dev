@@ -31,6 +31,7 @@ public class GameCharacter {
     public Body b2body;
 
     private boolean bodyDefined = false;
+    private Vector2 newPosition;
 
     /**
      * GameCharacter constructor.
@@ -51,7 +52,6 @@ public class GameCharacter {
         this.height = height;
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
-        defineCharacter();
     }
 
     /**
@@ -79,11 +79,29 @@ public class GameCharacter {
 
             // Set the flag to true to indicate that the body has been defined
             bodyDefined = true;
+
+            newPosition = new Vector2();
         }
     }
 
     public float getMovementSpeed() {
         return this.movementSpeed;
+    }
+
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
+    }
+
+    public void setyPosition(float yPosition) {
+        this.yPosition = yPosition;
+    }
+
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public float getyPosition() {
+        return yPosition;
     }
 
     public Rectangle getBoundingBox() {
@@ -99,7 +117,18 @@ public class GameCharacter {
     public void moveToNewPos(float xPos, float yPos) {
         this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
         if (b2body != null) {
-            b2body.setTransform(xPos, yPos, b2body.getAngle());
+            // Store the new position for later update
+            this.newPosition.set(xPos, yPos);
+        }
+    }
+
+    /**
+     * Update the position of the Box2D body.
+     * This method should be called outside the physics simulation loop.
+     */
+    public void updatePosition() {
+        if (b2body != null && newPosition != null) {
+            b2body.setTransform(newPosition, b2body.getAngle());
         }
     }
 
