@@ -61,8 +61,11 @@ public class ClientConnection {
 
 			// Receive packets from the Server.
 			public void received(Connection connection, Object object) {
+
 				if (object instanceof Packet) {
+
 					if (object instanceof PacketAddCharacter) {
+						// Packet for adding player to game.
 						PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
 						if (connection.getID() == ((PacketAddCharacter) object).getId()) {
 							MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
@@ -75,8 +78,9 @@ public class ClientConnection {
 							// Add new PlayerGameCharacter to client's game.
 							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 						}
+
 					} else  if (object instanceof PacketUpdateCharacterInformation) {
-						System.out.println("update other player");
+						// Packer for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
@@ -85,19 +89,21 @@ public class ClientConnection {
 						}
 
 					} else if (object instanceof PacketClientDisconnect) {
+						// Packet for removing player from world if disconnected.
 						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
 						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
 						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 
 					} else if (object instanceof PacketNewEnemy) {
-						System.out.println("new enemy");
+						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
 						enemy.defineCharacter();
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy) {
+						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
 							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
@@ -138,23 +144,42 @@ public class ClientConnection {
 		client.sendUDP(packet);
 	}
 
-
+	/**
+	 * Set game screen.
+	 * @param gameScreen game screen.
+	 */
 	public void setGameScreen(GameScreen gameScreen) {
 		this.gameScreen = gameScreen;
 	}
 
+	/**
+	 * Get game screen.
+	 * @return game screen.
+	 */
 	public GameScreen getGameScreen() {
 		return gameScreen;
 	}
 
+	/**
+	 * Set client world.
+	 * @param clientWorld client world.
+	 */
 	public void setClientWorld(ClientWorld clientWorld){
 		this.clientWorld = clientWorld;
 	}
 
+	/**
+	 * Set game client.
+	 * @param gameClient game client.
+	 */
 	public void setGameClient(GameClient gameClient) {
 		this.gameClient = gameClient;
 	}
 
+	/**
+	 * Get game client.
+	 * @return game client.
+	 */
 	public GameClient getGameClient() {
 		return gameClient;
 	}

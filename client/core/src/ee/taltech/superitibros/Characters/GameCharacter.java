@@ -84,26 +84,6 @@ public class GameCharacter {
         }
     }
 
-    public float getMovementSpeed() {
-        return this.movementSpeed;
-    }
-
-    public void setxPosition(float xPosition) {
-        this.xPosition = xPosition;
-    }
-
-    public void setyPosition(float yPosition) {
-        this.yPosition = yPosition;
-    }
-
-    public float getxPosition() {
-        return xPosition;
-    }
-
-    public float getyPosition() {
-        return yPosition;
-    }
-
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
@@ -132,6 +112,9 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Method for jumping.
+     */
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
@@ -140,22 +123,33 @@ public class GameCharacter {
         }
     }
 
-    // Fall faster
+    /**
+     * Method for faster falling.
+     */
     public void fallDown() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
     }
 
+    /**
+     * Method for moving right.
+     */
     // Move right
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
-    // Move left
+    /**
+     * Method for moving left.
+     */
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
     }
 
+    /**
+     * Method for checking if player is grounded.
+     * @return true if grounded, otherwise false.
+     */
     public boolean isGrounded() {
         return b2body.getLinearVelocity().y == 0;
     }
@@ -165,6 +159,10 @@ public class GameCharacter {
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
+    /**
+     * Method for drawing character.
+     * @param batch batch.
+     */
     public void draw(SpriteBatch batch) {
         // Create a sprite with the texture
         Sprite sprite = new Sprite(new Texture("Characters/TestCharacter.png"));
