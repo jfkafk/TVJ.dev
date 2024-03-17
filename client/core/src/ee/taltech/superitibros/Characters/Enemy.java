@@ -1,13 +1,7 @@
 package ee.taltech.superitibros.Characters;
 
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-
-import java.util.Objects;
 
 public class Enemy extends GameCharacter {
 
@@ -42,10 +36,18 @@ public class Enemy extends GameCharacter {
         return enemy;
     }
 
+    /**
+     * Set bot hash.
+     * @param botHash bot hash to set.
+     */
     public void setBotHash(String botHash) {
         this.botHash = botHash;
     }
 
+    /**
+     * Get bot hash.
+     * @return bot hash.
+     */
     public String getBotHash() {
         return botHash;
     }

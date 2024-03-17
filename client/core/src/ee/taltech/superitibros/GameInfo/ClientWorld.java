@@ -90,10 +90,18 @@ public class ClientWorld {
         this.mapLayer = tiledMap.getLayers().get(2);
     }
 
+    /**
+     * Get tiled map.
+     * @return tiled map.
+     */
     public TiledMap getMap() {
         return new TmxMapLoader().load("Maps/level1/level1.tmx");
     }
 
+    /**
+     * Get gdx world.
+     * @return gdx world.
+     */
     public com.badlogic.gdx.physics.box2d.World getGdxWorld() {
         return gdxWorld;
     }
@@ -105,10 +113,18 @@ public class ClientWorld {
         this.clientConnection = clientConnection;
     }
 
+    /**
+     * Set my player.
+     * @param myPlayerGameCharacter my player.
+     */
     public void setMyPlayerGameCharacter(MyPlayerGameCharacter myPlayerGameCharacter) {
         this.myPlayerGameCharacter = myPlayerGameCharacter;
     }
 
+    /**
+     * Get my player.
+     * @return my player.
+     */
     public MyPlayerGameCharacter getMyPlayerGameCharacter() {
         return myPlayerGameCharacter;
     }
@@ -122,6 +138,11 @@ public class ClientWorld {
         return worldGameCharactersMap;
     }
 
+    /**
+     * Get game character by id.
+     * @param id character's id.
+     * @return game character.
+     */
     public GameCharacter getGameCharacter(Integer id){
         return worldGameCharactersMap.get(id);
     }
@@ -150,6 +171,9 @@ public class ClientWorld {
         getGameCharacter(id).updatePosition();
     }
 
+    /**
+     * Method for moving enemy.
+     */
     public void moveEnemies() {
         for (Enemy enemy : this.getEnemyMap().values()) {
             enemy.moveToNewPos(enemy.xPosition);
@@ -157,18 +181,35 @@ public class ClientWorld {
         }
     }
 
+    /**
+     * Get enemy map.
+     * @return enemy map.
+     */
     public Map<String, Enemy> getEnemyMap() {
         return enemyMap;
     }
 
+    /**
+     * Add enemy to game.
+     * @param enemy to add.
+     */
     public void addEnemy(Enemy enemy) {
         enemyMap.put(enemy.getBotHash(), enemy);
     }
 
+    /**
+     * Remove enemy from game.
+     * @param enemy to remove.
+     */
     public void removeEnemy(Enemy enemy) {
         enemyMap.remove(enemy.getBotHash());
     }
 
+    /**
+     * Get enemy by hash.
+     * @param botHash hash.
+     * @return enemy.
+     */
     public Enemy getEnemy(String botHash) {
         return enemyMap.get(botHash);
     }

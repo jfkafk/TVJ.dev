@@ -5,7 +5,9 @@ import com.mygdx.game.World.World;
 
 public class Enemy extends GameCharacter {
 
+    // Bot hash
     String botHash;
+    // Unique number for botHash
     static int nextBotHashNumber = 0;
 
     // Enemy (AI) states
@@ -15,7 +17,6 @@ public class Enemy extends GameCharacter {
     private static final float DETECTION_RANGE = 100f;
 
     private State currentState = State.IDLE;
-    private long elapsedTime = 0;
     private long lastUpdateTime;
 
     /**
@@ -47,15 +48,25 @@ public class Enemy extends GameCharacter {
         return new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
     }
 
+    /**
+     * Get bot hash.
+     * @return bot hash.
+     */
     public String getBotHash() {
         return botHash;
     }
 
+    /**
+     * Main method for looping.
+     */
     public void spin() {
         sense();
         act();
     }
 
+    /**
+     * Sense method for npc sensing.
+     */
     private void sense() {
         float minDistance = DETECTION_RANGE;
         for (GameCharacter player : getWorld().getClients().values()) {
@@ -70,12 +81,10 @@ public class Enemy extends GameCharacter {
         }
     }
 
+    /**
+     * Act method for acting.
+     */
     private void act() {
-        long currentTime = System.currentTimeMillis();
-        long deltaTime = currentTime - lastUpdateTime;
-        lastUpdateTime = currentTime;
-        elapsedTime += deltaTime;
-
         switch (currentState) {
             case RUNNING_LEFT:
                 xPosition -= MOVEMENT_SPEED;

@@ -93,7 +93,7 @@ public class ServerConnection {
 					}
 
 				} else if (object instanceof PacketUpdateCharacterInformation) {
-					System.out.println("got packet update");
+					// Packet for updating player position
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 					// Update PlayerGameCharacter's coordinates.
 					serverWorld.getClients().get(connection.getID()).xPosition = packet.getX();
@@ -102,6 +102,7 @@ public class ServerConnection {
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY());
 
 				} else if (object instanceof PacketUpdateEnemy) {
+					// Packet for updating enemy position
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
 					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
@@ -176,18 +177,31 @@ public class ServerConnection {
 		server.sendToAllExceptUDP(Id, packet);
 	}
 
+	/**
+	 * Add enemy to server world.
+	 * @param xPosition x coordinate.
+	 * @param yPosition y coordinate.
+	 * @param world server world.
+	 */
 	public void addEnemyToGame(float xPosition, float yPosition, World world) {
 		Enemy enemy = Enemy.createEnemy(xPosition, yPosition, world);
 		world.addEnemy(enemy.getBotHash(), enemy);
 	}
 
+	/**
+	 * Add enemy to client's game.
+	 * @param botHash bot hash.
+	 * @param xPosition x coordinate.
+	 * @param yPosition y coordinate.
+	 * @param connectionId player connection id.
+	 */
 	public void addEnemyToClientsGame(String botHash, float xPosition, float yPosition, Integer connectionId) {
 		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewZombies(botHash, xPosition, yPosition);
 		server.sendToTCP(connectionId, packetNewEnemy);
 	}
 
 	/**
-	 * Method for sending serverWorld's updated Zombie instances info to all connections.
+	 * Method for sending serverWorld's updated Enemy instances info to all connections.
 	 */
 	public void sendUpdatedEnemies() {
 		serverWorld.updateEnemyInTheWorldEnemyMap();

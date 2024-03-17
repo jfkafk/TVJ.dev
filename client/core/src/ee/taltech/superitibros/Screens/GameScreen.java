@@ -79,6 +79,10 @@ public class GameScreen implements Screen, InputProcessor {
         batch.setProjectionMatrix(camera.combined);
     }
 
+    /**
+     * Register client connection.
+     * @param clientConnection client connection.
+     */
     public void registerClientConnection(ClientConnection clientConnection) {
         this.clientConnection = clientConnection;
     }
@@ -120,6 +124,9 @@ public class GameScreen implements Screen, InputProcessor {
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
     }
 
+    /**
+     * Method for updating camera position.
+     */
     private void updateCameraPosition() {
         if (clientWorld.getMyPlayerGameCharacter() != null) {
             // Set the target position to the center of the player character's bounding box
@@ -173,6 +180,7 @@ public class GameScreen implements Screen, InputProcessor {
                 lastPacketCount = 0;
             }
 
+             // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
             if (lastPacketCount < 3) {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
                 lastPacketCount++;
