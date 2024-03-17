@@ -5,13 +5,9 @@ import com.mygdx.game.World.World;
 
 public class Enemy extends GameCharacter {
 
-<<<<<<< HEAD
     // Bot hash
     String botHash;
     // Unique number for botHash
-=======
-    String botHash;
->>>>>>> 7e80772 (Some initial npc is added. Now need to add multiple states. Also deleted wrong server repo. And fixed bug that after last input was done, three packets are sent more.)
     static int nextBotHashNumber = 0;
 
     // Enemy (AI) states
@@ -21,7 +17,6 @@ public class Enemy extends GameCharacter {
     private static final float DETECTION_RANGE = 100f;
 
     private State currentState = State.IDLE;
-    private long elapsedTime = 0;
     private long lastUpdateTime;
 
     /**
@@ -53,6 +48,10 @@ public class Enemy extends GameCharacter {
         return new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
     }
 
+    /**
+     * Get bot hash.
+     * @return bot hash.
+     */
     public String getBotHash() {
         return botHash;
     }
@@ -65,6 +64,9 @@ public class Enemy extends GameCharacter {
         act();
     }
 
+    /**
+     * Sense method for npc sensing.
+     */
     private void sense() {
         float minDistance = DETECTION_RANGE;
         for (GameCharacter player : getWorld().getClients().values()) {
@@ -79,12 +81,10 @@ public class Enemy extends GameCharacter {
         }
     }
 
+    /**
+     * Act method for acting.
+     */
     private void act() {
-        long currentTime = System.currentTimeMillis();
-        long deltaTime = currentTime - lastUpdateTime;
-        lastUpdateTime = currentTime;
-        elapsedTime += deltaTime;
-
         switch (currentState) {
             case RUNNING_LEFT:
                 xPosition -= MOVEMENT_SPEED;

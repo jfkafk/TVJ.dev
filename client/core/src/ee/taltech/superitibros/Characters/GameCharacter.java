@@ -84,26 +84,6 @@ public class GameCharacter {
         }
     }
 
-    public float getMovementSpeed() {
-        return this.movementSpeed;
-    }
-
-    public void setxPosition(float xPosition) {
-        this.xPosition = xPosition;
-    }
-
-    public void setyPosition(float yPosition) {
-        this.yPosition = yPosition;
-    }
-
-    public float getxPosition() {
-        return xPosition;
-    }
-
-    public float getyPosition() {
-        return yPosition;
-    }
-
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
@@ -179,6 +159,10 @@ public class GameCharacter {
         return Objects.hash(movementSpeed, boundingBox.getX(), boundingBox.getY(), boundingBox.getWidth(), boundingBox.getHeight(), characterTexture);
     }
 
+    /**
+     * Method for drawing character.
+     * @param batch batch.
+     */
     public void draw(SpriteBatch batch) {
         // Create a sprite with the texture
         Sprite sprite = new Sprite(new Texture("Characters/TestCharacter.png"));

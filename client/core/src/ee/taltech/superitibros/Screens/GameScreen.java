@@ -180,6 +180,7 @@ public class GameScreen implements Screen, InputProcessor {
                 lastPacketCount = 0;
             }
 
+             // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
             if (lastPacketCount < 3) {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
                 lastPacketCount++;
