@@ -342,6 +342,15 @@ public class GameCharacter {
                     System.out.println("WALKING LEFT");
                 }
                 break;
+            case FALL:
+                if (facingRight) {
+                    currentFrame = fallAnimationRight.getKeyFrame(stateTime, true);
+                    System.out.println("FALLING RIGHT");
+                } else {
+                    currentFrame = fallAnimationLeft.getKeyFrame(stateTime, true);
+                    System.out.println("FALLING LEFT");
+                }
+                break;
             case JUMPING:
                 if (facingRight) {
                     currentFrame = jumpAnimationRight.getKeyFrame(stateTime, true);
@@ -359,6 +368,7 @@ public class GameCharacter {
                     currentFrame = fallAnimationLeft.getKeyFrame(stateTime, true);
                     System.out.println("FALLING LEFT");
                 }
+                break;
         }
 
         // Set the position of the current frame to match the position of the Box2D body
