@@ -127,6 +127,10 @@ public class ServerConnection {
 		serverUpdateThread.setServerWorld(serverWorld);
 		new Thread(serverUpdateThread).start();
 		System.out.println("Thread is on!");
+
+		addEnemyToGame(100, 35, serverWorld);
+		addEnemyToGame(150, 35, serverWorld);
+		addEnemyToGame(200, 35, serverWorld);
 	}
 
 	/**
@@ -153,8 +157,6 @@ public class ServerConnection {
 		// Create a packet to send new PlayerGameCharacter's info.
 		PacketAddCharacter addCharacter = PacketCreator.createPacketAddCharacter(newCharacterConnection.getID(), newPlayerGameCharacter.getBoundingBox().getX(), newPlayerGameCharacter.getBoundingBox().getY());
 		server.sendToAllTCP(addCharacter);  // Send packet to all connections.
-
-		addEnemyToGame(100, 30, serverWorld);
 	}
 
 	/**

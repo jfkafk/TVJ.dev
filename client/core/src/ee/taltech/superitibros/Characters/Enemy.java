@@ -28,10 +28,6 @@ public class Enemy extends GameCharacter {
         super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
     }
 
-    @Override
-    public void defineCharacter() {
-    }
-
     /**
      * Enemy static method for creating a new Enemy instance.
      *
@@ -54,16 +50,17 @@ public class Enemy extends GameCharacter {
         return botHash;
     }
 
-    public void draw(SpriteBatch batch) {
-        // Create a sprite with the texture
-        Sprite sprite = new Sprite(new Texture("Characters/TestCharacter.png"));
-        sprite.setSize((boundingBox.width) * 2, (boundingBox.height) * 2);
-
-        // Set the position of the sprite to match the physics body
-        sprite.setPosition((xPosition - boundingBox.width), (yPosition - boundingBox.height));
-
-        // Draw the sprite
-        sprite.draw(batch);
+    /**
+     * Moves the GameCharacter to a new position.
+     *
+     * @param xPos of the GameCharacter's new coordinates
+     */
+    public void moveToNewPos(float xPos) {
+        this.boundingBox.set(xPos, b2body.getPosition().y, boundingBox.getWidth(), boundingBox.getHeight());
+        if (b2body != null) {
+            // Store the new position for later update
+            this.newPosition.set(xPos, b2body.getPosition().y);
+        }
     }
 
 }

@@ -113,6 +113,7 @@ public class GameScreen implements Screen, InputProcessor {
         batch.begin();
         updatePlayersPositions();
         drawPlayerGameCharacters();
+        clientWorld.moveEnemies();
         drawEnemies();
         batch.end();
 
