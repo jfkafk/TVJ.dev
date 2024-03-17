@@ -84,13 +84,6 @@ public class ClientConnection {
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
-							System.out.println("client connection x pos: " + packetUpdateCharacterInformation.getX());
-							System.out.println("packet update character pos");
-							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
-							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
-							System.out.println(packetUpdateCharacterInformation.getCurrentState());
-							System.out.println("got state: " + packetUpdateCharacterInformation.getCurrentState());
-							gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
 						}
@@ -103,18 +96,16 @@ public class ClientConnection {
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 
 					} else if (object instanceof PacketNewEnemy) {
-						// Packet for adding enemy to game.
+						System.out.println("new enemy");
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
-						enemy.defineCharacter();
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy) {
-						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
-							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
-							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
+							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).setxPosition(packetUpdateEnemy.getxPosition());
+							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).setyPosition(packetUpdateEnemy.getyPosition());
 						}
 					}
 				}
@@ -146,13 +137,8 @@ public class ClientConnection {
 	 * @param x of the PlayerGameCharacters x coordinate (float)
 	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
-	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
-		System.out.println("Send player info");
-		System.out.println("sent: " + x);
+	public void sendPlayerInformation(float x, float y) {
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
-		System.out.println("sent state: " + currentState);
-		packet.setCurrentState(currentState);
-		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);
 	}
 

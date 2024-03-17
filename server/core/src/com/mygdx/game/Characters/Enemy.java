@@ -22,6 +22,7 @@ public class Enemy extends GameCharacter {
     /**
      * GameCharacter constructor.
      *
+     * @param movementSpeed of the PlayerGameCharacter (float)
      * @param boundingBox   encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
      * @param xPosition     of the PlayerGameCharacter (float)
      * @param yPosition     of the PlayerGameCharacter (float)
@@ -29,11 +30,10 @@ public class Enemy extends GameCharacter {
      * @param height        of the PlayerGameCharacter (float)
      * @param world         game world (World)
      */
-    public Enemy(Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
-        super(MOVEMENT_SPEED, boundingBox, xPosition, yPosition, width, height, world);
+    public Enemy(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
+        super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
         botHash = "Bot" + nextBotHashNumber;
-        lastUpdateTime = System.currentTimeMillis();
-        nextBotHashNumber++; // Incrementing here
+        incrementNextBotHashNumber();
     }
 
     /**
@@ -45,13 +45,14 @@ public class Enemy extends GameCharacter {
      */
     public static Enemy createEnemy(float x, float y, World world) {
         Rectangle enemyRectangle = new Rectangle(x, y, 10f, 20f);
-        return new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
+        Enemy enemy = new Enemy(10f, enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
+        return enemy;
     }
 
-    /**
-     * Get bot hash.
-     * @return bot hash.
-     */
+    private static void incrementNextBotHashNumber() {
+        nextBotHashNumber++;
+    }
+
     public String getBotHash() {
         return botHash;
     }
@@ -64,11 +65,10 @@ public class Enemy extends GameCharacter {
         act();
     }
 
-    /**
-     * Sense method for npc sensing.
-     */
-    private void sense() {
-        float minDistance = DETECTION_RANGE;
+    public void sense() {
+        float minDistance = Float.MAX_VALUE;
+        GameCharacter closestPlayer = null;
+
         for (GameCharacter player : getWorld().getClients().values()) {
             float distance = Math.abs(xPosition - player.xPosition) + Math.abs(yPosition - player.yPosition);
             if (distance < minDistance) {
@@ -81,19 +81,11 @@ public class Enemy extends GameCharacter {
         }
     }
 
-    /**
-     * Act method for acting.
-     */
     private void act() {
-        switch (currentState) {
-            case RUNNING_LEFT:
-                xPosition -= MOVEMENT_SPEED;
-                break;
-            case RUNNING_RIGHT:
-                xPosition += MOVEMENT_SPEED;
-                break;
-            case IDLE:
-                break;
+        if (currentState == State.RUNNING_LEFT) {
+            xPosition -= 0.1f;
+        } else if (currentState == State.RUNNING_RIGHT) {
+            xPosition += 0.1f;
         }
     }
 }
