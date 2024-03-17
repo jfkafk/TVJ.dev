@@ -5,9 +5,13 @@ import com.mygdx.game.World.World;
 
 public class Enemy extends GameCharacter {
 
+<<<<<<< HEAD
     // Bot hash
     String botHash;
     // Unique number for botHash
+=======
+    String botHash;
+>>>>>>> 7e80772 (Some initial npc is added. Now need to add multiple states. Also deleted wrong server repo. And fixed bug that after last input was done, three packets are sent more.)
     static int nextBotHashNumber = 0;
 
     // Enemy (AI) states
@@ -17,12 +21,12 @@ public class Enemy extends GameCharacter {
     private static final float DETECTION_RANGE = 100f;
 
     private State currentState = State.IDLE;
+    private long elapsedTime = 0;
     private long lastUpdateTime;
 
     /**
      * GameCharacter constructor.
      *
-     * @param movementSpeed of the PlayerGameCharacter (float)
      * @param boundingBox   encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
      * @param xPosition     of the PlayerGameCharacter (float)
      * @param yPosition     of the PlayerGameCharacter (float)
@@ -30,10 +34,11 @@ public class Enemy extends GameCharacter {
      * @param height        of the PlayerGameCharacter (float)
      * @param world         game world (World)
      */
-    public Enemy(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
-        super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
+    public Enemy(Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
+        super(MOVEMENT_SPEED, boundingBox, xPosition, yPosition, width, height, world);
         botHash = "Bot" + nextBotHashNumber;
-        incrementNextBotHashNumber();
+        lastUpdateTime = System.currentTimeMillis();
+        nextBotHashNumber++; // Incrementing here
     }
 
     /**
@@ -45,12 +50,7 @@ public class Enemy extends GameCharacter {
      */
     public static Enemy createEnemy(float x, float y, World world) {
         Rectangle enemyRectangle = new Rectangle(x, y, 10f, 20f);
-        Enemy enemy = new Enemy(10f, enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
-        return enemy;
-    }
-
-    private static void incrementNextBotHashNumber() {
-        nextBotHashNumber++;
+        return new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
     }
 
     public String getBotHash() {
@@ -65,10 +65,8 @@ public class Enemy extends GameCharacter {
         act();
     }
 
-    public void sense() {
-        float minDistance = Float.MAX_VALUE;
-        GameCharacter closestPlayer = null;
-
+    private void sense() {
+        float minDistance = DETECTION_RANGE;
         for (GameCharacter player : getWorld().getClients().values()) {
             float distance = Math.abs(xPosition - player.xPosition) + Math.abs(yPosition - player.yPosition);
             if (distance < minDistance) {
@@ -82,10 +80,20 @@ public class Enemy extends GameCharacter {
     }
 
     private void act() {
-        if (currentState == State.RUNNING_LEFT) {
-            xPosition -= 0.1f;
-        } else if (currentState == State.RUNNING_RIGHT) {
-            xPosition += 0.1f;
+        long currentTime = System.currentTimeMillis();
+        long deltaTime = currentTime - lastUpdateTime;
+        lastUpdateTime = currentTime;
+        elapsedTime += deltaTime;
+
+        switch (currentState) {
+            case RUNNING_LEFT:
+                xPosition -= MOVEMENT_SPEED;
+                break;
+            case RUNNING_RIGHT:
+                xPosition += MOVEMENT_SPEED;
+                break;
+            case IDLE:
+                break;
         }
     }
 }

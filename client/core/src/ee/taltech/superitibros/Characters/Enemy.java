@@ -59,7 +59,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Moves the GameCharacter to a new position.
+     * Moves the Enemy to a new position.
      *
      * @param xPos of the GameCharacter's new coordinates
      */
