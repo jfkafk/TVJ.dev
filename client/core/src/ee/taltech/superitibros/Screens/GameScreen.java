@@ -44,6 +44,8 @@ public class GameScreen implements Screen, InputProcessor {
     private ClientConnection clientConnection;
     private final ClientWorld clientWorld;
 
+    private int lastPacketCount = 0;
+
     /**
      * GameScreen constructor
      *
@@ -168,6 +170,12 @@ public class GameScreen implements Screen, InputProcessor {
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
+                lastPacketCount = 0;
+            }
+
+            if (lastPacketCount < 3) {
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
+                lastPacketCount++;
             }
 
             // Reset the velocity before applying new forces
