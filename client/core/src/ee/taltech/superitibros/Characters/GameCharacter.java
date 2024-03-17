@@ -350,8 +350,13 @@ public class GameCharacter {
 
         switch (currentState) {
             case IDLE:
-                currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
-                System.out.println("IDLE,IDLE");
+                if (facingRight) {
+                    currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
+                    System.out.println("IDLE, RIGHT");
+                } else {
+                    currentFrame = idleAnimationLeft.getKeyFrame(stateTime, true);
+                    System.out.println("IDLE LEFT");
+                }
                 break;
             case WALKING:
                 if (facingRight) {
