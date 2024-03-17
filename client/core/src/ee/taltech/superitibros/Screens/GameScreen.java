@@ -2,7 +2,9 @@ package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
+import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
 import com.badlogic.gdx.Gdx;
@@ -12,7 +14,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -32,7 +33,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Graphics and Texture
     private final SpriteBatch batch;
-    private TextureAtlas textureAtlas;
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
 
@@ -113,6 +113,7 @@ public class GameScreen implements Screen, InputProcessor {
         batch.begin();
         updatePlayersPositions();
         drawPlayerGameCharacters();
+        drawEnemies();
         batch.end();
 
         // Render Box2D debug
@@ -204,6 +205,16 @@ public class GameScreen implements Screen, InputProcessor {
             if (player != clientWorld.getMyPlayerGameCharacter()) {
                 player.updatePosition();
             }
+        }
+    }
+
+    /**
+     * Method for drawing Enemies.
+     */
+    public void drawEnemies() {
+        List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
+        for (Enemy enemy : enemies) {
+            enemy.draw(batch);
         }
     }
 
