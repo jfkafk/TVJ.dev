@@ -89,10 +89,6 @@ public class GameCharacter {
         animationCreated = true;
 
     }
-    public boolean isFacingRight() {
-        System.out.println(b2body.getLinearVelocity().x);
-        return b2body.getLinearVelocity().x > 0;
-    }
 
     public void createFramesIdle() {
         // Sprite
@@ -302,6 +298,7 @@ public class GameCharacter {
     // Move right
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
+        facingRight = true;
     }
 
     /**
@@ -310,6 +307,7 @@ public class GameCharacter {
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
+        facingRight = false;
     }
 
     /**
@@ -350,8 +348,6 @@ public class GameCharacter {
 
         b2body.setLinearVelocity(0, b2body.getLinearVelocity().y);
 
-        // getting the state of the character
-        isFacingRight();
         switch (currentState) {
             case IDLE:
                 currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
@@ -364,15 +360,6 @@ public class GameCharacter {
                 } else {
                     currentFrame = walkAnimationLeft.getKeyFrame(stateTime, true);
                     System.out.println("WALKING LEFT");
-                }
-                break;
-            case FALL:
-                if (facingRight) {
-                    currentFrame = fallAnimationRight.getKeyFrame(stateTime, true);
-                    System.out.println("FALLING RIGHT");
-                } else {
-                    currentFrame = fallAnimationLeft.getKeyFrame(stateTime, true);
-                    System.out.println("FALLING LEFT");
                 }
                 break;
             case JUMPING:
