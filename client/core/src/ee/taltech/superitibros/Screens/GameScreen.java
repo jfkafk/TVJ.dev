@@ -111,7 +111,6 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Render game objects
         batch.begin();
-        updatePlayersPositions();
         drawPlayerGameCharacters();
         clientWorld.moveEnemies();
         drawEnemies();
@@ -149,7 +148,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
     private void detectInput(){
-
+        System.out.println(clientWorld.getMyPlayerGameCharacter() != null);
         if (clientWorld.getMyPlayerGameCharacter() != null) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
@@ -168,21 +167,19 @@ public class GameScreen implements Screen, InputProcessor {
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 clientWorld.getMyPlayerGameCharacter().moveRight();
             }
-
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
                 lastPacketCount = 0;
             }
 
-            // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
             if (lastPacketCount < 3) {
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
                 lastPacketCount++;
             }
 
             // Reset the velocity before applying new forces
-            // clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
+            clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
         }
     }
 
@@ -195,17 +192,6 @@ public class GameScreen implements Screen, InputProcessor {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
             character.draw(batch);
-            if (character != clientWorld.getMyPlayerGameCharacter()) {
-                System.out.println(character.b2body.getLinearVelocity().x);
-            }
-        }
-    }
-
-    public void updatePlayersPositions() {
-        for (GameCharacter player : clientWorld.getWorldGameCharactersMap().values()) {
-            if (player != clientWorld.getMyPlayerGameCharacter()) {
-                player.updatePosition();
-            }
         }
     }
 
