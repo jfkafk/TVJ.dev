@@ -150,6 +150,13 @@ public class ClientWorld {
         getGameCharacter(id).updatePosition();
     }
 
+    public void moveEnemies() {
+        for (Enemy enemy : this.getEnemyMap().values()) {
+            enemy.moveToNewPos(enemy.xPosition);
+            enemy.updatePosition();
+        }
+    }
+
     public Map<String, Enemy> getEnemyMap() {
         return enemyMap;
     }
