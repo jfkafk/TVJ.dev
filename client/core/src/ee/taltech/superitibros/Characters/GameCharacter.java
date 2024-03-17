@@ -31,7 +31,7 @@ public class GameCharacter {
     public Body b2body;
 
     private boolean bodyDefined = false;
-    private Vector2 newPosition;
+    Vector2 newPosition;
 
     /**
      * GameCharacter constructor.

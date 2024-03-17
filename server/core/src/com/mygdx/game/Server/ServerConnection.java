@@ -158,8 +158,6 @@ public class ServerConnection {
 		// Create a packet to send new PlayerGameCharacter's info.
 		PacketAddCharacter addCharacter = PacketCreator.createPacketAddCharacter(newCharacterConnection.getID(), newPlayerGameCharacter.getBoundingBox().getX(), newPlayerGameCharacter.getBoundingBox().getY());
 		server.sendToAllTCP(addCharacter);  // Send packet to all connections.
-
-		addEnemyToGame(100, 30, serverWorld);
 	}
 
 	/**

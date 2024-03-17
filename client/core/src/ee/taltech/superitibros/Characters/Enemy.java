@@ -28,10 +28,6 @@ public class Enemy extends GameCharacter {
         super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
     }
 
-    @Override
-    public void defineCharacter() {
-    }
-
     /**
      * Enemy static method for creating a new Enemy instance.
      *
@@ -63,7 +59,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Moves the Enemy to a new position.
+     * Moves the GameCharacter to a new position.
      *
      * @param xPos of the GameCharacter's new coordinates
      */
