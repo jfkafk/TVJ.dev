@@ -44,6 +44,14 @@ public class GameCharacter {
         this.world = world;
     }
 
+    public float getxPosition() {
+        return xPosition;
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
     public Rectangle getBoundingBox() {
         return boundingBox;
     }

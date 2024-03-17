@@ -2,7 +2,9 @@ package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
+import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
 import com.badlogic.gdx.Gdx;
@@ -12,7 +14,6 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -32,7 +33,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Graphics and Texture
     private final SpriteBatch batch;
-    private TextureAtlas textureAtlas;
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
 
@@ -43,6 +43,8 @@ public class GameScreen implements Screen, InputProcessor {
     // Client's connection, world
     private ClientConnection clientConnection;
     private final ClientWorld clientWorld;
+
+    private int lastPacketCount = 0;
 
     /**
      * GameScreen constructor
@@ -77,6 +79,10 @@ public class GameScreen implements Screen, InputProcessor {
         batch.setProjectionMatrix(camera.combined);
     }
 
+    /**
+     * Register client connection.
+     * @param clientConnection client connection.
+     */
     public void registerClientConnection(ClientConnection clientConnection) {
         this.clientConnection = clientConnection;
     }
@@ -110,12 +116,17 @@ public class GameScreen implements Screen, InputProcessor {
         // Render game objects
         batch.begin();
         drawPlayerGameCharacters();
+        clientWorld.moveEnemies();
+        drawEnemies();
         batch.end();
 
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
     }
 
+    /**
+     * Method for updating camera position.
+     */
     private void updateCameraPosition() {
         if (clientWorld.getMyPlayerGameCharacter() != null) {
             // Set the target position to the center of the player character's bounding box
@@ -166,6 +177,13 @@ public class GameScreen implements Screen, InputProcessor {
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
                 clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
+                lastPacketCount = 0;
+            }
+
+             // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
+            if (lastPacketCount < 3) {
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition);
+                lastPacketCount++;
             }
 
             // Reset the velocity before applying new forces
@@ -182,6 +200,16 @@ public class GameScreen implements Screen, InputProcessor {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
             character.draw(batch);
+        }
+    }
+
+    /**
+     * Method for drawing Enemies.
+     */
+    public void drawEnemies() {
+        List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
+        for (Enemy enemy : enemies) {
+            enemy.draw(batch);
         }
     }
 

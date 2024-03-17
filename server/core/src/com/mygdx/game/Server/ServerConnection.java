@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
+import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.GameCharacter;
 import com.mygdx.game.Characters.PlayerGameCharacter;
 import com.mygdx.game.World.World;
@@ -12,10 +13,8 @@ import packets.*;
 
 import javax.swing.JOptionPane;
 import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 public class ServerConnection {
@@ -23,10 +22,12 @@ public class ServerConnection {
 	static com.esotericsoftware.kryonet.Server server;
 	static final int udpPort = 5007, tcpPort = 5008;
 	private World serverWorld;
+	private ServerUpdateThread serverUpdateThread;
 
 	private float playerGameCharacterX = 280f;
 	private float playerGameCharacterY = 250f;
 	private int playerCount = 0;
+	int x = 0;
 
 	/**
 	 * Server connection.
@@ -57,6 +58,8 @@ public class ServerConnection {
 		server.getKryo().register(Rectangle.class);
 		server.getKryo().register(HashMap.class);
 		server.getKryo().register(PacketClientDisconnect.class);
+		server.getKryo().register(PacketNewEnemy.class);
+		server.getKryo().register(PacketUpdateEnemy.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -84,8 +87,13 @@ public class ServerConnection {
 						}
 					}
 
+					// Send enemies info to joined player
+					for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
+						addEnemyToClientsGame(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition(), connection.getID());
+					}
+
 				} else if (object instanceof PacketUpdateCharacterInformation) {
-					System.out.println("got packet update");
+					// Packet for updating player position
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 					// Update PlayerGameCharacter's coordinates.
 					serverWorld.getClients().get(connection.getID()).xPosition = packet.getX();
@@ -93,6 +101,11 @@ public class ServerConnection {
 					// Send PlayerGameCharacter's new coordinate and direction to all connections.
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY());
 
+				} else if (object instanceof PacketUpdateEnemy) {
+					// Packet for updating enemy position
+					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
+					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
+					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 				}
 			}
 
@@ -108,6 +121,17 @@ public class ServerConnection {
 		});
 
 		System.out.println("Server is on!");
+
+		// Start ServerUpdateThread.
+		serverUpdateThread = new ServerUpdateThread();
+		serverUpdateThread.setServerConnection(this);
+		serverUpdateThread.setServerWorld(serverWorld);
+		new Thread(serverUpdateThread).start();
+		System.out.println("Thread is on!");
+
+		addEnemyToGame(100, 35, serverWorld);
+		addEnemyToGame(150, 35, serverWorld);
+		addEnemyToGame(200, 35, serverWorld);
 	}
 
 	/**
@@ -151,6 +175,41 @@ public class ServerConnection {
 		System.out.println("sent " + xPos);
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(Id, xPos, yPos);
 		server.sendToAllExceptUDP(Id, packet);
+	}
+
+	/**
+	 * Add enemy to server world.
+	 * @param xPosition x coordinate.
+	 * @param yPosition y coordinate.
+	 * @param world server world.
+	 */
+	public void addEnemyToGame(float xPosition, float yPosition, World world) {
+		Enemy enemy = Enemy.createEnemy(xPosition, yPosition, world);
+		world.addEnemy(enemy.getBotHash(), enemy);
+	}
+
+	/**
+	 * Add enemy to client's game.
+	 * @param botHash bot hash.
+	 * @param xPosition x coordinate.
+	 * @param yPosition y coordinate.
+	 * @param connectionId player connection id.
+	 */
+	public void addEnemyToClientsGame(String botHash, float xPosition, float yPosition, Integer connectionId) {
+		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewZombies(botHash, xPosition, yPosition);
+		server.sendToTCP(connectionId, packetNewEnemy);
+	}
+
+	/**
+	 * Method for sending serverWorld's updated Enemy instances info to all connections.
+	 */
+	public void sendUpdatedEnemies() {
+		serverWorld.updateEnemyInTheWorldEnemyMap();
+		// Enemy instance id (key) and new coordinates (value) are sent.
+		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
+			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateZombies(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
+			server.sendToAllUDP(packetUpdateEnemy);
+		}
 	}
 
 	/**
