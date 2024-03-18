@@ -193,18 +193,6 @@ public class ServerConnection {
 	}
 
 	/**
-	 * Add enemy to client's game.
-	 * @param botHash bot hash.
-	 * @param xPosition x coordinate.
-	 * @param yPosition y coordinate.
-	 * @param connectionId player connection id.
-	 */
-	public void addEnemyToClientsGame(String botHash, float xPosition, float yPosition, Integer connectionId) {
-		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewZombies(botHash, xPosition, yPosition);
-		server.sendToTCP(connectionId, packetNewEnemy);
-	}
-
-	/**
 	 * Method for sending serverWorld's updated Enemy instances info to all connections.
 	 */
 	public void sendUpdatedEnemies() {
@@ -217,17 +205,6 @@ public class ServerConnection {
 	}
 
 	/**
-	 * Add enemy to server world.
-	 * @param xPosition x coordinate.
-	 * @param yPosition y coordinate.
-	 * @param world server world.
-	 */
-	public void addEnemyToGame(float xPosition, float yPosition, World world) {
-		Enemy enemy = Enemy.createEnemy(xPosition, yPosition, world);
-		world.addEnemy(enemy.getBotHash(), enemy);
-	}
-
-	/**
 	 * Add enemy to client's game.
 	 * @param botHash bot hash.
 	 * @param xPosition x coordinate.
@@ -237,18 +214,6 @@ public class ServerConnection {
 	public void addEnemyToClientsGame(String botHash, float xPosition, float yPosition, Integer connectionId) {
 		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewZombies(botHash, xPosition, yPosition);
 		server.sendToTCP(connectionId, packetNewEnemy);
-	}
-
-	/**
-	 * Method for sending serverWorld's updated Enemy instances info to all connections.
-	 */
-	public void sendUpdatedEnemies() {
-		serverWorld.updateEnemyInTheWorldEnemyMap();
-		// Enemy instance id (key) and new coordinates (value) are sent.
-		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
-			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateZombies(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
-			server.sendToAllUDP(packetUpdateEnemy);
-		}
 	}
 
 	/**
