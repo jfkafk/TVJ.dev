@@ -14,7 +14,6 @@ public class GameCharacter {
     TextureAtlas textureAtlas;
     Animation<Sprite> animation;
     float stateTime;
-    private AssetManager assetManager;
     Sprite sprite;
     Sprite spriteArrow;
     Animation<TextureRegion> runningAnimation;
@@ -56,9 +55,6 @@ public class GameCharacter {
     Texture fallSheet;
     Texture jumpSheet;
     SpriteBatch spriteBatch;
-
-    // A variable for tracking elapsed time for the animation
-    float stateTime;
 
     // Animation
     boolean animationCreated = false;
@@ -334,10 +330,6 @@ public class GameCharacter {
     }
 
     public void draw(SpriteBatch batch) {
-        // Create a sprite with the texture
-        stateTime += Gdx.graphics.getDeltaTime();
-        Sprite sprite = animation.getKeyFrame(stateTime,true);
-//        sprite.setX(stateTime * 250 % (Gdx.graphics.getWidth() + 400) - 200);
 
         if (!animationCreated) {
             createFrames();
