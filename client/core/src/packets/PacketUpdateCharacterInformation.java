@@ -1,5 +1,7 @@
 package packets;
 
+import ee.taltech.superitibros.Characters.GameCharacter;
+
 /**
  * Packet superclass.
  */
@@ -10,6 +12,12 @@ public class PacketUpdateCharacterInformation extends Packet {
     private float x;
 
     private float y;
+
+    private enum State {IDLE, WALKING, JUMPING, FALL}
+
+    private GameCharacter.State currentState;
+
+    private boolean facingRight;
 
     public void setId(int id) {
         this.id = id;
@@ -28,4 +36,20 @@ public class PacketUpdateCharacterInformation extends Packet {
     public float getX() {return x;}
 
     public float getY() {return y;}
+
+    public void setCurrentState(GameCharacter.State currentState) {
+        this.currentState = currentState;
+    }
+
+    public GameCharacter.State getCurrentState() {
+        return currentState;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+    public boolean getFacingRight() {
+        return  this.facingRight;
+    }
 }

@@ -84,6 +84,13 @@ public class ClientConnection {
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
+							System.out.println("client connection x pos: " + packetUpdateCharacterInformation.getX());
+							System.out.println("packet update character pos");
+							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
+							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
+							System.out.println(packetUpdateCharacterInformation.getCurrentState());
+							System.out.println("got state: " + packetUpdateCharacterInformation.getCurrentState());
+							gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
 						}
@@ -139,8 +146,13 @@ public class ClientConnection {
 	 * @param x of the PlayerGameCharacters x coordinate (float)
 	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
-	public void sendPlayerInformation(float x, float y) {
+	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
+		System.out.println("Send player info");
+		System.out.println("sent: " + x);
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
+		System.out.println("sent state: " + currentState);
+		packet.setCurrentState(currentState);
+		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);
 	}
 

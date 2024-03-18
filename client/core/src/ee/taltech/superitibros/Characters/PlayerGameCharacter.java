@@ -1,5 +1,7 @@
 package ee.taltech.superitibros.Characters;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.*;
@@ -10,15 +12,14 @@ public class PlayerGameCharacter extends GameCharacter{
     public float width;
     public float height;
     private final float movementSpeed;
-    private boolean broIsDead;
-
     // Player sprite
     private TextureRegion characterTexture;
-
     // Box2D
     public ClientWorld world;
-    public Body b2body;
     private int playerGameCharacterId;
+    public GameCharacter.State state = GameCharacter.State.IDLE;
+
+    private boolean facingRight = true;
 
 
     public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
@@ -46,6 +47,18 @@ public class PlayerGameCharacter extends GameCharacter{
         this.characterTexture = texture;
     }
 
+    public void setCurrentState(GameCharacter.State currentState) {
+        this.currentState = currentState;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+    public boolean getFacingRight() {
+        return this.facingRight;
+    }
+
     /**
      * PlayerGameCharacter static method for creating a new PlayerGameCharacter instance.
      *
@@ -58,6 +71,10 @@ public class PlayerGameCharacter extends GameCharacter{
         PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(10f, playerGameCharacterRectangle, x, y, playerGameCharacterRectangle.width, playerGameCharacterRectangle.height, world);
         newGameCharacter.setPlayerGameCharacterId(id);
         return newGameCharacter;
+    }
+
+    public GameCharacter.State getState() {
+        return state;
     }
 
     // Dispose
