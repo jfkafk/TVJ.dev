@@ -58,12 +58,9 @@ public class ServerConnection {
 		server.getKryo().register(Rectangle.class);
 		server.getKryo().register(HashMap.class);
 		server.getKryo().register(PacketClientDisconnect.class);
-<<<<<<< HEAD
 		server.getKryo().register(PacketNewEnemy.class);
 		server.getKryo().register(PacketUpdateEnemy.class);
-=======
 		server.getKryo().register(GameCharacter.State.class);
->>>>>>> ca5173f (All animations work through server.)
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
