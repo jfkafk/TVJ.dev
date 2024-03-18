@@ -4,12 +4,14 @@ import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.math.Path;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import ee.taltech.superitibros.Characters.CollisionBits;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
+import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
 
@@ -120,7 +122,14 @@ public class ClientWorld {
     }
 
     public GameCharacter getGameCharacter(Integer id){
-        return worldGameCharactersMap.get(id);
+        GameCharacter character = worldGameCharactersMap.get(id);
+
+        if (character instanceof PlayerGameCharacter) {
+            return (PlayerGameCharacter) character;
+        } else if (character instanceof MyPlayerGameCharacter) {
+            return (MyPlayerGameCharacter) character;
+        }
+        return null;
     }
 
     /**

@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public class GameCharacter {
 
+    public enum State {IDLE, WALKING, JUMPING, FALL}
+
     // Character characteristics.
     protected float movementSpeed; // World units per second.
     protected int health;

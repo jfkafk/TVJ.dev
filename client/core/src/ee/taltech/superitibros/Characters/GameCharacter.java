@@ -14,8 +14,8 @@ public class GameCharacter {
     // Character characteristics.
     protected float movementSpeed; // world units per second
 
-    private enum State {IDLE, WALKING, JUMPING, FALL}
-    private boolean facingRight;
+    public enum State {IDLE, WALKING, JUMPING, FALL}
+    boolean facingRight;
     private float stateTimer;
 
     // Position & dimension.
@@ -29,6 +29,7 @@ public class GameCharacter {
     ClientWorld clientWorld;
     public Body b2body;
     private boolean bodyDefined = false;
+    Vector2 newPosition;
 
     // Textures
     Animation<TextureRegion> walkAnimationRight; // Must declare frame type (TextureRegion)
@@ -40,9 +41,7 @@ public class GameCharacter {
     Animation<TextureRegion> fallAnimationRight;
     Animation<TextureRegion> fallAnimationLeft;
     TextureRegion currentFrame;
-    public State currentState;
-    public State previousState;
-
+    public State currentState = State.IDLE;
 
     Texture walkSheet;
     Texture idleSheet;
@@ -240,11 +239,9 @@ public class GameCharacter {
 
             // Set the flag to true to indicate that the body has been defined
             bodyDefined = true;
-        }
-    }
 
-    public float getMovementSpeed() {
-        return this.movementSpeed;
+            newPosition = new Vector2();
+        }
     }
 
     public Rectangle getBoundingBox() {
@@ -260,9 +257,21 @@ public class GameCharacter {
     public void moveToNewPos(float xPos, float yPos) {
         this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
         if (b2body != null) {
-            b2body.setTransform(xPos, yPos, b2body.getAngle());
+            // Store the new position for later update
+            this.newPosition.set(xPos, yPos);
         }
     }
+
+    /**
+     * Update the position of the Box2D body.
+     * This method should be called outside the physics simulation loop.
+     */
+    public void updatePosition() {
+        if (b2body != null && newPosition != null) {
+            b2body.setTransform(newPosition, b2body.getAngle());
+        }
+    }
+
 
     public void jump() {
         // Player can't jump if he is already in air
@@ -280,21 +289,21 @@ public class GameCharacter {
     // Move right
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
-        facingRight = true;
+        setFacingRight(true);
     }
 
     // Move left
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
-        facingRight = false;
+        setFacingRight(false);
     }
 
     public boolean isGrounded() {
         return b2body.getLinearVelocity().y == 0;
     }
 
-    private State getState() {
+    public State getState() {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
         }
@@ -309,6 +318,13 @@ public class GameCharacter {
         return State.IDLE;
     }
 
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+    public boolean getFacingRight() {
+        return this.facingRight;
+    }
 
     public void draw(SpriteBatch batch) {
 
@@ -322,11 +338,16 @@ public class GameCharacter {
         // Get which state is player currently in
         State currentState = getState(); // Muuda olekut vastavalt vajadusele
 
-        b2body.setLinearVelocity(0, b2body.getLinearVelocity().y);
+        if (currentState == null) {
+            currentState = State.IDLE;
+        }
+
+        // Reset x-axis velocity
+        b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
 
         switch (currentState) {
             case IDLE:
-                if (facingRight) {
+                if (getFacingRight()) {
                     currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
                     System.out.println("IDLE, RIGHT");
                 } else {
@@ -335,7 +356,7 @@ public class GameCharacter {
                 }
                 break;
             case WALKING:
-                if (facingRight) {
+                if (getFacingRight()) {
                     currentFrame = walkAnimationRight.getKeyFrame(stateTime, true);
                     System.out.println("WALKING RIGHT");
                 } else {
@@ -344,7 +365,7 @@ public class GameCharacter {
                 }
                 break;
             case JUMPING:
-                if (facingRight) {
+                if (getFacingRight()) {
                     currentFrame = jumpAnimationRight.getKeyFrame(stateTime, true);
                     System.out.println("JUMPING RIGHT");
                 } else {
@@ -353,7 +374,7 @@ public class GameCharacter {
                 }
                 break;
             default:
-                if (facingRight) {
+                if (getFacingRight()) {
                     currentFrame = fallAnimationRight.getKeyFrame(stateTime, true);
                     System.out.println("FALLING RIGHT");
                 } else {
@@ -367,16 +388,20 @@ public class GameCharacter {
         float frameX = b2body.getPosition().x - boundingBox.getHeight();
         float frameY = b2body.getPosition().y - boundingBox.getHeight();
 
-        //Bounding box
+        // Bounding box
         boundingBox.x = b2body.getPosition().x;
         boundingBox.y = b2body.getPosition().y;
+
+        // Update coordinates
+        xPosition = b2body.getPosition().x;
+        yPosition = b2body.getPosition().y;
+
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
             batch.draw(currentFrame, frameX + 5, frameY, 50, 50);
         }
     }
-
 
     /**
          * Remove the Box2D body from the game world.
