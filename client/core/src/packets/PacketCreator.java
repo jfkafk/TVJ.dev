@@ -81,4 +81,25 @@ public class PacketCreator {
         packetNewEnemy.setyPosition(yPosition);
         return packetNewEnemy;
     }
+
+    /**
+     * Create a PacketSendNewLobby.
+     * @return new PacketSendNewLobby.
+     */
+    public static PacketSendNewLobby createPacketSendNewLobby() {
+        return new PacketSendNewLobby();
+    }
+
+    /**
+     * Create a PacketLobbyInfo.
+     * @param lobbyHash lobby's hash.
+     * @param playerCount lobby's player count.
+     * @return new PacketLobbyInfo.
+     */
+    public static PacketLobbyInfo createPacketLobbyInfo(String lobbyHash, Integer playerCount) {
+        PacketLobbyInfo packetLobbyInfo = new PacketLobbyInfo();
+        packetLobbyInfo.setLobbyHash(lobbyHash);
+        packetLobbyInfo.setPlayerCount(playerCount);
+        return packetLobbyInfo;
+    }
 }

@@ -8,6 +8,7 @@ import com.esotericsoftware.kryonet.Server;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.GameCharacter;
 import com.mygdx.game.Characters.PlayerGameCharacter;
+import com.mygdx.game.Lobbies.Lobby;
 import com.mygdx.game.World.World;
 import packets.*;
 
@@ -27,7 +28,12 @@ public class ServerConnection {
 	private float playerGameCharacterX = 280f;
 	private float playerGameCharacterY = 250f;
 	private int playerCount = 0;
-	int x = 0;
+
+	Map<String, List<Integer>> lobbies = new LinkedHashMap<>();
+
+	List<Lobby> availableLobbies = new LinkedList<>();
+
+	List<Integer> playersWhoWantJoinLobby = new LinkedList<>();
 
 	/**
 	 * Server connection.
@@ -61,6 +67,9 @@ public class ServerConnection {
 		server.getKryo().register(PacketNewEnemy.class);
 		server.getKryo().register(PacketUpdateEnemy.class);
 		server.getKryo().register(GameCharacter.State.class);
+		server.getKryo().register(PacketSendNewLobby.class);
+		server.getKryo().register(PacketLobbyInfo.class);
+		server.getKryo().register(PacketGetAvailableLobbies.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -108,6 +117,18 @@ public class ServerConnection {
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
 					serverWorld.getEnemyMap().get(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
+
+				} else if (object instanceof PacketSendNewLobby) {
+					// Packet for adding new lobby
+					System.out.println("got packet new lobby add");
+					PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
+					Lobby lobby = new Lobby(connection.getID());
+					availableLobbies.add(lobby);
+					System.out.println(availableLobbies);
+
+				} else if (object instanceof PacketGetAvailableLobbies) {
+					System.out.println("got packet get available lobbies");
+					sendAvailableLobbies(connection.getID());
 				}
 			}
 
@@ -131,9 +152,6 @@ public class ServerConnection {
 		new Thread(serverUpdateThread).start();
 		System.out.println("Thread is on!");
 
-		addEnemyToGame(100, 35, serverWorld);
-		addEnemyToGame(150, 35, serverWorld);
-		addEnemyToGame(200, 35, serverWorld);
 	}
 
 	/**
@@ -201,6 +219,17 @@ public class ServerConnection {
 		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
 			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateZombies(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
 			server.sendToAllUDP(packetUpdateEnemy);
+		}
+	}
+
+	/**
+	 * Method for sending list of available lobbies to clients.
+	 */
+	public void sendAvailableLobbies(Integer playerId) {
+		System.out.println("send available lobbies");
+		for (Lobby lobby : availableLobbies) {
+			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash(), lobby.getPlayers().size());
+			server.sendToUDP(playerId, packetLobbyInfo);
 		}
 	}
 

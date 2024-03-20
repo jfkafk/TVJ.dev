@@ -9,6 +9,7 @@ import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
+import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
@@ -56,6 +57,9 @@ public class ClientConnection {
 		client.getKryo().register(PacketNewEnemy.class);
 		client.getKryo().register(PacketUpdateEnemy.class);
 		client.getKryo().register(GameCharacter.State.class);
+		client.getKryo().register(PacketSendNewLobby.class);
+		client.getKryo().register(PacketLobbyInfo.class);
+		client.getKryo().register(PacketGetAvailableLobbies.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -117,6 +121,13 @@ public class ClientConnection {
 							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
 							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 						}
+					} else if (object instanceof PacketLobbyInfo) {
+						// Packet for updating available lobby info
+						System.out.println("got packet lobby info");
+						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
+						Lobby lobby = new Lobby(packetLobbyInfo.getLobbyHash());
+						lobby.setPlayerCount(((PacketLobbyInfo) object).getPlayerCount());
+						gameClient.addAvailableLobby(lobby);
 					}
 				}
 			}
@@ -155,6 +166,22 @@ public class ClientConnection {
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);
+	}
+
+	/**
+	 * Send packet for creating new lobby.
+	 */
+	public void sendCreateNewLobby() {
+		PacketSendNewLobby packetSendNewLobby = PacketCreator.createPacketSendNewLobby();
+		client.sendUDP(packetSendNewLobby);
+	}
+
+	/**
+	 * Method for sending info to server that client is searching available lobbies.
+	 */
+	public void sendGetAvailableLobbies() {
+		PacketGetAvailableLobbies packetGetAvailableLobbies = new PacketGetAvailableLobbies();
+		client.sendUDP(packetGetAvailableLobbies);
 	}
 
 	/**

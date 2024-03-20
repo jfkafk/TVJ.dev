@@ -32,8 +32,6 @@ public class ServerUpdateThread implements Runnable {
     public void run() {
         while (true) {
             try {
-                System.out.println(serverWorld.getEnemyMap());
-                System.out.println(serverWorld.getClients());
                 // Update and send Enemies.
                 if (!serverWorld.getEnemyMap().isEmpty()) {
                     for (Enemy enemy : serverWorld.getEnemyMap().values()) {

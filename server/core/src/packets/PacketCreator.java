@@ -58,10 +58,10 @@ public class PacketCreator {
      * @param botHash npc's botHash
      * @return new PacketUpdateEnemy
      */
-    public static PacketUpdateEnemy createPacketUpdateZombies(String botHash, float xPositon, float yPosition) {
+    public static PacketUpdateEnemy createPacketUpdateZombies(String botHash, float xPosition, float yPosition) {
         PacketUpdateEnemy packetEnemy = new PacketUpdateEnemy();
         packetEnemy.setBotHash(botHash);
-        packetEnemy.setxPosition(xPositon);
+        packetEnemy.setxPosition(xPosition);
         packetEnemy.setyPosition(yPosition);
         return packetEnemy;
     }
@@ -80,5 +80,26 @@ public class PacketCreator {
         packetNewEnemy.setxPosition(xPosition);
         packetNewEnemy.setyPosition(yPosition);
         return packetNewEnemy;
+    }
+
+    /**
+     * Create a PacketSendNewLobby.
+     * @return new PacketSendNewLobby.
+     */
+    public static PacketSendNewLobby createPacketSendNewLobby() {
+        return new PacketSendNewLobby();
+    }
+
+    /**
+     * Create a PacketLobbyInfo.
+     * @param lobbyHash lobby's hash.
+     * @param playerCount lobby's player count.
+     * @return new PacketLobbyInfo.
+     */
+    public static PacketLobbyInfo createPacketLobbyInfo(String lobbyHash, Integer playerCount) {
+        PacketLobbyInfo packetLobbyInfo = new PacketLobbyInfo();
+        packetLobbyInfo.setLobbyHash(lobbyHash);
+        packetLobbyInfo.setPlayerCount(playerCount);
+        return packetLobbyInfo;
     }
 }
