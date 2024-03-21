@@ -24,7 +24,7 @@ import ee.taltech.superitibros.Lobbies.Lobby;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JoinLobby implements Screen {
+public class LobbyScreen implements Screen {
     private SpriteBatch batch;
     private BitmapFont font;
     private ArrayList<String> joinedPlayers;
@@ -35,13 +35,14 @@ public class JoinLobby implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
+    Lobby currentLobby;
 
     // Fetch available lobbies
-    List<Lobby> availableLobbies = new ArrayList<>();
+    List<LobbyScreen> availableLobbies = new ArrayList<>();
 
     private static final int BUTTON_PADDING = 10;
 
-    public JoinLobby(GameClient gameClient) {
+    public LobbyScreen(GameClient gameClient, Lobby currentLobby) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
@@ -55,8 +56,7 @@ public class JoinLobby implements Screen {
         stage = new Stage(viewport, batch);
         font = new BitmapFont();
         joinedPlayers = new ArrayList<String>();
-        // Assuming you have a method to retrieve joined players
-        // You can populate joinedPlayers list here
+        this.currentLobby = currentLobby;
     }
 
     @Override
@@ -70,31 +70,17 @@ public class JoinLobby implements Screen {
         // Set alignment of contents in the table.
         mainTable.center();
 
-        // Fetch available lobbies
-        availableLobbies.clear();
-        availableLobbies.addAll(getAvailableLobbies());
-
         // Create game title
-        Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         // Create buttons
-        TextButton startGameButton = new TextButton("Start Game", skin);
         TextButton refreshButton = new TextButton("Refresh", skin);
         TextButton back = new TextButton("Back", skin);
-
-        // Add listeners to buttons
-        startGameButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                gameClient.startGame();
-            }
-        });
 
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                refreshLobbies();
+                refreshPlayers();
             }
         });
 
@@ -106,29 +92,17 @@ public class JoinLobby implements Screen {
             }
         });
 
-        // Display available lobbies
-        for (Lobby lobby : availableLobbies) {
+        // Display players
+        for (String playerName : currentLobby.getPlayers()) {
             // Create a button for each lobby
-            TextButton lobbyButton = new TextButton(lobby.getLobbyHash(), skin);
-            // Add a listener to the button to join the lobby
-            lobbyButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    // Join the selected lobby
-                    joinLobby(lobby);
-                }
-            });
+            TextButton lobbyButton = new TextButton(String.valueOf(playerName), skin);
             // Add the lobby button to the table
             mainTable.add(lobbyButton).pad(BUTTON_PADDING);
             mainTable.row();
         }
 
         // Add existing components to the table
-        mainTable.add(gameLabel).pad(BUTTON_PADDING);
-        mainTable.row();
         mainTable.add(menuLabel).pad(BUTTON_PADDING);
-        mainTable.row();
-        mainTable.add(startGameButton).pad(BUTTON_PADDING);
         mainTable.row();
         mainTable.add(refreshButton).pad(BUTTON_PADDING);
         mainTable.row();
@@ -139,27 +113,8 @@ public class JoinLobby implements Screen {
         stage.addActor(mainTable);
     }
 
-    // Method to join the selected lobby
-    private void joinLobby(Lobby lobby) {
-        // Add your logic here to join the selected lobby
-        gameClient.setMyLobby(lobby);
-        gameClient.getClientConnection().sendUpdateLobbyInfo(lobby.getLobbyHash());
-        lobby.addPLayer(gameClient.getClientName());
-        LobbyScreen lobbyScreen = new LobbyScreen(gameClient, lobby);
-        ((Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
-    }
-
-    public List<Lobby> getAvailableLobbies() {
-        return gameClient.getAvailableLobbies();
-    }
-
-    public void refreshLobbies() {
-        // Clear the stage
+    public void refreshPlayers() {
         stage.clear();
-        // Update available lobbies
-        availableLobbies.clear();
-        availableLobbies.addAll(getAvailableLobbies());
-        // Call show() again to rebuild the UI components
         show();
     }
 
@@ -199,3 +154,4 @@ public class JoinLobby implements Screen {
         font.dispose();
     }
 }
+

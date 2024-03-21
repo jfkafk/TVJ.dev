@@ -11,6 +11,8 @@ import ee.taltech.superitibros.Screens.MenuScreen;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class GameClient extends Game {
 
@@ -19,6 +21,8 @@ public class GameClient extends Game {
     private ClientWorld clientWorld;
     private MenuScreen menuScreen;
     List<Lobby> availableLobbies = new LinkedList<>();
+    Lobby myLobby;
+    String clientName;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -84,8 +88,38 @@ public class GameClient extends Game {
         System.out.println("added lobby: " + availableLobbies);
     }
 
+    public void removeAvailableLobby(String lobbyHash) {
+        availableLobbies.removeIf(lobby -> Objects.equals(lobby.getLobbyHash(), lobbyHash));
+    }
+
+    public Optional<Lobby> getLobby(String lobbyHash) {
+        for (Lobby lobby : availableLobbies) {
+            if (Objects.equals(lobby.getLobbyHash(), lobbyHash)) {
+                return Optional.of(lobby);
+            }
+        }
+        return Optional.empty();
+    }
+
     public List<Lobby> getAvailableLobbies() {
+        clientConnection.sendGetAvailableLobbies();
         return this.availableLobbies;
+    }
+
+    public void setMyLobby(Lobby myLobby) {
+        this.myLobby = myLobby;
+    }
+
+    public Lobby getMyLobby() {
+        return myLobby;
+    }
+
+    public void setClientName(String clientName) {
+        this.clientName = clientName;
+    }
+
+    public String getClientName() {
+        return clientName;
     }
 
     /**

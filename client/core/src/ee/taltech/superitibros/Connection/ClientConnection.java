@@ -17,9 +17,7 @@ import packets.*;
 
 import javax.swing.JOptionPane;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class ClientConnection {
@@ -60,6 +58,7 @@ public class ClientConnection {
 		client.getKryo().register(PacketSendNewLobby.class);
 		client.getKryo().register(PacketLobbyInfo.class);
 		client.getKryo().register(PacketGetAvailableLobbies.class);
+		client.getKryo().register(HashSet.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -125,9 +124,28 @@ public class ClientConnection {
 						// Packet for updating available lobby info
 						System.out.println("got packet lobby info");
 						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
-						Lobby lobby = new Lobby(packetLobbyInfo.getLobbyHash());
-						lobby.setPlayerCount(((PacketLobbyInfo) object).getPlayerCount());
+						Optional<Lobby> optionalLobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
+						if (optionalLobby.isPresent()) {
+							Lobby lobby = optionalLobby.get();
+							if (packetLobbyInfo.getPlayerCount() == 0) {
+								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
+							} else {
+								lobby.setPlayerCount(packetLobbyInfo.getPlayerCount());
+								lobby.setPlayers(packetLobbyInfo.getPlayers());
+							}
+						} else {
+							Lobby lobby = new Lobby(packetLobbyInfo.getLobbyHash()); // Instantiate Lobby
+							lobby.setPlayerCount(packetLobbyInfo.getPlayerCount()); // Set player count
+							lobby.setPlayers(packetLobbyInfo.getPlayers()); // Set players
+							gameClient.addAvailableLobby(lobby); // Add available lobby
+						}
+
+					} else if (object instanceof PacketSendNewLobby) {
+						PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
+						Lobby lobby = new Lobby(packetSendNewLobby.getLobbyHash());
+						lobby.addPLayer(packetSendNewLobby.getCreatorName());
 						gameClient.addAvailableLobby(lobby);
+						gameClient.setMyLobby(lobby);
 					}
 				}
 			}
@@ -173,6 +191,7 @@ public class ClientConnection {
 	 */
 	public void sendCreateNewLobby() {
 		PacketSendNewLobby packetSendNewLobby = PacketCreator.createPacketSendNewLobby();
+		packetSendNewLobby.setCreatorName(gameClient.getClientName());
 		client.sendUDP(packetSendNewLobby);
 	}
 
@@ -182,6 +201,14 @@ public class ClientConnection {
 	public void sendGetAvailableLobbies() {
 		PacketGetAvailableLobbies packetGetAvailableLobbies = new PacketGetAvailableLobbies();
 		client.sendUDP(packetGetAvailableLobbies);
+	}
+
+	public void sendUpdateLobbyInfo(String lobbyHash) {
+		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		packetLobbyInfo.setPlayers(gameClient.getMyLobby().getPlayers());
+		packetLobbyInfo.setPlayerToAdd(gameClient.getClientName());
+		System.out.println(gameClient.getMyLobby().getPlayers());
+		client.sendUDP(packetLobbyInfo);
 	}
 
 	/**

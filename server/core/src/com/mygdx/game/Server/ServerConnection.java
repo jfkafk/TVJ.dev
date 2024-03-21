@@ -31,7 +31,7 @@ public class ServerConnection {
 
 	Map<String, List<Integer>> lobbies = new LinkedHashMap<>();
 
-	List<Lobby> availableLobbies = new LinkedList<>();
+	Map<String, Lobby> availableLobbies = new LinkedHashMap<>();
 
 	List<Integer> playersWhoWantJoinLobby = new LinkedList<>();
 
@@ -70,6 +70,7 @@ public class ServerConnection {
 		server.getKryo().register(PacketSendNewLobby.class);
 		server.getKryo().register(PacketLobbyInfo.class);
 		server.getKryo().register(PacketGetAvailableLobbies.class);
+		server.getKryo().register(HashSet.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -122,13 +123,33 @@ public class ServerConnection {
 					// Packet for adding new lobby
 					System.out.println("got packet new lobby add");
 					PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
-					Lobby lobby = new Lobby(connection.getID());
-					availableLobbies.add(lobby);
+
+					Lobby lobby = new Lobby(connection.getID(), packetSendNewLobby.getCreatorName(), connection.getID());
+					lobby.addPLayers(packetSendNewLobby.getCreatorName(), connection.getID());
+
+					availableLobbies.put(lobby.getLobbyHash(), lobby);
+
+					packetSendNewLobby.setLobbyHash(lobby.getLobbyHash());
+					packetSendNewLobby.setCreatorId(connection.getID());
+
+					server.sendToAllUDP(packetSendNewLobby);
 					System.out.println(availableLobbies);
 
 				} else if (object instanceof PacketGetAvailableLobbies) {
 					System.out.println("got packet get available lobbies");
 					sendAvailableLobbies(connection.getID());
+
+				} else if (object instanceof PacketLobbyInfo) {
+					PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
+					if (packetLobbyInfo.getPlayerCount() == 0) {
+						removeAvailableLobby(packetLobbyInfo.getLobbyHash());
+						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+					} else {
+						availableLobbies.get(packetLobbyInfo.getLobbyHash()).addPLayers(packetLobbyInfo.getPlayerToAdd(), connection.getID());
+						Set<String> lobbyPlayers = new HashSet<>(availableLobbies.get(packetLobbyInfo.getLobbyHash()).getPlayers().keySet());
+						packetLobbyInfo.setPlayers(lobbyPlayers);
+						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+					}
 				}
 			}
 
@@ -227,10 +248,15 @@ public class ServerConnection {
 	 */
 	public void sendAvailableLobbies(Integer playerId) {
 		System.out.println("send available lobbies");
-		for (Lobby lobby : availableLobbies) {
-			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash(), lobby.getPlayers().size());
+		for (Lobby lobby : availableLobbies.values()) {
+			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash());
+			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers().keySet()));
 			server.sendToUDP(playerId, packetLobbyInfo);
 		}
+	}
+
+	public void removeAvailableLobby(String lobbyHash) {
+        availableLobbies.remove(lobbyHash);
 	}
 
 	/**

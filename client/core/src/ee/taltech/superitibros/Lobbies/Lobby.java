@@ -1,38 +1,26 @@
 package ee.taltech.superitibros.Lobbies;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Lobby {
 
     String lobbyHash;
-    static Integer nextLobbyNum = 1;
 
     Integer creatorId;
 
-    List<Integer> players = new LinkedList<>();
+    Set<String> players = new LinkedHashSet<>();
 
     Integer playerCount;
-
-    public Lobby() {
-        lobbyHash = "Lobby:" + nextLobbyNum;
-        incrementNextLobbyNumber();
-        players.add(creatorId);
-    }
 
     public Lobby(String lobbyHash) {
         this.lobbyHash = lobbyHash;
     }
 
-    public static void incrementNextLobbyNumber() {
-        nextLobbyNum++;
+    public void setPlayers(Set<String> players) {
+        this.players = players;
     }
 
-    public void addPlayer(Integer id) {
-        players.add(id);
-    }
-
-    public List<Integer> getPlayers() {
+    public Set<String> getPlayers() {
         return players;
     }
 
@@ -42,5 +30,9 @@ public class Lobby {
 
     public void setPlayerCount(Integer playerCount) {
         this.playerCount = playerCount;
+    }
+
+    public void addPLayer(String playerName) {
+        players.add(playerName);
     }
 }

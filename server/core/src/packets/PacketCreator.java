@@ -93,13 +93,11 @@ public class PacketCreator {
     /**
      * Create a PacketLobbyInfo.
      * @param lobbyHash lobby's hash.
-     * @param playerCount lobby's player count.
      * @return new PacketLobbyInfo.
      */
-    public static PacketLobbyInfo createPacketLobbyInfo(String lobbyHash, Integer playerCount) {
+    public static PacketLobbyInfo createPacketLobbyInfo(String lobbyHash) {
         PacketLobbyInfo packetLobbyInfo = new PacketLobbyInfo();
         packetLobbyInfo.setLobbyHash(lobbyHash);
-        packetLobbyInfo.setPlayerCount(playerCount);
         return packetLobbyInfo;
     }
 }

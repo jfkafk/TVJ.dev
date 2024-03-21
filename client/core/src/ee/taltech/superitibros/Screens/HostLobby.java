@@ -70,8 +70,16 @@ public class HostLobby implements Screen {
 
         //Create buttons
         TextButton startGameButton = new TextButton("Start Game", skin);
-
         TextButton back = new TextButton("Back", skin);
+        TextButton refreshButton = new TextButton("Refresh", skin);
+
+
+        refreshButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                refreshPlayers();
+            }
+        });
 
 
         //Add listeners to buttons
@@ -89,20 +97,41 @@ public class HostLobby implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
+                gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
             }
         });
+
         int buttonLocationPadding = 5;
+
+        // Display players
+        if (gameClient.getMyLobby() != null) {
+            for (String playerName : gameClient.getMyLobby().getPlayers()) {
+                // Create a button for each lobby
+                TextButton lobbyButton = new TextButton(String.valueOf(playerName), skin);
+                // Add the lobby button to the table
+                mainTable.add(lobbyButton).pad(buttonLocationPadding);
+                mainTable.row();
+            }
+        }
+
         mainTable.add(gameLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(menuLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(startGameButton).pad(buttonLocationPadding);
         mainTable.row();
+        mainTable.add(refreshButton).pad(buttonLocationPadding);
+        mainTable.row();
         mainTable.add(back).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(back).pad(buttonLocationPadding);
         //Add table to stage
         stage.addActor(mainTable);
+    }
+
+    public void refreshPlayers() {
+        stage.clear();
+        show();
     }
 
     @Override
