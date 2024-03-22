@@ -132,6 +132,8 @@ public class ClientConnection {
 							} else {
 								lobby.setPlayerCount(packetLobbyInfo.getPlayerCount());
 								lobby.setPlayers(packetLobbyInfo.getPlayers());
+								gameClient.refreshLobbyScreen();
+								gameClient.refreshHostLobbyScreen();
 							}
 						} else {
 							Lobby lobby = new Lobby(packetLobbyInfo.getLobbyHash()); // Instantiate Lobby

@@ -146,6 +146,7 @@ public class JoinLobby implements Screen {
         gameClient.getClientConnection().sendUpdateLobbyInfo(lobby.getLobbyHash());
         lobby.addPLayer(gameClient.getClientName());
         LobbyScreen lobbyScreen = new LobbyScreen(gameClient, lobby);
+        gameClient.setLobbyScreen(lobbyScreen);
         ((Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
     }
 

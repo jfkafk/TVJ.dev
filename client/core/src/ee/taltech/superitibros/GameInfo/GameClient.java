@@ -4,9 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import ee.taltech.superitibros.Lobbies.Lobby;
-import ee.taltech.superitibros.Screens.GameScreen;
-import ee.taltech.superitibros.Screens.MainMenu;
-import ee.taltech.superitibros.Screens.MenuScreen;
+import ee.taltech.superitibros.Screens.*;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -23,6 +21,8 @@ public class GameClient extends Game {
     List<Lobby> availableLobbies = new LinkedList<>();
     Lobby myLobby;
     String clientName;
+    LobbyScreen lobbyScreen;
+    HostLobby hostLobbyScreen;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -116,6 +116,26 @@ public class GameClient extends Game {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+    }
+
+    public void setLobbyScreen(LobbyScreen lobbyScreen) {
+        this.lobbyScreen = lobbyScreen;
+    }
+
+    public void setHostLobbyScreen(HostLobby hostLobbyScreen) {
+        this.hostLobbyScreen = hostLobbyScreen;
+    }
+
+    public void refreshLobbyScreen() {
+        if (lobbyScreen != null) {
+            lobbyScreen.refreshPlayers();
+        }
+    }
+
+    public void refreshHostLobbyScreen() {
+        if (hostLobbyScreen != null) {
+            hostLobbyScreen.refreshPlayers();
+        }
     }
 
     public String getClientName() {

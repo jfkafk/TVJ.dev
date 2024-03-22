@@ -97,6 +97,7 @@ public class MultiplayerMenu implements Screen {
                 String playerName = nameField.getText();
                 if (playerName.length() >= 3) {
                     HostLobby hostLobby = new HostLobby(gameClient);
+                    gameClient.setHostLobbyScreen(hostLobby);
                     gameClient.setClientName(playerName);
                     gameClient.getClientConnection().sendCreateNewLobby();
                     ((Game) Gdx.app.getApplicationListener()).setScreen(hostLobby);
