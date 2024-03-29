@@ -68,9 +68,9 @@ public class GameScreen implements Screen, InputProcessor {
         // Cameras and screen
         buttonHasBeenPressed = false;
 
-        float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
-        float desiredCameraWidth = 1600; // Set the desired width of the camera
-        float desiredCameraHeight = desiredCameraWidth * aspectRatio; // Calculate the corresponding height
+        float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
+        float desiredCameraHeight = 640; // Set the desired width of the camera
+        float desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
@@ -194,7 +194,12 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
-
+    public Integer getWorldWidth() {
+        return ((int) WORLD_WIDTH);
+    }
+    public Integer getWorldHeight() {
+        return ((int) WORLD_HEIGHT);
+    }
 
     /**
      * Method for drawing PlayerGameCharacters.

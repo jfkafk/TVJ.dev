@@ -93,7 +93,6 @@ public class ClientWorld {
      */
     public void initializeMap() {
         this.tiledMap = getMap();
-        System.out.println(tiledMap.getLayers());
         this.mapLayer = tiledMap.getLayers().get("ground");
     }
 
@@ -103,6 +102,24 @@ public class ClientWorld {
      */
     public TiledMap getMap() {
         return new TmxMapLoader().load(path);
+    }
+
+    /**
+     * @return map tiles count vertically * tile height.
+     */
+    public Integer getMapHeight() {
+        int tileHeight = tiledMap.getProperties().get("tileheight", Integer.class);
+        int mapHeightInTiles = tiledMap.getProperties().get("height", Integer.class);
+        return tileHeight * mapHeightInTiles;
+    }
+
+    /**
+     * @return map tiles count horizontally * tile width.
+     */
+    public Integer getMapWidth() {
+        int tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
+        int mapWidthInTiles = tiledMap.getProperties().get("width", Integer.class);
+        return tileWidth * mapWidthInTiles;
     }
 
     /**
