@@ -56,7 +56,7 @@ public class GameScreen implements Screen, InputProcessor {
         this.clientWorld = clientWorld;
 
         // TextureAtlas and background texture
-        tiledMap = new TmxMapLoader().load("Maps/level1/level1.tmx");
+        tiledMap = new TmxMapLoader().load(clientWorld.getPath());
         int tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
         int mapWidthInTiles = tiledMap.getProperties().get("width", Integer.class);
         WORLD_WIDTH = tileWidth * mapWidthInTiles;
