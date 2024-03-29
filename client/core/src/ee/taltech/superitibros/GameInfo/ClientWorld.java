@@ -23,6 +23,7 @@ public class ClientWorld {
 
     private com.badlogic.gdx.physics.box2d.World gdxWorld;
     private TiledMap tiledMap;
+    private String path;
     MapLayer mapLayer;
     private ClientConnection clientConnection;
     private MyPlayerGameCharacter myPlayerGameCharacter;
@@ -30,8 +31,9 @@ public class ClientWorld {
     private Map<String, Enemy> enemyMap = new HashMap<>();
     public final Box2DDebugRenderer b2dr;
 
-    public ClientWorld() {
+    public ClientWorld(String path) {
         // Map and physics
+        this.path = path;
         gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -300), true);
         b2dr = new Box2DDebugRenderer();
         gdxWorld.step(1/60f, 6, 2);
@@ -47,6 +49,8 @@ public class ClientWorld {
         PolygonShape polygonShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
         Body body;
+
+        System.out.println(path);
 
         Array<RectangleMapObject> objects = mapLayer.getObjects().getByType(RectangleMapObject.class);
         for (RectangleMapObject obj : objects) {
@@ -89,7 +93,8 @@ public class ClientWorld {
      */
     public void initializeMap() {
         this.tiledMap = getMap();
-        this.mapLayer = tiledMap.getLayers().get(2);
+        System.out.println(tiledMap.getLayers());
+        this.mapLayer = tiledMap.getLayers().get("ground");
     }
 
     /**
@@ -97,7 +102,14 @@ public class ClientWorld {
      * @return tiled map.
      */
     public TiledMap getMap() {
-        return new TmxMapLoader().load("Maps/level1/level1.tmx");
+        return new TmxMapLoader().load(path);
+    }
+
+    /**
+     * @return path of the map.
+     */
+    public String getPath() {
+        return this.path;
     }
 
     /**
