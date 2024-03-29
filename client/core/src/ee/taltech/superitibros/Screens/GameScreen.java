@@ -69,11 +69,11 @@ public class GameScreen implements Screen, InputProcessor {
         buttonHasBeenPressed = false;
 
         float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
-        float desiredCameraWidth = 400; // Set the desired width of the camera
+        float desiredCameraWidth = 1600; // Set the desired width of the camera
         float desiredCameraHeight = desiredCameraWidth * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
-        this.fitViewport = new FitViewport(desiredCameraWidth, WORLD_HEIGHT, camera);
+        this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
