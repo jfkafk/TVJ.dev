@@ -55,7 +55,7 @@ public class GameClient extends Game {
     }
 
     /**
-     * Starts a game and tries to create a new client.
+     * Starts a game.
      */
     public void startGame() {
         // Create a new game screen and transition to it
@@ -101,6 +101,11 @@ public class GameClient extends Game {
         return Optional.empty();
     }
 
+    public void readyToStart() {
+        lobbyScreen.setReadyToStart(true);
+        lobbyScreen.refreshScreen();
+    }
+
     public List<Lobby> getAvailableLobbies() {
         clientConnection.sendGetAvailableLobbies();
         return this.availableLobbies;
@@ -128,7 +133,7 @@ public class GameClient extends Game {
 
     public void refreshLobbyScreen() {
         if (lobbyScreen != null) {
-            lobbyScreen.refreshPlayers();
+            lobbyScreen.refreshScreen();
         }
     }
 

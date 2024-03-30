@@ -36,6 +36,7 @@ public class LobbyScreen implements Screen {
     protected Skin skin;
     GameClient gameClient;
     Lobby currentLobby;
+    boolean readyToStart;
 
     // Fetch available lobbies
     List<LobbyScreen> availableLobbies = new ArrayList<>();
@@ -80,7 +81,7 @@ public class LobbyScreen implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                refreshPlayers();
+                refreshScreen();
             }
         });
 
@@ -88,9 +89,23 @@ public class LobbyScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
+                gameClient.setMyLobby(null);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
             }
         });
+
+        if (readyToStart) {
+            TextButton startGameButton = new TextButton("Start Game", skin);
+            startGameButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    // Add logic here to start the game
+                    gameClient.startGame();
+                }
+            });
+            mainTable.add(startGameButton).pad(BUTTON_PADDING);
+            mainTable.row();
+        }
 
         // Display players
         for (String playerName : currentLobby.getPlayers()) {
@@ -113,7 +128,11 @@ public class LobbyScreen implements Screen {
         stage.addActor(mainTable);
     }
 
-    public void refreshPlayers() {
+    public void setReadyToStart(boolean readyToStart) {
+        this.readyToStart = readyToStart;
+    }
+
+    public void refreshScreen() {
         stage.clear();
         show();
     }

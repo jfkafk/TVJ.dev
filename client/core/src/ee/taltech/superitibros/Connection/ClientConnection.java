@@ -1,5 +1,7 @@
 package ee.taltech.superitibros.Connection;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -13,6 +15,7 @@ import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
+import ee.taltech.superitibros.Screens.JoinLobby;
 import packets.*;
 
 import javax.swing.JOptionPane;
@@ -59,6 +62,7 @@ public class ClientConnection {
 		client.getKryo().register(PacketLobbyInfo.class);
 		client.getKryo().register(PacketGetAvailableLobbies.class);
 		client.getKryo().register(HashSet.class);
+		client.getKryo().register(LinkedHashSet.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -69,31 +73,31 @@ public class ClientConnection {
 				if (object instanceof Packet) {
 
 					if (object instanceof PacketAddCharacter) {
-						// Packet for adding player to game.
-						PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
-						if (connection.getID() == ((PacketAddCharacter) object).getId()) {
-							MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
-							newGameCharacter.defineCharacter();
-							// Add new PlayerGameCharacter to client's game.
-							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
-						} else {
-							// Create a new PlayerGameCharacter instance from received info.
-							PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
-							// Add new PlayerGameCharacter to client's game.
-							clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
+						if (gameScreen != null && clientWorld != null) {
+							// Packet for adding player to game.
+							PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
+							if (!clientWorld.getWorldGameCharactersMap().containsKey(packetAddCharacter.getId())) {
+								if (connection.getID() == ((PacketAddCharacter) object).getId()) {
+									MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+									// Add new PlayerGameCharacter to client's game.
+									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
+								} else {
+									// Create a new PlayerGameCharacter instance from received info.
+									PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+									// Add new PlayerGameCharacter to client's game.
+									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
+								}
+							}
 						}
 
 					} else  if (object instanceof PacketUpdateCharacterInformation) {
-						// Packer for updating player position.
+						// Packet for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
-						if (clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
+						if (gameScreen != null && clientWorld != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
-							System.out.println("client connection x pos: " + packetUpdateCharacterInformation.getX());
-							System.out.println("packet update character pos");
 							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
 							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
 							System.out.println(packetUpdateCharacterInformation.getCurrentState());
-							System.out.println("got state: " + packetUpdateCharacterInformation.getCurrentState());
 							gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
@@ -122,12 +126,16 @@ public class ClientConnection {
 						}
 					} else if (object instanceof PacketLobbyInfo) {
 						// Packet for updating available lobby info
-						System.out.println("got packet lobby info");
 						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
 						Optional<Lobby> optionalLobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
-						if (optionalLobby.isPresent()) {
+
+						// Start game if startGame true
+						if (packetLobbyInfo.isStartGame()) {
+							gameClient.readyToStart();
+
+						} else if (optionalLobby.isPresent()) {
 							Lobby lobby = optionalLobby.get();
-							if (packetLobbyInfo.getPlayerCount() == 0) {
+							if (packetLobbyInfo.isToDelete()) {
 								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
 							} else {
 								lobby.setPlayerCount(packetLobbyInfo.getPlayerCount());
@@ -169,6 +177,7 @@ public class ClientConnection {
 	 */
 	public void sendPacketConnect() {
 		PacketConnect packetConnect = PacketCreator.createPacketConnect();
+		packetConnect.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
 		client.sendTCP(packetConnect);
 	}
 
@@ -179,10 +188,8 @@ public class ClientConnection {
 	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
 	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
-		System.out.println("Send player info");
-		System.out.println("sent: " + x);
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
-		System.out.println("sent state: " + currentState);
+		packet.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);
@@ -210,6 +217,18 @@ public class ClientConnection {
 		packetLobbyInfo.setPlayers(gameClient.getMyLobby().getPlayers());
 		packetLobbyInfo.setPlayerToAdd(gameClient.getClientName());
 		System.out.println(gameClient.getMyLobby().getPlayers());
+		client.sendUDP(packetLobbyInfo);
+	}
+
+	public void sendLobbyStartGame(String lobbyHash) {
+		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		packetLobbyInfo.setStartGame(true);
+		client.sendUDP(packetLobbyInfo);
+	}
+
+	public void sendDeleteLobby(String lobbyHash) {
+		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		packetLobbyInfo.setToDelete(true);
 		client.sendUDP(packetLobbyInfo);
 	}
 

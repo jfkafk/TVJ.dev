@@ -8,6 +8,8 @@ public class PacketLobbyInfo extends Packet {
     String lobbyHash;
     Set<String> players = new LinkedHashSet<>();
     String playerToAdd;
+    boolean startGame;
+    boolean toDelete;
 
     public String getLobbyHash() {
         return lobbyHash;
@@ -35,5 +37,21 @@ public class PacketLobbyInfo extends Packet {
 
     public String getPlayerToAdd() {
         return playerToAdd;
+    }
+
+    public void setStartGame(boolean startGame) {
+        this.startGame = startGame;
+    }
+
+    public boolean isStartGame() {
+        return startGame;
+    }
+
+    public void setToDelete(boolean toDelete) {
+        this.toDelete = toDelete;
+    }
+
+    public boolean isToDelete() {
+        return toDelete;
     }
 }

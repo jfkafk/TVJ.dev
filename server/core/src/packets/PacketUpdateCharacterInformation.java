@@ -19,6 +19,8 @@ public class PacketUpdateCharacterInformation extends Packet {
 
     private boolean facingRight;
 
+    String lobbyHash;
+
     public void setId(int id) {
         this.id = id;
     }
@@ -51,5 +53,13 @@ public class PacketUpdateCharacterInformation extends Packet {
 
     public boolean getFacingRight() {
         return  this.facingRight;
+    }
+
+    public void setLobbyHash(String lobbyHash) {
+        this.lobbyHash = lobbyHash;
+    }
+
+    public String getLobbyHash() {
+        return lobbyHash;
     }
 }

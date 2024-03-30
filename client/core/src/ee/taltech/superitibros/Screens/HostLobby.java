@@ -87,7 +87,7 @@ public class HostLobby implements Screen {
         startGameButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-
+                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash());
                 gameClient.startGame();
             }
         });
@@ -97,7 +97,7 @@ public class HostLobby implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
-                gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
+                gameClient.getClientConnection().sendDeleteLobby(gameClient.getMyLobby().getLobbyHash());
             }
         });
 

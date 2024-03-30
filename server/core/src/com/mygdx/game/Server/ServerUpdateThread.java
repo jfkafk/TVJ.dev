@@ -17,8 +17,9 @@ public class ServerUpdateThread implements Runnable {
 
     private ServerConnection serverConnection;
     private World serverWorld;
+    String lobbyHash;
 
-    int count = 0;
+    // TODO create constructor
 
     public void setServerConnection(ServerConnection serverConnection) {
         this.serverConnection = serverConnection;
@@ -26,6 +27,14 @@ public class ServerUpdateThread implements Runnable {
 
     public void setServerWorld(World serverWorld) {
         this.serverWorld = serverWorld;
+    }
+
+    public void setLobbyHash(String lobbyHash) {
+        this.lobbyHash = lobbyHash;
+    }
+
+    public String getLobbyHash() {
+        return lobbyHash;
     }
 
     @Override
@@ -37,7 +46,7 @@ public class ServerUpdateThread implements Runnable {
                     for (Enemy enemy : serverWorld.getEnemyMap().values()) {
                         enemy.spin();
                     }
-                    serverConnection.sendUpdatedEnemies();
+                    serverConnection.sendUpdatedEnemies(lobbyHash);
                 }
 
                 sleep(5);

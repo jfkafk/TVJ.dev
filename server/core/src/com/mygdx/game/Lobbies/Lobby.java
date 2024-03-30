@@ -1,10 +1,8 @@
 package com.mygdx.game.Lobbies;
-
-import com.mygdx.game.Characters.Enemy;
+import com.mygdx.game.Server.ServerUpdateThread;
+import com.mygdx.game.World.World;
 
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 public class Lobby {
@@ -12,6 +10,9 @@ public class Lobby {
     String lobbyHash;
 
     Integer creatorId;
+
+    World serverWorld;
+    ServerUpdateThread serverUpdateThread;
 
     Map<String, Integer> players = new LinkedHashMap<>();
 
@@ -42,5 +43,21 @@ public class Lobby {
 
     public void addPLayers(String name, Integer id) {
         players.put(name, id);
+    }
+
+    public void setServerWorld(World serverWorld) {
+        this.serverWorld = serverWorld;
+    }
+
+    public World getServerWorld() {
+        return serverWorld;
+    }
+
+    public void setServerUpdateThread(ServerUpdateThread serverUpdateThread) {
+        this.serverUpdateThread = serverUpdateThread;
+    }
+
+    public ServerUpdateThread getServerUpdateThread() {
+        return serverUpdateThread;
     }
 }
