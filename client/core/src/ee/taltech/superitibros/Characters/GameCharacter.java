@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
+import ee.taltech.superitibros.Screens.GameScreen;
 
 public class GameCharacter {
 
@@ -31,12 +32,18 @@ public class GameCharacter {
 
     protected float width, height;
     protected Rectangle boundingBox;
+    private final Integer possiblyDealingWithSheetSize = 8;
+    private final Integer boundingBoxHeight = 128;
+    private final Integer boundingBoxWidth = 128;
+    private Integer playerSize = 64;
 
     // World where physics are applied
     ClientWorld clientWorld;
     public Body b2body;
     private boolean bodyDefined = false;
     Vector2 newPosition;
+    private Integer mapHeight;
+    private Integer mapWidth;
 
     // Textures
     Animation<TextureRegion> walkAnimationRight; // Must declare frame type (TextureRegion)
@@ -78,11 +85,15 @@ public class GameCharacter {
         this.height = height;
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
-        facingRight = true;
-        stateTimer = 0;
+        this.facingRight = true;
+        this.stateTimer = 0;
+        this.mapHeight = clientWorld.getMapHeight();
+        this.mapWidth = clientWorld.getMapWidth();
+        if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
+            playerSize = 256;
+        }
         defineCharacter();
     }
-
     public void createFrames() {
         createFramesIdle();
         createFramesWalking();
@@ -96,14 +107,14 @@ public class GameCharacter {
         // Sprite
         // Idle
         Texture idlesheet = new Texture("Characters/Skeleton sprites/IDLE 64 frames.png");
-        TextureRegion[][] tmpIdle = TextureRegion.split(idlesheet, idlesheet.getWidth() / 8,
-                idlesheet.getHeight() / 8);
+        TextureRegion[][] tmpIdle = TextureRegion.split(idlesheet, idlesheet.getWidth() / possiblyDealingWithSheetSize,
+                idlesheet.getHeight() / possiblyDealingWithSheetSize);
         TextureRegion[] idleFramesRight = new TextureRegion[64];
         TextureRegion[] idleFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
-        int croppedWidth = 128; // Adjust as needed
-        int croppedHeight = 128; // Adjust as needed
+        int croppedWidth = boundingBoxWidth; // Adjust as needed
+        int croppedHeight = boundingBoxHeight; // Adjust as needed
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -128,14 +139,15 @@ public class GameCharacter {
 
         // Walking
         Texture walksheet = new Texture("Characters/Skeleton sprites/WALK 64 frames.png");
-        TextureRegion[][] tmpwalk = TextureRegion.split(walksheet, walksheet.getWidth() / 8, walksheet.getHeight() / 8);
+        TextureRegion[][] tmpwalk = TextureRegion.split(walksheet, walksheet.getWidth() / possiblyDealingWithSheetSize,
+                walksheet.getHeight() / possiblyDealingWithSheetSize);
 
         TextureRegion[] walkFramesRight = new TextureRegion[64];
         TextureRegion[] walkFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
-        int croppedWidth = 128; // Adjust as needed
-        int croppedHeight = 128; // Adjust as needed
+        int croppedWidth = boundingBoxWidth; // Adjust as needed
+        int croppedHeight = boundingBoxHeight; // Adjust as needed
 
 
         for (int i = 0; i < 8; i++) {
@@ -159,14 +171,14 @@ public class GameCharacter {
         // Sprite
         // Idle
         Texture fallSheet = new Texture("Characters/Skeleton sprites/FALL 64 frames.png");
-        TextureRegion[][] tmpFall = TextureRegion.split(fallSheet, fallSheet.getWidth() / 8,
-                fallSheet.getHeight() / 8);
+        TextureRegion[][] tmpFall = TextureRegion.split(fallSheet, fallSheet.getWidth() / possiblyDealingWithSheetSize,
+                fallSheet.getHeight() / possiblyDealingWithSheetSize);
         TextureRegion[] fallFramesRight = new TextureRegion[64];
         TextureRegion[] fallFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
-        int croppedWidth = 128; // Adjust as needed
-        int croppedHeight = 128; // Adjust as needed
+        int croppedWidth = boundingBoxWidth; // Adjust as needed
+        int croppedHeight = boundingBoxHeight; // Adjust as needed
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -190,14 +202,14 @@ public class GameCharacter {
         // Sprite
         // Idle
         Texture jumpSheet = new Texture("Characters/Skeleton sprites/JUMP 64 frames.png");
-        TextureRegion[][] tmpJump = TextureRegion.split(jumpSheet, jumpSheet.getWidth() / 8,
-                jumpSheet.getHeight() / 8);
+        TextureRegion[][] tmpJump = TextureRegion.split(jumpSheet, jumpSheet.getWidth() / possiblyDealingWithSheetSize,
+                jumpSheet.getHeight() / possiblyDealingWithSheetSize);
         TextureRegion[] jumpFramesRight = new TextureRegion[64];
         TextureRegion[] jumpFramesLeft = new TextureRegion[64];
 
         // Define the desired width and height for the cropped frames
-        int croppedWidth = 128; // Adjust as needed
-        int croppedHeight = 128; // Adjust as needed
+        int croppedWidth = boundingBoxWidth; // Adjust as needed
+        int croppedHeight = boundingBoxHeight; // Adjust as needed
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -258,7 +270,7 @@ public class GameCharacter {
      * @param yPos of the GameCharacter's new coordinates
      */
     public void moveToNewPos(float xPos, float yPos) {
-        this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
+        this.boundingBox.set(xPos, yPos, boundingBoxWidth, boundingBoxHeight);
         if (b2body != null) {
             // Store the new position for later update
             this.newPosition.set(xPos, yPos);
@@ -280,13 +292,13 @@ public class GameCharacter {
         // Player can't jump if he is already in air
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
-            this.b2body.applyLinearImpulse(0, 1000000000f, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
+            this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
         }
     }
 
     // Fall faster
     public void fallDown() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().y, -movementSpeed * 70);
     }
 
     // Move right
@@ -310,14 +322,14 @@ public class GameCharacter {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
         }
-            //if negative in Y-Axis mario is falling
+        //if negative in Y-Axis mario is falling
         else if(b2body.getLinearVelocity().y < 0)
             return State.FALL;
             //if mario is positive or negative in the X axis he is running
         else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
             return State.WALKING;
         }
-            //if none of these return then he must be standing
+        //if none of these return then he must be standing
         return State.IDLE;
     }
 
@@ -388,27 +400,27 @@ public class GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = b2body.getPosition().x - boundingBox.getHeight();
-        float frameY = b2body.getPosition().y - boundingBox.getHeight();
+        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameY = (b2body.getPosition().y - boundingBox.getHeight());
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x;
-        boundingBox.y = b2body.getPosition().y;
+        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
+        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
 
         // Update coordinates
-        xPosition = b2body.getPosition().x;
-        yPosition = b2body.getPosition().y;
+        xPosition = b2body.getPosition().x + ((float) playerSize / 50);
+        yPosition = b2body.getPosition().y + ((float) playerSize / 50);
 
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
-            batch.draw(currentFrame, frameX + 5, frameY, 50, 50);
+            batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
     }
 
     /**
-         * Remove the Box2D body from the game world.
-         */
+     * Remove the Box2D body from the game world.
+     */
     public void removeBodyFromWorld() {
         if (b2body != null) {
             clientWorld.getGdxWorld().destroyBody(b2body);
@@ -417,4 +429,3 @@ public class GameCharacter {
 
     }
 }
-

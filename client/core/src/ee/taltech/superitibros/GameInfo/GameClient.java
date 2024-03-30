@@ -49,9 +49,9 @@ public class GameClient extends Game {
     /**
      * Starts a game and tries to create a new client.
      */
-    public void startGame() {
+    public void startGame(String path) {
         // Create a new game screen and transition to it
-        clientWorld = new ClientWorld();
+        clientWorld = new ClientWorld(path);
         gameScreen = new GameScreen(clientWorld);
         setScreen(gameScreen);
         try {

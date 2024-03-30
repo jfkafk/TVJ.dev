@@ -87,26 +87,29 @@ public class SinglePlayerMenu implements Screen {
         chapter1.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                gameClient.startGame();
+                resume();
             }
 
         });
         chapter2.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                resume();
+                new ClientConnection();
+                gameClient.startGame("Maps/level4/gameart2d-desert.tmx");
             }
         });
         chapter3.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                resume();
+                new ClientConnection();
+                gameClient.startGame("Maps/level2/level2.tmx");
             }
         });
         chapter4.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                resume();
+                new ClientConnection();
+                gameClient.startGame("Maps/level3/MagicLand.tmx");
             }
         });
         optionsButton.addListener(new ClickListener() {
