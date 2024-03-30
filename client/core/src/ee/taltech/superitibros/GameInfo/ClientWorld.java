@@ -34,7 +34,7 @@ public class ClientWorld {
     public ClientWorld(String path) {
         // Map and physics
         this.path = path;
-        gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -300), true);
+        gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -150), true);
         b2dr = new Box2DDebugRenderer();
         gdxWorld.step(1/60f, 6, 2);
         initializeMap();
@@ -83,7 +83,7 @@ public class ClientWorld {
             }
 
             // Set friction for the ground
-            fixtureDef.friction = 0.5f;
+            fixtureDef.friction = 1f;
             body.createFixture(fixtureDef);
         }
     }

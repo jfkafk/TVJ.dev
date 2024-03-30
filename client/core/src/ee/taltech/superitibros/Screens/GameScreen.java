@@ -35,6 +35,9 @@ public class GameScreen implements Screen, InputProcessor {
     private final SpriteBatch batch;
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
+    private String path;
+    private float desiredCameraWidth;
+    private float desiredCameraHeight;
 
     // World parameters
     private final float WORLD_WIDTH;
@@ -64,13 +67,16 @@ public class GameScreen implements Screen, InputProcessor {
         int mapHeightInTiles = tiledMap.getProperties().get("height", Integer.class);
         WORLD_HEIGHT = tileHeight * mapHeightInTiles;
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
         // Cameras and screen
         buttonHasBeenPressed = false;
 
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
-        float desiredCameraHeight = 640; // Set the desired width of the camera
-        float desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
+        if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles / 2; // Set the desired width of the camera
+        } else {
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
+        }
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);

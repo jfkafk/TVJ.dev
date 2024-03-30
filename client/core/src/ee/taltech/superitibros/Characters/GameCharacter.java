@@ -89,6 +89,9 @@ public class GameCharacter {
         this.stateTimer = 0;
         this.mapHeight = clientWorld.getMapHeight();
         this.mapWidth = clientWorld.getMapWidth();
+        if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
+            playerSize = 256;
+        }
         defineCharacter();
     }
     public void createFrames() {
@@ -289,13 +292,13 @@ public class GameCharacter {
         // Player can't jump if he is already in air
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
-            this.b2body.applyLinearImpulse(0, 1000000000f, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
+            this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
         }
     }
 
     // Fall faster
     public void fallDown() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed);
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().y, -movementSpeed * 70);
     }
 
     // Move right
@@ -319,14 +322,14 @@ public class GameCharacter {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
         }
-            //if negative in Y-Axis mario is falling
+        //if negative in Y-Axis mario is falling
         else if(b2body.getLinearVelocity().y < 0)
             return State.FALL;
             //if mario is positive or negative in the X axis he is running
         else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
             return State.WALKING;
         }
-            //if none of these return then he must be standing
+        //if none of these return then he must be standing
         return State.IDLE;
     }
 
@@ -397,27 +400,27 @@ public class GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = b2body.getPosition().x - boundingBox.getHeight() - 4; // Somehow needed -4 to match the sprite.
-        float frameY = b2body.getPosition().y - boundingBox.getHeight();
+        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameY = (b2body.getPosition().y - boundingBox.getHeight());
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x * 1.28f;
-        boundingBox.y = b2body.getPosition().y * 1.28f;
+        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
+        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
 
         // Update coordinates
-        xPosition = b2body.getPosition().x;
-        yPosition = b2body.getPosition().y;
+        xPosition = b2body.getPosition().x + ((float) playerSize / 50);
+        yPosition = b2body.getPosition().y + ((float) playerSize / 50);
 
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
-            batch.draw(currentFrame, frameX + 5, frameY, playerSize, playerSize);
+            batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
     }
 
     /**
-         * Remove the Box2D body from the game world.
-         */
+     * Remove the Box2D body from the game world.
+     */
     public void removeBodyFromWorld() {
         if (b2body != null) {
             clientWorld.getGdxWorld().destroyBody(b2body);
