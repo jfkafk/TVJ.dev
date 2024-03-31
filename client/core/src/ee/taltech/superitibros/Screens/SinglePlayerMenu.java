@@ -49,8 +49,8 @@ public class SinglePlayerMenu implements Screen {
         viewport = new FitViewport(worldWidth, worldHeight, camera);
         viewport.apply();
         camera.update();
-
         stage = new Stage(viewport, batch);
+        gameClient.getClientConnection().sendCreateNewLobby();
     }
 
     /**
@@ -94,22 +94,25 @@ public class SinglePlayerMenu implements Screen {
         chapter2.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                new ClientConnection();
-                gameClient.startGame("Maps/level4/gameart2d-desert.tmx");
+                String mapPath = "Maps/level4/gameart2d-desert.tmx";
+                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
+                gameClient.startGame(mapPath);
             }
         });
         chapter3.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                new ClientConnection();
-                gameClient.startGame("Maps/level2/level2.tmx");
+                String mapPath = "Maps/level2/level2.tmx";
+                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
+                gameClient.startGame(mapPath);
             }
         });
         chapter4.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                new ClientConnection();
-                gameClient.startGame("Maps/level3/MagicLand.tmx");
+                String mapPath = "Maps/level3/MagicLand.tmx";
+                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
+                gameClient.startGame(mapPath);
             }
         });
         optionsButton.addListener(new ClickListener() {

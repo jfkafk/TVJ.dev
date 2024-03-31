@@ -12,6 +12,7 @@ public class PacketLobbyInfo extends Packet {
     boolean updateInfo;
     boolean startGame;
     boolean toDelete;
+    String mapPath;
 
     public String getLobbyHash() {
         return lobbyHash;
@@ -67,5 +68,13 @@ public class PacketLobbyInfo extends Packet {
 
     public boolean isToDelete() {
         return toDelete;
+    }
+
+    public void setMapPath(String mapPath) {
+        this.mapPath = mapPath;
+    }
+
+    public String getMapPath() {
+        return mapPath;
     }
 }

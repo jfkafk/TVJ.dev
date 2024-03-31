@@ -58,7 +58,7 @@ public class PacketCreator {
      * @param botHash npc's botHash
      * @return new PacketUpdateEnemy
      */
-    public static PacketUpdateEnemy createPacketUpdateZombies(String botHash, float xPosition, float yPosition) {
+    public static PacketUpdateEnemy createPacketUpdateEnemy(String botHash, float xPosition, float yPosition) {
         PacketUpdateEnemy packetEnemy = new PacketUpdateEnemy();
         packetEnemy.setBotHash(botHash);
         packetEnemy.setxPosition(xPosition);

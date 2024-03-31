@@ -38,6 +38,7 @@ public class LobbyScreen implements Screen {
     Lobby currentLobby;
     boolean readyToStart;
     boolean hostLeft;
+    String mapPath;
 
     // Fetch available lobbies
     List<LobbyScreen> availableLobbies = new ArrayList<>();
@@ -102,7 +103,7 @@ public class LobbyScreen implements Screen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     // Add logic here to start the game
-                    gameClient.startGame();
+                    gameClient.startGame(mapPath);
                 }
             });
             mainTable.add(startGameButton).pad(BUTTON_PADDING);
@@ -115,7 +116,7 @@ public class LobbyScreen implements Screen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     // Add logic here to start the game
-                    gameClient.startGame();
+                    gameClient.startGame(mapPath);
                 }
             });
             mainTable.add(startGameButton).pad(BUTTON_PADDING);
@@ -154,6 +155,10 @@ public class LobbyScreen implements Screen {
     public void refreshScreen() {
         stage.clear();
         show();
+    }
+
+    public void setMapPath(String mapPath) {
+        this.mapPath = mapPath;
     }
 
     @Override
