@@ -5,10 +5,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
-import ee.taltech.superitibros.Characters.Enemy;
-import ee.taltech.superitibros.Characters.GameCharacter;
-import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
+import ee.taltech.superitibros.Characters.*;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
