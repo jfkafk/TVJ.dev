@@ -23,6 +23,7 @@ public class GameClient extends Game {
     LobbyScreen lobbyScreen;
     HostLobby hostLobbyScreen;
     Integer connectionId;
+    String mapPath;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -105,9 +106,10 @@ public class GameClient extends Game {
         return Optional.empty();
     }
 
-    public void readyToStart() {
+    public void readyToStart(String mapPath) {
         lobbyScreen.setReadyToStart(true);
         lobbyScreen.refreshScreen();
+        lobbyScreen.setMapPath(mapPath);
     }
 
     public void hostLeft() {
@@ -154,6 +156,14 @@ public class GameClient extends Game {
         if (hostLobbyScreen != null) {
             hostLobbyScreen.refreshPlayers();
         }
+    }
+
+    public void updateMapPath(String newPath) {
+        this.mapPath = newPath;
+    }
+
+    public String getMapPath() {
+        return mapPath;
     }
 
     /**

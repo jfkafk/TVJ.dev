@@ -133,7 +133,7 @@ public class ClientConnection {
 
 						// Start game if startGame true
 						if (packetLobbyInfo.isStartGame()) {
-							gameClient.readyToStart();
+							gameClient.readyToStart(packetLobbyInfo.getMapPath());
 
 						} else if (packetLobbyInfo.isToDelete()) {
 							gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
@@ -241,9 +241,10 @@ public class ClientConnection {
 		client.sendUDP(packetLobbyInfo);
 	}
 
-	public void sendLobbyStartGame(String lobbyHash) {
+	public void sendLobbyStartGame(String lobbyHash, String mapPath) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setStartGame(true);
+		packetLobbyInfo.setMapPath(mapPath);
 		client.sendUDP(packetLobbyInfo);
 	}
 

@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.superitibros.Connection.ClientConnection;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
@@ -33,6 +34,7 @@ public class HostLobby implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
+    String mapPath;
 
     public HostLobby(GameClient gameClient) {
         this.gameClient = gameClient;
@@ -68,6 +70,10 @@ public class HostLobby implements Screen {
         TextButton startGameButton = new TextButton("Start Game", skin);
         TextButton back = new TextButton("Back", skin);
         TextButton refreshButton = new TextButton("Refresh", skin);
+        TextButton chapter1 = new TextButton("CHAPTER 1: AWAKENING", skin);
+        TextButton chapter2 = new TextButton("CHAPTER 2: FreeFall", skin);
+        TextButton chapter3 = new TextButton("Chapter 3: DesertStrike", skin);
+        TextButton chapter4 = new TextButton("Chapter 4: RiseOfTheItiBro", skin);
 
 
         refreshButton.addListener(new ClickListener() {
@@ -80,13 +86,58 @@ public class HostLobby implements Screen {
 
         //Add listeners to buttons
 
-        startGameButton.addListener(new ClickListener() {
+        chapter1.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash());
-                gameClient.startGame();
+                mapPath = "Maps/level1/level1.tmx";
+                gameClient.updateMapPath(mapPath);
+                refreshPlayers();
+            }
+
+        });
+        chapter2.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mapPath = "Maps/level4/gameart2d-desert.tmx";
+                gameClient.updateMapPath(mapPath);
+                refreshPlayers();
             }
         });
+        chapter3.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mapPath = "Maps/level2/level2.tmx";
+                gameClient.updateMapPath(mapPath);
+                refreshPlayers();
+            }
+        });
+        chapter4.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mapPath = "Maps/level3/MagicLand.tmx";
+                gameClient.updateMapPath(mapPath);
+                System.out.println(gameClient.getMapPath());
+                refreshPlayers();
+            }
+        });
+
+        back.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                MenuScreen menuScreen = new MenuScreen(gameClient);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+            }
+        });
+
+        if (gameClient.getMapPath() != null) {
+            startGameButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
+                    gameClient.startGame(gameClient.getMapPath());
+                }
+            });
+        }
 
         back.addListener(new ClickListener() {
             @Override
@@ -114,6 +165,14 @@ public class HostLobby implements Screen {
         mainTable.add(gameLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(menuLabel).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(chapter1).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(chapter2).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(chapter3).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(chapter4).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(startGameButton).pad(buttonLocationPadding);
         mainTable.row();
