@@ -364,37 +364,29 @@ public class GameCharacter {
             case IDLE:
                 if (getFacingRight()) {
                     currentFrame = idleAnimationRight.getKeyFrame(stateTime, true);
-                    System.out.println("IDLE, RIGHT");
                 } else {
                     currentFrame = idleAnimationLeft.getKeyFrame(stateTime, true);
-                    System.out.println("IDLE LEFT");
                 }
                 break;
             case WALKING:
                 if (getFacingRight()) {
                     currentFrame = walkAnimationRight.getKeyFrame(stateTime, true);
-                    System.out.println("WALKING RIGHT");
                 } else {
                     currentFrame = walkAnimationLeft.getKeyFrame(stateTime, true);
-                    System.out.println("WALKING LEFT");
                 }
                 break;
             case JUMPING:
                 if (getFacingRight()) {
                     currentFrame = jumpAnimationRight.getKeyFrame(stateTime, true);
-                    System.out.println("JUMPING RIGHT");
                 } else {
                     currentFrame = jumpAnimationLeft.getKeyFrame(stateTime, true);
-                    System.out.println("JUMPING LEFT");
                 }
                 break;
             default:
                 if (getFacingRight()) {
                     currentFrame = fallAnimationRight.getKeyFrame(stateTime, true);
-                    System.out.println("FALLING RIGHT");
                 } else {
                     currentFrame = fallAnimationLeft.getKeyFrame(stateTime, true);
-                    System.out.println("FALLING LEFT");
                 }
                 break;
         }

@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -18,11 +19,14 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.GameInfo.GameClient;
+import ee.taltech.superitibros.Lobbies.Lobby;
 
+import java.util.ArrayList;
 
-public class Lobby implements Screen {
-
+public class HostLobby implements Screen {
     private SpriteBatch batch;
+    private BitmapFont font;
+
     protected Stage stage;
     private Viewport viewport;
     private OrthographicCamera camera;
@@ -30,11 +34,7 @@ public class Lobby implements Screen {
     protected Skin skin;
     GameClient gameClient;
 
-    /**
-     * Constructor for the Menu class.
-     * Define texture
-     */
-    public Lobby(GameClient gameClient) {
+    public HostLobby(GameClient gameClient) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
@@ -45,17 +45,12 @@ public class Lobby implements Screen {
         viewport = new FitViewport(worldWidth, worldHeight, camera);
         viewport.apply();
         camera.update();
-
         stage = new Stage(viewport, batch);
+        font = new BitmapFont();
     }
 
-    /**
-     * Show menu screen
-     * Create table and add buttons to the table
-     */
     @Override
     public void show() {
-
         Gdx.input.setInputProcessor(stage);
 
         //Create Table
@@ -70,47 +65,72 @@ public class Lobby implements Screen {
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         //Create buttons
-        TextButton multiplayerButton = new TextButton("Multiplayer", skin);
-
-        TextButton optionsButton = new TextButton("Options", skin);
-
+        TextButton startGameButton = new TextButton("Start Game", skin);
         TextButton back = new TextButton("Back", skin);
+        TextButton refreshButton = new TextButton("Refresh", skin);
+
+
+        refreshButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                refreshPlayers();
+            }
+        });
 
 
         //Add listeners to buttons
 
+        startGameButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash());
+                gameClient.startGame();
+            }
+        });
+
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MenuScreen menuScreen = new MenuScreen(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+                MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
+                gameClient.removeAvailableLobby(gameClient.getMyLobby());
+                gameClient.getClientConnection().sendDeleteLobby(gameClient.getMyLobby().getLobbyHash());
             }
         });
-        optionsButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                Options options = new Options(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(options);
-            }
-        });
+
         int buttonLocationPadding = 5;
+
+        // Display players
+        if (gameClient.getMyLobby() != null) {
+            for (Integer playerId : gameClient.getMyLobby().getPlayers()) {
+                // Create a button for each lobby
+                TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
+                // Add the lobby button to the table
+                mainTable.add(lobbyButton).pad(buttonLocationPadding);
+                mainTable.row();
+            }
+        }
+
         mainTable.add(gameLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(menuLabel).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.add(startGameButton).pad(buttonLocationPadding);
         mainTable.row();
-        mainTable.add(optionsButton).pad(buttonLocationPadding);
+        mainTable.add(refreshButton).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(back).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(back).pad(buttonLocationPadding);
         //Add table to stage
         stage.addActor(mainTable);
-
     }
 
-    /**
-     * Render (creates stage)
-     */
+    public void refreshPlayers() {
+        stage.clear();
+        show();
+    }
+
     @Override
     public void render(float delta) {
         Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
@@ -119,9 +139,6 @@ public class Lobby implements Screen {
         stage.draw();
     }
 
-    /**
-     * Resize
-     */
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height);
@@ -131,19 +148,22 @@ public class Lobby implements Screen {
 
     @Override
     public void pause() {
+
     }
 
     @Override
     public void resume() {
+
     }
 
     @Override
     public void hide() {
+
     }
 
     @Override
     public void dispose() {
-        skin.dispose();
-        atlas.dispose();
+        batch.dispose();
+        font.dispose();
     }
 }

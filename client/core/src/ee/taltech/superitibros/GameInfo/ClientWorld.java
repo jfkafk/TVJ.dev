@@ -195,6 +195,7 @@ public class ClientWorld {
         if (newCharacter instanceof MyPlayerGameCharacter) {
             setMyPlayerGameCharacter((MyPlayerGameCharacter) newCharacter);
         }
+        System.out.println("characters: " + worldGameCharactersMap.keySet());
         worldGameCharactersMap.put(id, newCharacter);
     }
 
@@ -205,6 +206,7 @@ public class ClientWorld {
      * @param id of the moving character - id is key in worldGameCharactersMap.
      */
     public void movePlayerGameCharacter(Integer id, float xPos, float yPos) {
+        System.out.println("moving player to x: " + xPos + " y: " + yPos);
         getGameCharacter(id).moveToNewPos(xPos, yPos);
         getGameCharacter(id).updatePosition();
     }
