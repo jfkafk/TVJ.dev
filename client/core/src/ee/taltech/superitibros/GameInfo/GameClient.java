@@ -113,8 +113,10 @@ public class GameClient extends Game {
     }
 
     public void hostLeft() {
-        lobbyScreen.setHostLeft(true);
-        lobbyScreen.refreshScreen();
+        if (lobbyScreen != null) {
+            lobbyScreen.setHostLeft(true);
+            lobbyScreen.refreshScreen();
+        }
     }
 
     public List<Lobby> getAvailableLobbies() {
