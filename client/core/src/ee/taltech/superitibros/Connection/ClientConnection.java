@@ -15,7 +15,6 @@ import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-import ee.taltech.superitibros.Screens.JoinLobby;
 import packets.*;
 
 import javax.swing.JOptionPane;
@@ -63,12 +62,15 @@ public class ClientConnection {
 		client.getKryo().register(PacketGetAvailableLobbies.class);
 		client.getKryo().register(HashSet.class);
 		client.getKryo().register(LinkedHashSet.class);
+		client.getKryo().register(PacketRemoveLobby.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
 
 			// Receive packets from the Server.
 			public void received(Connection connection, Object object) {
+
+				gameClient.setConnectionId(connection.getID());
 
 				if (object instanceof Packet) {
 
@@ -127,35 +129,44 @@ public class ClientConnection {
 					} else if (object instanceof PacketLobbyInfo) {
 						// Packet for updating available lobby info
 						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
-						Optional<Lobby> optionalLobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
+						Optional<Lobby> lobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
 
 						// Start game if startGame true
 						if (packetLobbyInfo.isStartGame()) {
 							gameClient.readyToStart();
 
-						} else if (optionalLobby.isPresent()) {
-							Lobby lobby = optionalLobby.get();
-							if (packetLobbyInfo.isToDelete()) {
-								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
-							} else {
-								lobby.setPlayerCount(packetLobbyInfo.getPlayerCount());
-								lobby.setPlayers(packetLobbyInfo.getPlayers());
-								gameClient.refreshLobbyScreen();
-								gameClient.refreshHostLobbyScreen();
-							}
-						} else {
-							Lobby lobby = new Lobby(packetLobbyInfo.getLobbyHash()); // Instantiate Lobby
-							lobby.setPlayerCount(packetLobbyInfo.getPlayerCount()); // Set player count
-							lobby.setPlayers(packetLobbyInfo.getPlayers()); // Set players
-							gameClient.addAvailableLobby(lobby); // Add available lobby
+						} else if (packetLobbyInfo.isToDelete()) {
+							gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
+							gameClient.hostLeft();
+
+						} else if (packetLobbyInfo.isUpdateInfo()) {
+							lobby.get().setPlayers(packetLobbyInfo.getPlayers());
+							gameClient.refreshLobbyScreen();
+							gameClient.refreshHostLobbyScreen();
+
+						} else if (packetLobbyInfo.getPlayerToAdd() != null) {
+							lobby.get().addPLayer(packetLobbyInfo.getPlayerToAdd());
+							gameClient.refreshLobbyScreen();
+							gameClient.refreshHostLobbyScreen();
+
+						} else if (packetLobbyInfo.getPlayerToRemove() != null) {
+							lobby.get().removePlayer(packetLobbyInfo.getPlayerToRemove());
+							gameClient.refreshLobbyScreen();
+							gameClient.refreshHostLobbyScreen();
 						}
 
 					} else if (object instanceof PacketSendNewLobby) {
 						PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
 						Lobby lobby = new Lobby(packetSendNewLobby.getLobbyHash());
-						lobby.addPLayer(packetSendNewLobby.getCreatorName());
+						lobby.addPLayer(packetSendNewLobby.getCreatorId());
 						gameClient.addAvailableLobby(lobby);
-						gameClient.setMyLobby(lobby);
+						if (packetSendNewLobby.getCreatorId() == connection.getID()) {
+							gameClient.setMyLobby(lobby);
+						}
+
+					} else if (object instanceof PacketRemoveLobby) {
+						PacketRemoveLobby packetRemoveLobby = (PacketRemoveLobby) object;
+						gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
 					}
 				}
 			}
@@ -190,6 +201,7 @@ public class ClientConnection {
 	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
 		packet.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
+		System.out.println("send update character with lobby hash: " + gameClient.getMyLobby().getLobbyHash());
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);
@@ -200,7 +212,6 @@ public class ClientConnection {
 	 */
 	public void sendCreateNewLobby() {
 		PacketSendNewLobby packetSendNewLobby = PacketCreator.createPacketSendNewLobby();
-		packetSendNewLobby.setCreatorName(gameClient.getClientName());
 		client.sendUDP(packetSendNewLobby);
 	}
 
@@ -214,9 +225,19 @@ public class ClientConnection {
 
 	public void sendUpdateLobbyInfo(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
-		packetLobbyInfo.setPlayers(gameClient.getMyLobby().getPlayers());
-		packetLobbyInfo.setPlayerToAdd(gameClient.getClientName());
-		System.out.println(gameClient.getMyLobby().getPlayers());
+		packetLobbyInfo.setUpdateInfo(true);
+		client.sendUDP(packetLobbyInfo);
+	}
+
+	public void sendAddPlayerToLobby(String lobbyHash) {
+		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		packetLobbyInfo.setPlayerToAdd(gameClient.getConnectionId());
+		client.sendUDP(packetLobbyInfo);
+	}
+
+	public void sendRemovePlayerFromLobby(String lobbyHash) {
+		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		packetLobbyInfo.setPlayerToRemove(gameClient.getConnectionId());
 		client.sendUDP(packetLobbyInfo);
 	}
 

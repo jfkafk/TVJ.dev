@@ -26,7 +26,6 @@ import java.util.ArrayList;
 public class HostLobby implements Screen {
     private SpriteBatch batch;
     private BitmapFont font;
-    private ArrayList<String> joinedPlayers;
 
     protected Stage stage;
     private Viewport viewport;
@@ -48,9 +47,6 @@ public class HostLobby implements Screen {
         camera.update();
         stage = new Stage(viewport, batch);
         font = new BitmapFont();
-        joinedPlayers = new ArrayList<String>();
-        // Assuming you have a method to retrieve joined players
-        // You can populate joinedPlayers list here
     }
 
     @Override
@@ -97,6 +93,7 @@ public class HostLobby implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
+                gameClient.removeAvailableLobby(gameClient.getMyLobby());
                 gameClient.getClientConnection().sendDeleteLobby(gameClient.getMyLobby().getLobbyHash());
             }
         });
@@ -105,9 +102,9 @@ public class HostLobby implements Screen {
 
         // Display players
         if (gameClient.getMyLobby() != null) {
-            for (String playerName : gameClient.getMyLobby().getPlayers()) {
+            for (Integer playerId : gameClient.getMyLobby().getPlayers()) {
                 // Create a button for each lobby
-                TextButton lobbyButton = new TextButton(String.valueOf(playerName), skin);
+                TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
                 // Add the lobby button to the table
                 mainTable.add(lobbyButton).pad(buttonLocationPadding);
                 mainTable.row();

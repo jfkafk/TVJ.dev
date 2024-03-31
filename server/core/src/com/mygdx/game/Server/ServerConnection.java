@@ -65,6 +65,7 @@ public class ServerConnection {
 		server.getKryo().register(PacketGetAvailableLobbies.class);
 		server.getKryo().register(HashSet.class);
 		server.getKryo().register(LinkedHashSet.class);
+		server.getKryo().register(PacketRemoveLobby.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -106,10 +107,8 @@ public class ServerConnection {
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 
 					// Update PlayerGameCharacter's coordinates in lobby.
-					if (onGoingLobbies.get(packet.getLobbyHash()) != null) {
-						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
-						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
-					}
+					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
+					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
 
 					// Send players new coordinates and direction to all players in lobby
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash());
@@ -122,8 +121,8 @@ public class ServerConnection {
 					// Packet for adding new lobby
 					PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
 
-					Lobby lobby = new Lobby(connection.getID(), packetSendNewLobby.getCreatorName(), connection.getID());
-					lobby.addPLayers(packetSendNewLobby.getCreatorName(), connection.getID());
+					Lobby lobby = new Lobby(connection.getID());
+					lobby.addPlayer(connection.getID());
 
 					availableLobbies.put(lobby.getLobbyHash(), lobby);
 
@@ -154,7 +153,7 @@ public class ServerConnection {
 						// Set lobbyHash to server thread
 						lobby.getServerUpdateThread().setLobbyHash(packetLobbyInfo.getLobbyHash());
 						// Send packet that lobby has started to all players except host that are in that lobby
-						for (Integer playerId : availableLobbies.get(packetLobbyInfo.getLobbyHash()).getPlayers().values()) {
+						for (Integer playerId : availableLobbies.get(packetLobbyInfo.getLobbyHash()).getPlayers()) {
 							// Add player id's to server world with new PlayerGameCharacter instance
 							availableLobbies.get(packetLobbyInfo.getLobbyHash()).getServerWorld().addGameCharacter(playerId, PlayerGameCharacter
 									.createPlayerGameCharacter(playerGameCharacterX, playerGameCharacterY, availableLobbies.get(packetLobbyInfo.getLobbyHash()).getServerWorld(), playerId));
@@ -166,23 +165,33 @@ public class ServerConnection {
 						onGoingLobbies.put(packetLobbyInfo.getLobbyHash(), availableLobbies.get(packetLobbyInfo.getLobbyHash()));
 						// Remove lobby from available lobbies
 						availableLobbies.remove(packetLobbyInfo.getLobbyHash());
+						// Send to all packet that removes lobby from available lobbies
+						sendRemoveLobby(packetLobbyInfo.getLobbyHash());
 
-					} else {
-						if (packetLobbyInfo.isToDelete()) {
-							// Remove lobby from available lobbies
-							removeAvailableLobby(packetLobbyInfo.getLobbyHash());
-							// Send to all that lobby is to be deleted
-							server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
-						} else {
-							// Add new player to server's lobby
-							availableLobbies.get(packetLobbyInfo.getLobbyHash()).addPLayers(packetLobbyInfo.getPlayerToAdd(), connection.getID());
-							// Create set of all lobby players
-							Set<String> lobbyPlayers = new HashSet<>(availableLobbies.get(packetLobbyInfo.getLobbyHash()).getPlayers().keySet());
-							// Set all lobby players to packet
-							packetLobbyInfo.setPlayers(lobbyPlayers);
-							// Send info to all TODO info should be sent only people, who are in given lobby
-							server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
-						}
+					} else if (packetLobbyInfo.isUpdateInfo() && availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null) {
+						// If client request info about lobby, send players in lobby
+						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
+						Set<Integer> players = lobby.getPlayers();
+						packetLobbyInfo.setPlayers(players);
+						server.sendToUDP(connection.getID(), packetLobbyInfo);
+
+					} else if (packetLobbyInfo.getPlayerToAdd() != null && availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null) {
+						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
+						lobby.addPlayer(packetLobbyInfo.getPlayerToAdd());
+						// TODO dont send to all
+						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+
+					} else if (availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null && packetLobbyInfo.getPlayerToRemove() != null) {
+						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
+						lobby.removePlayer(packetLobbyInfo.getPlayerToRemove());
+						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+
+					} else if (packetLobbyInfo.isToDelete()) {
+						// Remove lobby from available lobbies
+						removeAvailableLobby(packetLobbyInfo.getLobbyHash());
+						// Send to all that lobby is to be deleted
+						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+
 					}
 				}
 			}
@@ -235,9 +244,6 @@ public class ServerConnection {
 			server.sendToTCP(newCharacterConnection.getID(), addCharacter);
 		}
 
-		// Add new PlayerGameCharacter instance to lobby's server world.
-		onGoingLobbies.get(lobbyHash).getServerWorld().addGameCharacter(newCharacterConnection.getID(), newPlayerGameCharacter);
-
 		// Add new PlayerGameCharacter instance to all connections.
 		// Create a packet to send new PlayerGameCharacter's info.
 		PacketAddCharacter addCharacter = PacketCreator.createPacketAddCharacter(newCharacterConnection.getID(), newPlayerGameCharacter.getBoundingBox().getX(), newPlayerGameCharacter.getBoundingBox().getY());
@@ -256,9 +262,6 @@ public class ServerConnection {
 	 * @param yPos new y coordinate of the PlayerGameCharacter (float)
 	 */
 	public void sendUpdatedGameCharacter(int id, float xPos, float yPos, GameCharacter.State state, boolean isFacingRight, String lobbyHash) {
-		// Update player's coordinates
-		PlayerGameCharacter character = onGoingLobbies.get(lobbyHash).getServerWorld().getGameCharacter(id);
-		character.moveToNewPos(xPos, yPos);
 		// Create packet
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(id, xPos, yPos);
 		// Set player's state and if he's facing right
@@ -309,11 +312,25 @@ public class ServerConnection {
 	public void sendAvailableLobbies(Integer playerId) {
 		for (Lobby lobby : availableLobbies.values()) {
 			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash());
-			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers().keySet()));
+			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers()));
 			server.sendToUDP(playerId, packetLobbyInfo);
 		}
 	}
 
+	/**
+	 * Method for sending packet that lobby is removed.
+	 * @param lobbyHash lobby hash.
+	 */
+	public void sendRemoveLobby(String lobbyHash) {
+		PacketRemoveLobby packetRemoveLobby = new PacketRemoveLobby();
+		packetRemoveLobby.setLobbyHash(lobbyHash);
+		server.sendToAllUDP(packetRemoveLobby);
+	}
+
+	/**
+	 * Remove lobby from available lobbies
+	 * @param lobbyHash lobby hash.
+	 */
 	public void removeAvailableLobby(String lobbyHash) {
         availableLobbies.remove(lobbyHash);
 	}

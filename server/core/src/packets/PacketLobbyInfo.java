@@ -6,8 +6,10 @@ import java.util.Set;
 public class PacketLobbyInfo extends Packet {
 
     String lobbyHash;
-    Set<String> players = new LinkedHashSet<>();
-    String playerToAdd;
+    Set<Integer> players = new LinkedHashSet<>();
+    Integer playerToAdd;
+    Integer playerToRemove;
+    boolean updateInfo;
     boolean startGame;
     boolean toDelete;
 
@@ -15,28 +17,40 @@ public class PacketLobbyInfo extends Packet {
         return lobbyHash;
     }
 
-    public Integer getPlayerCount() {
-        return players.size();
-    }
-
     public void setLobbyHash(String lobbyHash) {
         this.lobbyHash = lobbyHash;
     }
 
-    public void setPlayers(Set<String> players) {
+    public void setPlayers(Set<Integer> players) {
         this.players = players;
     }
 
-    public Set<String> getPlayers() {
+    public Set<Integer> getPlayers() {
         return players;
     }
 
-    public void setPlayerToAdd(String playerToAdd) {
+    public void setPlayerToAdd(Integer playerToAdd) {
         this.playerToAdd = playerToAdd;
     }
 
-    public String getPlayerToAdd() {
+    public Integer getPlayerToAdd() {
         return playerToAdd;
+    }
+
+    public void setPlayerToRemove(Integer playerToRemove) {
+        this.playerToRemove = playerToRemove;
+    }
+
+    public Integer getPlayerToRemove() {
+        return playerToRemove;
+    }
+
+    public void setUpdateInfo(boolean updateInfo) {
+        this.updateInfo = updateInfo;
+    }
+
+    public boolean isUpdateInfo() {
+        return updateInfo;
     }
 
     public void setStartGame(boolean startGame) {

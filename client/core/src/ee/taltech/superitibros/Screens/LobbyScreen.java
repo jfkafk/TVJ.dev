@@ -37,6 +37,7 @@ public class LobbyScreen implements Screen {
     GameClient gameClient;
     Lobby currentLobby;
     boolean readyToStart;
+    boolean hostLeft;
 
     // Fetch available lobbies
     List<LobbyScreen> availableLobbies = new ArrayList<>();
@@ -56,7 +57,6 @@ public class LobbyScreen implements Screen {
         camera.update();
         stage = new Stage(viewport, batch);
         font = new BitmapFont();
-        joinedPlayers = new ArrayList<String>();
         this.currentLobby = currentLobby;
     }
 
@@ -81,6 +81,7 @@ public class LobbyScreen implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
                 refreshScreen();
             }
         });
@@ -89,7 +90,8 @@ public class LobbyScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
-                gameClient.setMyLobby(null);
+                gameClient.getMyLobby().getPlayers().remove(gameClient.getConnectionId());
+                gameClient.getClientConnection().sendRemovePlayerFromLobby(gameClient.getMyLobby().getLobbyHash());
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
             }
         });
@@ -107,10 +109,23 @@ public class LobbyScreen implements Screen {
             mainTable.row();
         }
 
+        if (hostLeft) {
+            TextButton startGameButton = new TextButton("Host Left, find new lobby", skin);
+            startGameButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    // Add logic here to start the game
+                    gameClient.startGame();
+                }
+            });
+            mainTable.add(startGameButton).pad(BUTTON_PADDING);
+            mainTable.row();
+        }
+
         // Display players
-        for (String playerName : currentLobby.getPlayers()) {
+        for (Integer playerId : currentLobby.getPlayers()) {
             // Create a button for each lobby
-            TextButton lobbyButton = new TextButton(String.valueOf(playerName), skin);
+            TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
             // Add the lobby button to the table
             mainTable.add(lobbyButton).pad(BUTTON_PADDING);
             mainTable.row();
@@ -130,6 +145,10 @@ public class LobbyScreen implements Screen {
 
     public void setReadyToStart(boolean readyToStart) {
         this.readyToStart = readyToStart;
+    }
+
+    public void setHostLeft(boolean hostLeft) {
+        this.hostLeft = hostLeft;
     }
 
     public void refreshScreen() {

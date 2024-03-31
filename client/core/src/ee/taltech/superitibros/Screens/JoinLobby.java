@@ -79,17 +79,8 @@ public class JoinLobby implements Screen {
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         // Create buttons
-        TextButton startGameButton = new TextButton("Start Game", skin);
         TextButton refreshButton = new TextButton("Refresh", skin);
         TextButton back = new TextButton("Back", skin);
-
-        // Add listeners to buttons
-        startGameButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                gameClient.startGame();
-            }
-        });
 
         refreshButton.addListener(new ClickListener() {
             @Override
@@ -128,8 +119,6 @@ public class JoinLobby implements Screen {
         mainTable.row();
         mainTable.add(menuLabel).pad(BUTTON_PADDING);
         mainTable.row();
-        mainTable.add(startGameButton).pad(BUTTON_PADDING);
-        mainTable.row();
         mainTable.add(refreshButton).pad(BUTTON_PADDING);
         mainTable.row();
         mainTable.add(back).pad(BUTTON_PADDING);
@@ -143,8 +132,8 @@ public class JoinLobby implements Screen {
     private void joinLobby(Lobby lobby) {
         // Add your logic here to join the selected lobby
         gameClient.setMyLobby(lobby);
-        gameClient.getClientConnection().sendUpdateLobbyInfo(lobby.getLobbyHash());
-        lobby.addPLayer(gameClient.getClientName());
+        lobby.addPLayer(gameClient.getConnectionId());
+        gameClient.getClientConnection().sendAddPlayerToLobby(lobby.getLobbyHash());
         LobbyScreen lobbyScreen = new LobbyScreen(gameClient, lobby);
         gameClient.setLobbyScreen(lobbyScreen);
         ((Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);

@@ -69,39 +69,22 @@ public class MultiplayerMenu implements Screen {
 
         TextButton back = new TextButton("Back", skin);
 
-        nameField.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                String playerName = nameField.getText();
-                boolean validName = playerName.length() >= 3;
-                joinLobbyButton.setDisabled(!validName);
-                hostLobbyButton.setDisabled(!validName);
-            }
-        });
-
         joinLobbyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String playerName = nameField.getText();
-                if (playerName.length() >= 3) {
-                    JoinLobby joinLobby = new JoinLobby(gameClient);
-                    gameClient.setClientName(playerName);
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(joinLobby);
-                }
+                JoinLobby joinLobby = new JoinLobby(gameClient);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(joinLobby);
+
             }
         });
 
         hostLobbyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                String playerName = nameField.getText();
-                if (playerName.length() >= 3) {
-                    HostLobby hostLobby = new HostLobby(gameClient);
-                    gameClient.setHostLobbyScreen(hostLobby);
-                    gameClient.setClientName(playerName);
-                    gameClient.getClientConnection().sendCreateNewLobby();
-                    ((Game) Gdx.app.getApplicationListener()).setScreen(hostLobby);
-                }
+                HostLobby hostLobby = new HostLobby(gameClient);
+                gameClient.setHostLobbyScreen(hostLobby);
+                gameClient.getClientConnection().sendCreateNewLobby();
+                ((Game) Gdx.app.getApplicationListener()).setScreen(hostLobby);
             }
         });
 
@@ -118,9 +101,6 @@ public class MultiplayerMenu implements Screen {
         mainTable.add(gameLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(menuLabel).pad(buttonLocationPadding);
-        mainTable.row();
-        mainTable.add(new Label("Name:", skin)).pad(buttonLocationPadding);
-        mainTable.add(nameField).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(joinLobbyButton).pad(buttonLocationPadding);
         mainTable.row();

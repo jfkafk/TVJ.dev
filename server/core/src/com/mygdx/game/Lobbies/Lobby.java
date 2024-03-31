@@ -2,25 +2,22 @@ package com.mygdx.game.Lobbies;
 import com.mygdx.game.Server.ServerUpdateThread;
 import com.mygdx.game.World.World;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Lobby {
 
     String lobbyHash;
-
     Integer creatorId;
-
     World serverWorld;
     ServerUpdateThread serverUpdateThread;
 
-    Map<String, Integer> players = new LinkedHashMap<>();
+    Set<Integer> players = new HashSet<>();
 
     static Integer nextLobbyNumber = 1;
 
-    public Lobby(Integer creatorId, String creatorName, Integer id) {
+    public Lobby(Integer creatorId) {
         this.creatorId = creatorId;
-        players.put(creatorName, id);
+        players.add(creatorId);
         lobbyHash = "Lobby:" + nextLobbyNumber;
         incrementNextLobbyNumber();
     }
@@ -29,7 +26,7 @@ public class Lobby {
         nextLobbyNumber++;
     }
 
-    public Map<String, Integer> getPlayers() {
+    public Set<Integer> getPlayers() {
         return players;
     }
 
@@ -41,8 +38,12 @@ public class Lobby {
         this.lobbyHash = lobbyHash;
     }
 
-    public void addPLayers(String name, Integer id) {
-        players.put(name, id);
+    public void addPlayer(Integer id) {
+        players.add(id);
+    }
+
+    public void removePlayer(Integer id) {
+        players.remove(id);
     }
 
     public void setServerWorld(World serverWorld) {

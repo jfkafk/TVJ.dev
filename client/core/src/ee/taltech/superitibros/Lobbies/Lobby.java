@@ -6,21 +6,17 @@ public class Lobby {
 
     String lobbyHash;
 
-    Integer creatorId;
-
-    Set<String> players = new LinkedHashSet<>();
-
-    Integer playerCount;
+    Set<Integer> players = new LinkedHashSet<>();
 
     public Lobby(String lobbyHash) {
         this.lobbyHash = lobbyHash;
     }
 
-    public void setPlayers(Set<String> players) {
+    public void setPlayers(Set<Integer> players) {
         this.players = players;
     }
 
-    public Set<String> getPlayers() {
+    public Set<Integer> getPlayers() {
         return players;
     }
 
@@ -28,11 +24,11 @@ public class Lobby {
         return lobbyHash;
     }
 
-    public void setPlayerCount(Integer playerCount) {
-        this.playerCount = playerCount;
+    public void addPLayer(Integer playerId) {
+        players.add(playerId);
     }
 
-    public void addPLayer(String playerName) {
-        players.add(playerName);
+    public void removePlayer(Integer playerId) {
+        players.remove(playerId);
     }
 }

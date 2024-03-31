@@ -20,9 +20,9 @@ public class GameClient extends Game {
     private MenuScreen menuScreen;
     List<Lobby> availableLobbies = new LinkedList<>();
     Lobby myLobby;
-    String clientName;
     LobbyScreen lobbyScreen;
     HostLobby hostLobbyScreen;
+    Integer connectionId;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -88,6 +88,10 @@ public class GameClient extends Game {
         System.out.println("added lobby: " + availableLobbies);
     }
 
+    public void removeAvailableLobby(Lobby lobby) {
+        availableLobbies.remove(lobby);
+    }
+
     public void removeAvailableLobby(String lobbyHash) {
         availableLobbies.removeIf(lobby -> Objects.equals(lobby.getLobbyHash(), lobbyHash));
     }
@@ -106,6 +110,11 @@ public class GameClient extends Game {
         lobbyScreen.refreshScreen();
     }
 
+    public void hostLeft() {
+        lobbyScreen.setHostLeft(true);
+        lobbyScreen.refreshScreen();
+    }
+
     public List<Lobby> getAvailableLobbies() {
         clientConnection.sendGetAvailableLobbies();
         return this.availableLobbies;
@@ -119,16 +128,20 @@ public class GameClient extends Game {
         return myLobby;
     }
 
-    public void setClientName(String clientName) {
-        this.clientName = clientName;
-    }
-
     public void setLobbyScreen(LobbyScreen lobbyScreen) {
         this.lobbyScreen = lobbyScreen;
     }
 
     public void setHostLobbyScreen(HostLobby hostLobbyScreen) {
         this.hostLobbyScreen = hostLobbyScreen;
+    }
+
+    public void setConnectionId(Integer connectionId) {
+        this.connectionId = connectionId;
+    }
+
+    public Integer getConnectionId() {
+        return connectionId;
     }
 
     public void refreshLobbyScreen() {
@@ -141,10 +154,6 @@ public class GameClient extends Game {
         if (hostLobbyScreen != null) {
             hostLobbyScreen.refreshPlayers();
         }
-    }
-
-    public String getClientName() {
-        return clientName;
     }
 
     /**
