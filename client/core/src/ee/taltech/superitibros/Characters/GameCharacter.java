@@ -75,6 +75,9 @@ public class GameCharacter {
     }
 
 
+    /**
+     * Making frames for character
+     */
     public void createFrames() {
         skinCreator.makeFrames();
         walkAnimationRight = skinCreator.getWalkAnimationRight();
