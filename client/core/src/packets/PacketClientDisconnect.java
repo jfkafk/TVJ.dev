@@ -6,6 +6,7 @@ package packets;
 public class PacketClientDisconnect extends Packet {
 
     private int id;
+    String lobbyHash;
 
     public void setId(int id) {
         this.id = id;
@@ -13,5 +14,13 @@ public class PacketClientDisconnect extends Packet {
 
     public int getId() {
         return id;
+    }
+
+    public void setLobbyHash(String lobbyHash) {
+        this.lobbyHash = lobbyHash;
+    }
+
+    public String getLobbyHash() {
+        return lobbyHash;
     }
 }

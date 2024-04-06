@@ -34,7 +34,7 @@ public class World {
     /**
      * Add a new PlayerGameCharacter to the map.
      *
-     * @param id of the PlayerGameCharacter and connection whose the playerGameCharacter is
+     * @param id of the PlayerGameCharacter and connection who the playerGameCharacter is
      * @param gameCharacter new PlayerGamCharacter
      */
     public void addGameCharacter(Integer id, PlayerGameCharacter gameCharacter){

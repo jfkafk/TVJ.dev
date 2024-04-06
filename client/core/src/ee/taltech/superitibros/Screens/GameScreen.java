@@ -35,6 +35,9 @@ public class GameScreen implements Screen, InputProcessor {
     private final SpriteBatch batch;
     private TiledMap tiledMap;
     private TiledMapRenderer tiledMapRenderer;
+    private String path;
+    private float desiredCameraWidth;
+    private float desiredCameraHeight;
 
     // World parameters
     private final float WORLD_WIDTH;
@@ -56,7 +59,7 @@ public class GameScreen implements Screen, InputProcessor {
         this.clientWorld = clientWorld;
 
         // TextureAtlas and background texture
-        tiledMap = new TmxMapLoader().load("Maps/level1/level1.tmx");
+        tiledMap = new TmxMapLoader().load(clientWorld.getPath());
         int tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
         int mapWidthInTiles = tiledMap.getProperties().get("width", Integer.class);
         WORLD_WIDTH = tileWidth * mapWidthInTiles;
@@ -64,16 +67,19 @@ public class GameScreen implements Screen, InputProcessor {
         int mapHeightInTiles = tiledMap.getProperties().get("height", Integer.class);
         WORLD_HEIGHT = tileHeight * mapHeightInTiles;
         tiledMapRenderer = new OrthogonalTiledMapRenderer(tiledMap);
-
         // Cameras and screen
         buttonHasBeenPressed = false;
 
-        float aspectRatio = (float) Gdx.graphics.getHeight() / (float) Gdx.graphics.getWidth();
-        float desiredCameraWidth = 400; // Set the desired width of the camera
-        float desiredCameraHeight = desiredCameraWidth * aspectRatio; // Calculate the corresponding height
+        float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
+        if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles / 2; // Set the desired width of the camera
+        } else {
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
+        }
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
-        this.fitViewport = new FitViewport(desiredCameraWidth, WORLD_HEIGHT, camera);
+        this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
@@ -194,7 +200,12 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
-
+    public Integer getWorldWidth() {
+        return ((int) WORLD_WIDTH);
+    }
+    public Integer getWorldHeight() {
+        return ((int) WORLD_HEIGHT);
+    }
 
     /**
      * Method for drawing PlayerGameCharacters.
