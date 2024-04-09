@@ -2,6 +2,7 @@ package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
@@ -50,6 +51,10 @@ public class GameScreen implements Screen, InputProcessor {
     private final ClientWorld clientWorld;
 
     private int lastPacketCount = 0;
+
+    // Shooting cooldown
+    private boolean canShoot = true;
+    private float shootCooldown = 1f;
 
     /**
      * GameScreen constructor
@@ -172,7 +177,7 @@ public class GameScreen implements Screen, InputProcessor {
                 buttonHasBeenPressed = true;
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 clientWorld.getMyPlayerGameCharacter().jump();
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -267,7 +272,8 @@ public class GameScreen implements Screen, InputProcessor {
         System.out.println("Current bullets: " + clientWorld.getBullets());
         for (Bullet bullet : clientWorld.getBullets()) {
 
-            if (bullet.getBulletX() > 3499 || bullet.getBulletY() > 299) {
+            // If bullet is beyond map borders, then remove it
+            if (bullet.getBulletX() > 3499 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
                 clientWorld.addBulletToRemove(bullet);
             }
 
@@ -323,12 +329,26 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        // Convert screen coordinates to world coordinates
-        Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
+        if (canShoot) {
+            // Convert screen coordinates to world coordinates
+            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
 
-        // Send the bullet with the correct world coordinates
-        clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, worldCoordinates.x, worldCoordinates.y);
+            // Player coordinates
+            float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter().getBoundingBox().width;
+            float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
+            // Send the bullet with the correct world coordinates
+            clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
+
+            // Start cooldown timer
+            canShoot = false;
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    canShoot = true;
+                }
+            }, shootCooldown);
+        }
         return false;
     }
 

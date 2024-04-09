@@ -64,7 +64,7 @@ public class ServerUpdateThread implements Runnable {
                     for (Bullet bullet : serverWorld.getBullets()) {
                         bullet.updateBullet();
 
-                        if (bullet.getBulletX() > 3500 || bullet.getBulletY() > 300) {
+                        if (bullet.getBulletX() > 3499 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
                             serverWorld.addBulletToRemove(bullet);
                         }
                     }
