@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
@@ -19,6 +20,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
+import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,11 +74,11 @@ public class GameScreen implements Screen, InputProcessor {
 
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
         if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles / 2; // Set the desired width of the camera
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles; // Set the desired width of the camera
         } else {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles * 2;
         }
-        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio * 2; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
@@ -125,6 +127,7 @@ public class GameScreen implements Screen, InputProcessor {
         drawPlayerGameCharacters();
         clientWorld.moveEnemies();
         drawEnemies();
+        drawBullets();
         batch.end();
 
         // Render Box2D debug
@@ -239,6 +242,41 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     /**
+     * Draw bullets.
+     */
+    public void drawBullets() {
+
+        if (!clientWorld.getBulletsToRemove().isEmpty()) {
+            //System.out.println(clientWorld.getBulletsToRemove());
+            for (Bullet bullet : clientWorld.getBulletsToRemove()) {
+                clientWorld.removeBullet(bullet);
+                System.out.println("removed");
+            }
+            clientWorld.clearBulletsToRemove();
+            //System.out.println(clientWorld.getBulletsToRemove());
+        }
+
+        if (!clientWorld.getBulletsToAdd().isEmpty()) {
+            for (Bullet bullet : clientWorld.getBulletsToAdd()) {
+                System.out.println("added");
+                clientWorld.addBullet(bullet);
+            }
+            clientWorld.clearBulletsToAdd();
+        }
+
+        System.out.println("Current bullets: " + clientWorld.getBullets());
+        for (Bullet bullet : clientWorld.getBullets()) {
+
+            if (bullet.getBulletX() > 3499 || bullet.getBulletY() > 299) {
+                clientWorld.addBulletToRemove(bullet);
+            }
+
+            // System.out.println("Bullet X: " + bullet.getBulletX() + " | Bullet Y: " + bullet.getBulletY() + " | Bullet ID: " + bullet.getBulletId());
+            bullet.draw(batch);
+        }
+    }
+
+    /**
      * Resizing the camera.
      */
     @Override
@@ -285,6 +323,12 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+        // Convert screen coordinates to world coordinates
+        Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
+
+        // Send the bullet with the correct world coordinates
+        clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, worldCoordinates.x, worldCoordinates.y);
+
         return false;
     }
 

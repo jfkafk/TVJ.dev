@@ -9,6 +9,7 @@ import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.GameCharacter;
 import com.mygdx.game.Characters.PlayerGameCharacter;
 import com.mygdx.game.Lobbies.Lobby;
+import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.World;
 import packets.*;
 
@@ -66,6 +67,7 @@ public class ServerConnection {
 		server.getKryo().register(HashSet.class);
 		server.getKryo().register(LinkedHashSet.class);
 		server.getKryo().register(PacketRemoveLobby.class);
+		server.getKryo().register(PacketBullet.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -193,6 +195,14 @@ public class ServerConnection {
 						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
 
 					}
+				} else if (object instanceof PacketBullet) {
+					PacketBullet packetBullet = (PacketBullet) object;
+
+					// Create bullet
+					Bullet bullet = Bullet.createBullet(packetBullet.getLobbyHash(), packetBullet.getPlayerX(), packetBullet.getPlayerY(), packetBullet.getMouseX(), packetBullet.getMouseY());
+					// Add to server world
+					onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld().addBullet(bullet);
+					// Check for collisions
 				}
 			}
 
@@ -343,8 +353,25 @@ public class ServerConnection {
 	 * @param connectionId player connection id.
 	 */
 	public void addEnemyToClientsGame(String botHash, float xPosition, float yPosition, Integer connectionId) {
-		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewZombies(botHash, xPosition, yPosition);
+		PacketNewEnemy packetNewEnemy = PacketCreator.createPacketNewEnemy(botHash, xPosition, yPosition);
 		server.sendToTCP(connectionId, packetNewEnemy);
+	}
+
+	public void sendUpdatedBullet(String lobbyHash) {
+
+		// To prevent modifying list while iterating
+		List<Bullet> bullets = onGoingLobbies.get(lobbyHash).getServerWorld().getBullets();
+
+		for (Bullet bullet : bullets) {
+			PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
+			packetBullet.setBulletX(bullet.getBulletX());
+			packetBullet.setBulletY(bullet.getBulletY());
+			packetBullet.setBulletId(bullet.getBulletId());
+
+			for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
+				server.sendToUDP(id, packetBullet);
+			}
+		}
 	}
 
 	/**
