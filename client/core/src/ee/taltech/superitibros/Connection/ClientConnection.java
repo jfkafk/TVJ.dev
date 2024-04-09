@@ -183,10 +183,13 @@ public class ClientConnection {
 						} else {
 							// System.out.println("got new bullet");
 							// If not, create new bullet and add to client world
-							Bullet bullet = new Bullet(packetBullet.getBulletId());
-							bullet.setBulletX(packetBullet.getBulletX());
-							bullet.setBulletY(packetBullet.getBulletY());
-							clientWorld.addBulletToAdd(bullet);
+							// Check is bullet has collided already with solid object
+							if (!clientWorld.getCollidedBullets().contains(packetBullet.getBulletId())) {
+								Bullet bullet = new Bullet(packetBullet.getBulletId());
+								bullet.setBulletX(packetBullet.getBulletX());
+								bullet.setBulletY(packetBullet.getBulletY());
+								clientWorld.addBulletToAdd(bullet);
+							}
 						}
 					}
 				}

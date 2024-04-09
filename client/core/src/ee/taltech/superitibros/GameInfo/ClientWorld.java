@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.GameInfo;
 
 import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -34,6 +35,7 @@ public class ClientWorld {
     private Map<Integer, Bullet> bullets = new HashMap<>();
     private Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
     private List<Bullet> bulletsToRemove = new ArrayList<>();
+    private List<Integer> collidedBullets = new ArrayList<>();
 
     public ClientWorld(String path) {
         // Map and physics
@@ -187,6 +189,43 @@ public class ClientWorld {
             return (MyPlayerGameCharacter) character;
         }
         return null;
+    }
+
+    /**
+     * Check for bullet collisions with obstacles.
+     */
+    public void checkBulletCollisions() {
+        for (Bullet bullet : bullets.values()) {
+            for (MapObject object : mapLayer.getObjects()) {
+                if (object instanceof RectangleMapObject) {
+                    RectangleMapObject rectangleObject = (RectangleMapObject) object;
+                    Rectangle rectangle = rectangleObject.getRectangle();
+                    if (bullet.getBoundingBox().overlaps(rectangle)) {
+                        // Collision detected, handle accordingly
+                        handleBulletCollisionWithObstacle(bullet);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle bullet collision with an obstacle.
+     * @param bullet the bullet that collided with the obstacle.
+     */
+    private void handleBulletCollisionWithObstacle(Bullet bullet) {
+        // Remove the bullet from the world
+        bulletsToRemove.add(bullet);
+        collidedBullets.add(bullet.getBulletId());
+        // Optionally, you can play a sound effect, spawn particles, etc.
+    }
+
+    /**
+     * Get collided bullets ids.
+     * @return collided bullets.
+     */
+    public List<Integer> getCollidedBullets() {
+        return collidedBullets;
     }
 
     /**

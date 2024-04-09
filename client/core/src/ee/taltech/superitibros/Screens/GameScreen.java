@@ -135,6 +135,9 @@ public class GameScreen implements Screen, InputProcessor {
         drawBullets();
         batch.end();
 
+        // Check bullet collision
+        clientWorld.checkBulletCollisions();
+
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
     }
