@@ -2,6 +2,7 @@ package com.mygdx.game.World;
 
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.PlayerGameCharacter;
+import com.mygdx.game.Weapons.Bullet;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,25 +11,61 @@ public class World {
 
     private Map<Integer, PlayerGameCharacter> clients = new HashMap<>();
     private  Map<String, Enemy> enemyMap = new HashMap<>();
+    private List<Bullet> bullets = new ArrayList<>();
+    private List<Bullet> bulletsToRemove = new ArrayList<>();
 
-    private boolean isNewGame = false;
-
-    public PlayerGameCharacter getGameCharacter(int id){
-        return clients.get(id);
+    /**
+     * Get list of all bullets to remove.
+     * @return bullets to remove.
+     */
+    public List<Bullet> getBulletsToRemove() {
+        return bulletsToRemove;
     }
 
+    /**
+     * Add bullet to bulletsToRemove list.
+     * @param bullet to remove.
+     */
+    public void addBulletToRemove(Bullet bullet) {
+        bulletsToRemove.add(bullet);
+    }
+
+    /**
+     * Get enemy map.
+     * @return enemy map.
+     */
     public Map<String, Enemy> getEnemyMap() { return enemyMap; }
 
+    /**
+     * Get clients map.
+     * @return clients map.
+     */
     public Map<Integer, PlayerGameCharacter> getClients(){
         return clients;
     }
 
-    public void setNewGame(boolean newGame) {
-        isNewGame = newGame;
+    /**
+     * Add bullet to server world.
+     * @param bullet to add.
+     */
+    public void addBullet(Bullet bullet) {
+        bullets.add(bullet);
     }
 
-    public boolean isNewGame() {
-        return isNewGame;
+    /**
+     * Get all bullets in the world.
+     * @return bullets.
+     */
+    public List<Bullet> getBullets() {
+        return bullets;
+    }
+
+    /**
+     * Remove bullet from server world.
+     * @param bullet to remove.
+     */
+    public void removeBullet(Bullet bullet) {
+        bullets.remove(bullet);
     }
 
     /**
@@ -80,6 +117,5 @@ public class World {
      */
     public void restartWorld() {
         clients.clear();
-        isNewGame = false;
     }
 }

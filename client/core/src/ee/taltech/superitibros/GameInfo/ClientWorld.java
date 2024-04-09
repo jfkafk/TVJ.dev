@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.GameInfo;
 
 import com.badlogic.gdx.maps.MapLayer;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -15,9 +16,9 @@ import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
+import ee.taltech.superitibros.Weapons.Bullet;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ClientWorld {
 
@@ -30,6 +31,11 @@ public class ClientWorld {
     private final HashMap<Integer, GameCharacter> worldGameCharactersMap = new HashMap<>();
     private Map<String, Enemy> enemyMap = new HashMap<>();
     public final Box2DDebugRenderer b2dr;
+
+    private Map<Integer, Bullet> bullets = new HashMap<>();
+    private Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
+    private List<Bullet> bulletsToRemove = new ArrayList<>();
+    private List<Integer> collidedBullets = new ArrayList<>();
 
     public ClientWorld(String path) {
         // Map and physics
@@ -93,7 +99,7 @@ public class ClientWorld {
      */
     public void initializeMap() {
         this.tiledMap = getMap();
-        this.mapLayer = tiledMap.getLayers().get("ground");
+        this.mapLayer = tiledMap.getLayers().get(2);
     }
 
     /**
@@ -183,6 +189,130 @@ public class ClientWorld {
             return (MyPlayerGameCharacter) character;
         }
         return null;
+    }
+
+    /**
+     * Check for bullet collisions with obstacles.
+     */
+    public void checkBulletCollisions() {
+        for (Bullet bullet : bullets.values()) {
+            for (MapObject object : mapLayer.getObjects()) {
+                if (object instanceof RectangleMapObject) {
+                    RectangleMapObject rectangleObject = (RectangleMapObject) object;
+                    Rectangle rectangle = rectangleObject.getRectangle();
+                    if (bullet.getBoundingBox().overlaps(rectangle)) {
+                        // Collision detected, handle accordingly
+                        handleBulletCollisionWithObstacle(bullet);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle bullet collision with an obstacle.
+     * @param bullet the bullet that collided with the obstacle.
+     */
+    private void handleBulletCollisionWithObstacle(Bullet bullet) {
+        // Remove the bullet from the world
+        bulletsToRemove.add(bullet);
+        collidedBullets.add(bullet.getBulletId());
+        // Optionally, you can play a sound effect, spawn particles, etc.
+    }
+
+    /**
+     * Get collided bullets ids.
+     * @return collided bullets.
+     */
+    public List<Integer> getCollidedBullets() {
+        return collidedBullets;
+    }
+
+    /**
+     * Get list of all bullets in client world.
+     * @return list of all bullets.
+     */
+    public Collection<Bullet> getBullets() {
+        return bullets.values();
+    }
+
+    /**
+     * Add bullet to client world.
+     * @param bullet to add.
+     */
+    public void addBullet(Bullet bullet) {
+        bullets.put(bullet.getBulletId(), bullet);
+    }
+
+    /**
+     * Remove bullet from client world.
+     * @param bullet to remove.
+     */
+    public void removeBullet(Bullet bullet) {
+        bullets.remove(bullet.getBulletId());
+    }
+
+    /**
+     * Check if bullet is in the world already.
+     * @param id bullet's id.
+     * @return true if in the world, otherwise false.
+     */
+    public boolean isBulletInWorld(Integer id) {
+        return bullets.containsKey(id);
+    }
+
+    /**
+     * Get bullet by id.
+     * @param id bullet's id.
+     * @return bullet.
+     */
+    public Bullet getBulletById(Integer id) {
+        return bullets.get(id);
+    }
+
+    /**
+     * Get bulletsToAdd collection.
+     * @return bullets to add.
+     */
+    public Collection<Bullet> getBulletsToAdd() {
+        return bulletsToAdd.values();
+    }
+
+    /**
+     * Add bullet to bulletsToAdd list.
+     */
+    public void addBulletToAdd(Bullet bullet) {
+        bulletsToAdd.put(bullet.getBulletId(), bullet);
+    }
+
+    /**
+     * Clear bulletsToAdd list.
+     */
+    public void clearBulletsToAdd() {
+        bulletsToAdd.clear();
+    }
+
+    /**
+     * Get list of bullets to remove.
+     * @return bullets to remove.
+     */
+    public List<Bullet> getBulletsToRemove() {
+        return bulletsToRemove;
+    }
+
+    /**
+     * Add bullet to remove.
+     * @param bullet bullet.
+     */
+    public void addBulletToRemove(Bullet bullet) {
+        bulletsToRemove.add(bullet);
+    }
+
+    /**
+     * Clear bulletsToRemove list.
+     */
+    public void clearBulletsToRemove() {
+        bulletsToRemove.clear();
     }
 
     /**
