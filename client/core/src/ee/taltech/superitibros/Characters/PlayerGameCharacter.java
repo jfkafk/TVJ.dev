@@ -67,8 +67,8 @@ public class PlayerGameCharacter extends GameCharacter{
      * @return new PlayerGameCharacter instance
      */
     public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, int id, ClientWorld world) {
-        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 20f);
-        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(10f, playerGameCharacterRectangle, x, y, playerGameCharacterRectangle.width, playerGameCharacterRectangle.height, world);
+        Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10, 20);
+        PlayerGameCharacter newGameCharacter = new PlayerGameCharacter(100f, playerGameCharacterRectangle, x, y, playerGameCharacterRectangle.width, playerGameCharacterRectangle.height, world);
         newGameCharacter.setPlayerGameCharacterId(id);
         return newGameCharacter;
     }
