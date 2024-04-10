@@ -104,13 +104,19 @@ public class ServerConnection {
 						addEnemyToClientsGame(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition(), connection.getID());
 					}
 
+					World world = onGoingLobbies.get(packetConnect.getLobbyHash()).getServerWorld();
+
+					Enemy enemy = addEnemyToGame(200, 50 ,world);
+
+					addEnemyToClientsGame(enemy.getBotHash(), 200, 50, connection.getID());
+
 				} else if (object instanceof PacketUpdateCharacterInformation) {
 					// Packet for updating player position
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 
 					// Update PlayerGameCharacter's coordinates in lobby.
 					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
-					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
+					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).yPosition = packet.getY();
 
 					// Send players new coordinates and direction to all players in lobby
 					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash());
@@ -291,9 +297,10 @@ public class ServerConnection {
 	 * @param yPosition y coordinate.
 	 * @param world server world.
 	 */
-	public void addEnemyToGame(float xPosition, float yPosition, World world) {
+	public Enemy addEnemyToGame(float xPosition, float yPosition, World world) {
 		Enemy enemy = Enemy.createEnemy(xPosition, yPosition, world);
 		world.addEnemy(enemy.getBotHash(), enemy);
+		return enemy;
 	}
 
 	/**

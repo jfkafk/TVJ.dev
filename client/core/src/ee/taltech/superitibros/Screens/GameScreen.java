@@ -245,6 +245,7 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawEnemies() {
         List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
         for (Enemy enemy : enemies) {
+            // System.out.println("Enemy y: " + enemy.yPosition);
             enemy.draw(batch);
         }
     }
@@ -272,7 +273,7 @@ public class GameScreen implements Screen, InputProcessor {
             clientWorld.clearBulletsToAdd();
         }
 
-        System.out.println("Current bullets: " + clientWorld.getBullets());
+        // System.out.println("Current bullets: " + clientWorld.getBullets());
         for (Bullet bullet : clientWorld.getBullets()) {
 
             // If bullet is beyond map borders, then remove it

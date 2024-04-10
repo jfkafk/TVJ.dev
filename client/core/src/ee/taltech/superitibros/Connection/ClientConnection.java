@@ -118,7 +118,6 @@ public class ClientConnection {
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
-						enemy.defineCharacter();
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy) {
@@ -126,7 +125,8 @@ public class ClientConnection {
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
 							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
-							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
+							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
+							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
 						}
 					} else if (object instanceof PacketLobbyInfo) {
 						// Packet for updating available lobby info
