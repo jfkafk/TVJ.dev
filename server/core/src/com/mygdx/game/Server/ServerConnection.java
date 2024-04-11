@@ -362,4 +362,6 @@ public class ServerConnection {
 		// Runs the main application.
 		new ServerConnection();
 	}
+	// key location.
+	// /Users/mactamm/.ssh/id_ed25519
 }
