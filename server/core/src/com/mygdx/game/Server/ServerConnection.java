@@ -20,7 +20,7 @@ import java.util.*;
 public class ServerConnection {
 
 	static Server server;
-	static final int udpPort = 5007, tcpPort = 5008;
+	static final int udpPort = 8081, tcpPort = 8082;
 
 	private ServerUpdateThread serverUpdateThread;
 
@@ -396,4 +396,6 @@ public class ServerConnection {
 		// Runs the main application.
 		new ServerConnection();
 	}
+	// key location.
+	// /Users/mactamm/.ssh/id_ed25519
 }
