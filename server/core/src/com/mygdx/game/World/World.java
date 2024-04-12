@@ -86,6 +86,14 @@ public class World {
     public void addEnemy(String botHash, Enemy enemy) { enemyMap.put(botHash, enemy); }
 
     /**
+     * Remove enemy from server world.
+     * @param botHash enemy botHash.
+     */
+    public void removeEnemy(String botHash) {
+        enemyMap.remove(botHash);
+    }
+
+    /**
      * Remove a client from the clients map.
      *
      * @param id of the PlayerGameCharacter and connection

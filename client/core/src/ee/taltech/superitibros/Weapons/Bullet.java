@@ -10,6 +10,7 @@ public class Bullet {
     Integer bulletId;
     float bulletX;
     float bulletY;
+
     Rectangle boundingBox = new Rectangle(bulletX, bulletY, 20, 20);
 
     public Bullet(Integer bulletId) {
@@ -40,8 +41,7 @@ public class Bullet {
         return boundingBox;
     }
 
-    public void draw(SpriteBatch batch) {
-        Sprite sprite = new Sprite(new Texture("Bullet/bullet.png"));
+    public void draw(SpriteBatch batch, Sprite sprite) {
 
         sprite.setSize(20, 20);
 

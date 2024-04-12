@@ -125,6 +125,11 @@ public class ServerConnection {
 					// Packet for updating enemy position
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 
+					if (packetUpdateEnemy.isDead()) {
+						World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
+						world.removeEnemy(packetUpdateEnemy.getBotHash());
+					}
+
 				} else if (object instanceof PacketSendNewLobby) {
 					// Packet for adding new lobby
 					PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
@@ -204,11 +209,24 @@ public class ServerConnection {
 				} else if (object instanceof PacketBullet) {
 					PacketBullet packetBullet = (PacketBullet) object;
 
-					// Create bullet
-					Bullet bullet = Bullet.createBullet(packetBullet.getLobbyHash(), packetBullet.getPlayerX(), packetBullet.getPlayerY(), packetBullet.getMouseX(), packetBullet.getMouseY());
-					// Add to server world
-					onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld().addBullet(bullet);
-					// Check for collisions
+					// Check if arrived packet that informs that enemy wask killed
+					if (packetBullet.isKilled()) {
+						World world = onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld();
+
+						// Check if enemy is in server world
+						if (world.getEnemyMap().containsKey(packetBullet.getKilledBot())) {
+							// Remove enemy from world
+							world.removeEnemy(packetBullet.getKilledBot());
+							// Inform other clients that enemy
+							sendKilledEnemy(packetBullet.getLobbyHash(), packetBullet);
+						}
+
+					} else {
+						// Create bullet
+						Bullet bullet = Bullet.createBullet(packetBullet.getLobbyHash(), packetBullet.getPlayerX(), packetBullet.getPlayerY(), packetBullet.getMouseX(), packetBullet.getMouseY());
+						// Add to server world
+						onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld().addBullet(bullet);
+					}
 				}
 			}
 
@@ -378,6 +396,17 @@ public class ServerConnection {
 			for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
 				server.sendToUDP(id, packetBullet);
 			}
+		}
+	}
+
+	/**
+	 * Inform players in lobby that given enemy is killed.
+	 * @param lobbyHash lobby's hash.
+	 * @param packetBullet bullet packet.
+	 */
+	public void sendKilledEnemy(String lobbyHash, PacketBullet packetBullet) {
+		for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
+			server.sendToUDP(id, packetBullet);
 		}
 	}
 
