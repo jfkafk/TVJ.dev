@@ -19,7 +19,7 @@ import java.util.*;
 public class ServerConnection {
 
 	static Server server;
-	static final int udpPort = 5007, tcpPort = 5008;
+	static final int udpPort = 8081, tcpPort = 8082;
 
 	private ServerUpdateThread serverUpdateThread;
 

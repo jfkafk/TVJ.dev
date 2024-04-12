@@ -33,11 +33,12 @@ public class ClientConnection {
 	 * Client connection.
 	 */
 	public ClientConnection() {
-
+		// To access taltech server add Server as ip.
+		// To test locally add local as ip.
 		String ip = "127.0.0.1";
-		// Server 193.40.255.23
+		// Server 193.40.255.30
 		// local  127.0.0.1
-		int udpPort = 5007, tcpPort = 5008;
+		int udpPort = 8081, tcpPort = 8082;
 
 
 		client = new Client(49152, 49152);
