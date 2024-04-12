@@ -15,7 +15,6 @@ import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-import ee.taltech.superitibros.Weapons.Bullet;
 import packets.*;
 
 import javax.swing.JOptionPane;
@@ -35,7 +34,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.23
 		// local  127.0.0.1
 		int udpPort = 8081, tcpPort = 8082;
@@ -64,7 +63,6 @@ public class ClientConnection {
 		client.getKryo().register(HashSet.class);
 		client.getKryo().register(LinkedHashSet.class);
 		client.getKryo().register(PacketRemoveLobby.class);
-		client.getKryo().register(PacketBullet.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -118,6 +116,7 @@ public class ClientConnection {
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
+						enemy.defineCharacter();
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy) {
@@ -125,8 +124,7 @@ public class ClientConnection {
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
 							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
-							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
-							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
+							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 						}
 					} else if (object instanceof PacketLobbyInfo) {
 						// Packet for updating available lobby info
@@ -169,28 +167,6 @@ public class ClientConnection {
 					} else if (object instanceof PacketRemoveLobby) {
 						PacketRemoveLobby packetRemoveLobby = (PacketRemoveLobby) object;
 						gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
-
-					} else if (object instanceof PacketBullet) {
-						PacketBullet packetBullet = (PacketBullet) object;
-
-						// Check if bullet is already in client world
-						if (clientWorld.isBulletInWorld(packetBullet.getBulletId())) {
-							// System.out.println("got existing bullet");
-							// If is then update coordinates
-							Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
-							bullet.setBulletX(packetBullet.getBulletX());
-							bullet.setBulletY(packetBullet.getBulletY());
-						} else {
-							// System.out.println("got new bullet");
-							// If not, create new bullet and add to client world
-							// Check is bullet has collided already with solid object
-							if (!clientWorld.getCollidedBullets().contains(packetBullet.getBulletId())) {
-								Bullet bullet = new Bullet(packetBullet.getBulletId());
-								bullet.setBulletX(packetBullet.getBulletX());
-								bullet.setBulletY(packetBullet.getBulletY());
-								clientWorld.addBulletToAdd(bullet);
-							}
-						}
 					}
 				}
 			}
@@ -276,15 +252,6 @@ public class ClientConnection {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setToDelete(true);
 		client.sendUDP(packetLobbyInfo);
-	}
-
-	public void sendBullet(String lobbyHash, float playerX, float playerY, float mouseX, float mouseY) {
-		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
-		packetBullet.setPlayerX(playerX);
-		packetBullet.setPlayerY(playerY);
-		packetBullet.setMouseX(mouseX);
-		packetBullet.setMouseY(mouseY);
-		client.sendUDP(packetBullet);
 	}
 
 	/**
