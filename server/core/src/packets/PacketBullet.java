@@ -10,6 +10,8 @@ public class PacketBullet extends Packet {
     float mouseY;
     float bulletX;
     float bulletY;
+    boolean isKilled;
+    String killedBot;
 
     public void setBulletId(Integer bulletId) {
         this.bulletId = bulletId;
@@ -73,5 +75,21 @@ public class PacketBullet extends Packet {
 
     public float getMouseY() {
         return mouseY;
+    }
+
+    public boolean isKilled() {
+        return isKilled;
+    }
+
+    public void setKilled(boolean killed) {
+        isKilled = killed;
+    }
+
+    public String getKilledBot() {
+        return killedBot;
+    }
+
+    public void setKilledBot(String killedBot) {
+        this.killedBot = killedBot;
     }
 }

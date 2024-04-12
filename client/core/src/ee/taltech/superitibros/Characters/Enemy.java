@@ -172,4 +172,16 @@ public class Enemy extends GameCharacter {
         }
     }
 
+    /**
+     * Remove the Box2D body from the game world.
+     */
+    public void removeBodyFromWorld() {
+        if (b2body != null) {
+            System.out.println("isnt null");
+            clientWorld.getGdxWorld().destroyBody(b2body);
+            b2body = null; // Set the reference to null to indicate that the body has been destroyed
+        }
+
+    }
+
 }

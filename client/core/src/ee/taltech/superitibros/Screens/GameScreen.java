@@ -137,6 +137,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Check bullet collision
         clientWorld.checkBulletCollisions();
+        clientWorld.checkBulletEnemyCollisions();
 
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
@@ -282,7 +283,7 @@ public class GameScreen implements Screen, InputProcessor {
             }
 
             // System.out.println("Bullet X: " + bullet.getBulletX() + " | Bullet Y: " + bullet.getBulletY() + " | Bullet ID: " + bullet.getBulletId());
-            bullet.draw(batch);
+            bullet.draw(batch, clientWorld.getBulletSprite());
         }
     }
 

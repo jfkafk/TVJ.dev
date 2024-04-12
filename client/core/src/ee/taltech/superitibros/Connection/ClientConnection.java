@@ -94,10 +94,10 @@ public class ClientConnection {
 							}
 						}
 
-					} else  if (object instanceof PacketUpdateCharacterInformation) {
+					} else if (object instanceof PacketUpdateCharacterInformation && clientWorld != null) {
 						// Packet for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
-						if (gameScreen != null && clientWorld != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
+						if (gameScreen != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 							// Update PlayerGameCharacter's coordinates.
 							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
 							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
@@ -107,20 +107,20 @@ public class ClientConnection {
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
 						}
 
-					} else if (object instanceof PacketClientDisconnect) {
+					} else if (object instanceof PacketClientDisconnect && clientWorld != null) {
 						// Packet for removing player from world if disconnected.
 						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
 						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
 						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 
-					} else if (object instanceof PacketNewEnemy) {
+					} else if (object instanceof PacketNewEnemy && clientWorld != null) {
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
 						clientWorld.addEnemy(enemy);
 
-					} else if (object instanceof PacketUpdateEnemy) {
+					} else if (object instanceof PacketUpdateEnemy && clientWorld != null) {
 						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
@@ -170,25 +170,34 @@ public class ClientConnection {
 						PacketRemoveLobby packetRemoveLobby = (PacketRemoveLobby) object;
 						gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
 
-					} else if (object instanceof PacketBullet) {
+					} else if (object instanceof PacketBullet && clientWorld != null) {
 						PacketBullet packetBullet = (PacketBullet) object;
 
-						// Check if bullet is already in client world
-						if (clientWorld.isBulletInWorld(packetBullet.getBulletId())) {
-							// System.out.println("got existing bullet");
-							// If is then update coordinates
-							Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
-							bullet.setBulletX(packetBullet.getBulletX());
-							bullet.setBulletY(packetBullet.getBulletY());
+						// If bullet collided with enemy, then remove enemy from game
+						if (packetBullet.isKilled()) {
+							if (clientWorld.getEnemyMap().containsKey(packetBullet.getKilledBot())) {
+								clientWorld.removeEnemy(packetBullet.getKilledBot());
+							}
 						} else {
-							// System.out.println("got new bullet");
-							// If not, create new bullet and add to client world
-							// Check is bullet has collided already with solid object
-							if (!clientWorld.getCollidedBullets().contains(packetBullet.getBulletId())) {
-								Bullet bullet = new Bullet(packetBullet.getBulletId());
+
+							// Check if bullet is already in client world
+							if (clientWorld.isBulletInWorld(packetBullet.getBulletId())) {
+								// System.out.println("got existing bullet");
+								// If is then update coordinates
+								Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
 								bullet.setBulletX(packetBullet.getBulletX());
 								bullet.setBulletY(packetBullet.getBulletY());
-								clientWorld.addBulletToAdd(bullet);
+
+							} else {
+								// System.out.println("got new bullet");
+								// If not, create new bullet and add to client world
+								// Check is bullet has collided already with solid object
+								if (!clientWorld.getCollidedBullets().contains(packetBullet.getBulletId())) {
+									Bullet bullet = new Bullet(packetBullet.getBulletId());
+									bullet.setBulletX(packetBullet.getBulletX());
+									bullet.setBulletY(packetBullet.getBulletY());
+									clientWorld.addBulletToAdd(bullet);
+								}
 							}
 						}
 					}
@@ -284,6 +293,13 @@ public class ClientConnection {
 		packetBullet.setPlayerY(playerY);
 		packetBullet.setMouseX(mouseX);
 		packetBullet.setMouseY(mouseY);
+		client.sendUDP(packetBullet);
+	}
+
+	public void sendKilledEnemy(String lobbyHash, String botHash) {
+		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
+		packetBullet.setKilled(true);
+		packetBullet.setKilledBot(botHash);
 		client.sendUDP(packetBullet);
 	}
 

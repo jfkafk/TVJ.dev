@@ -5,11 +5,11 @@ package packets;
  */
 public class PacketUpdateEnemy extends Packet {
 
+    private String lobbyHash;
     private String botHash;
-
-    float xPosition;
-
-    float yPosition;
+    private float xPosition;
+    private float yPosition;
+    private boolean isDead;
 
     public void setBotHash(String botHash) {
         this.botHash = botHash;
@@ -33,5 +33,21 @@ public class PacketUpdateEnemy extends Packet {
 
     public float getyPosition() {
         return yPosition;
+    }
+
+    public void setLobbyHash(String lobbyHash) {
+        this.lobbyHash = lobbyHash;
+    }
+
+    public String getLobbyHash() {
+        return lobbyHash;
+    }
+
+    public boolean isDead() {
+        return isDead;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
     }
 }

@@ -1,5 +1,7 @@
 package ee.taltech.superitibros.GameInfo;
 
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
@@ -36,6 +38,7 @@ public class ClientWorld {
     private Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
     private List<Bullet> bulletsToRemove = new ArrayList<>();
     private List<Integer> collidedBullets = new ArrayList<>();
+    private Sprite bulletSprite = new Sprite(new Texture("Bullet/bullet.png"));
 
     public ClientWorld(String path) {
         // Map and physics
@@ -229,6 +232,51 @@ public class ClientWorld {
     }
 
     /**
+     * Check bullet collisions with enemies.
+     */
+    public void checkBulletEnemyCollisions() {
+        Collection<Bullet> bulletList = bullets.values();
+        Collection<Enemy> enemiesList = enemyMap.values();
+
+        List<Enemy> enemiesToRemove = new ArrayList<>(); // Create a list to store enemies to remove
+
+        for (Bullet bullet : bulletList) {
+            for (Enemy enemy : enemiesList) {
+                if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
+                    // Collision detected, handle accordingly
+                    handleBulletCollisionWithEnemy(bullet, enemy, enemiesToRemove); // Pass the list as an argument
+                }
+            }
+        }
+
+        // Remove the enemies from the enemyMap
+        for (Enemy enemyToRemove : enemiesToRemove) {
+            enemyMap.remove(enemyToRemove.getBotHash());
+        }
+    }
+
+    /**
+     * Handle bullet collision with enemy.
+     * @param bullet object.
+     * @param enemy object.
+     * @param enemiesToRemove list of enemies to remove.
+     */
+    private void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy, List<Enemy> enemiesToRemove) {
+        // Remove the bullet from the world
+        bulletsToRemove.add(bullet);
+        collidedBullets.add(bullet.getBulletId());
+
+        // Send packet to server that informs that enemy is dead
+        clientConnection.sendKilledEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+
+        // Add the enemy to the list of enemies to remove
+        enemiesToRemove.add(enemy);
+
+        // Remove enemies b2body
+        enemy.removeBodyFromWorld();
+    }
+
+    /**
      * Get list of all bullets in client world.
      * @return list of all bullets.
      */
@@ -316,6 +364,14 @@ public class ClientWorld {
     }
 
     /**
+     * Get bullet sprite.
+     * @return sprite.
+     */
+    public Sprite getBulletSprite() {
+        return bulletSprite;
+    }
+
+    /**
      * Add a PlayerGameCharacter to the characters map.
      *
      * @param id of the PlayerGameCharacter
@@ -369,10 +425,11 @@ public class ClientWorld {
 
     /**
      * Remove enemy from game.
-     * @param enemy to remove.
+     * @param botHash bot's hash.
      */
-    public void removeEnemy(Enemy enemy) {
-        enemyMap.remove(enemy.getBotHash());
+    public void removeEnemy(String botHash) {
+        getEnemy(botHash).removeBodyFromWorld();
+        enemyMap.remove(botHash);
     }
 
     /**
