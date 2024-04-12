@@ -74,7 +74,7 @@ public class PacketCreator {
      * @param yPosition y coordinate
      * @return new PacketNewEnemy
      */
-    public static PacketNewEnemy createPacketNewZombies(String botHash, float xPosition, float yPosition) {
+    public static PacketNewEnemy createPacketNewEnemy(String botHash, float xPosition, float yPosition) {
         PacketNewEnemy packetNewEnemy = new PacketNewEnemy();
         packetNewEnemy.setBotHash(botHash);
         packetNewEnemy.setxPosition(xPosition);
@@ -99,5 +99,12 @@ public class PacketCreator {
         PacketLobbyInfo packetLobbyInfo = new PacketLobbyInfo();
         packetLobbyInfo.setLobbyHash(lobbyHash);
         return packetLobbyInfo;
+    }
+
+    public static PacketBullet createPacketBullet(String lobbyHash) {
+        PacketBullet packetBullet = new PacketBullet();
+        packetBullet.setLobbyHash(lobbyHash);
+        return packetBullet;
+
     }
 }

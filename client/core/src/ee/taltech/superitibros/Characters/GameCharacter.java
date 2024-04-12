@@ -167,12 +167,13 @@ public class GameCharacter {
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
+            System.out.println("jumped");
         }
     }
 
     // Fall faster
     public void fallDown() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().y, -movementSpeed * 70);
+        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed * 70);
     }
 
     // Move right

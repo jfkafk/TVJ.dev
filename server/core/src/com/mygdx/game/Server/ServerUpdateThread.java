@@ -1,6 +1,7 @@
 package com.mygdx.game.Server;
 
 import com.mygdx.game.Characters.Enemy;
+import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.World;
 
 import java.util.Arrays;
@@ -47,6 +48,27 @@ public class ServerUpdateThread implements Runnable {
                         enemy.spin();
                     }
                     serverConnection.sendUpdatedEnemies(lobbyHash);
+                }
+
+                if(!serverWorld.getBullets().isEmpty()) {
+
+                    if (!serverWorld.getBulletsToRemove().isEmpty()) {
+
+                        for (Bullet bullet : serverWorld.getBulletsToRemove()) {
+                            serverWorld.getBullets().remove(bullet);
+                        }
+                        serverWorld.getBulletsToRemove().clear();
+
+                    }
+
+                    for (Bullet bullet : serverWorld.getBullets()) {
+                        bullet.updateBullet();
+
+                        if (bullet.getBulletX() > 3499 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
+                            serverWorld.addBulletToRemove(bullet);
+                        }
+                    }
+                    serverConnection.sendUpdatedBullet(lobbyHash);
                 }
 
                 sleep(5);
