@@ -35,9 +35,9 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
-		// Server 193.40.255.23
-		// local  127.0.0.1
+		// Uncomment the one you want to test.
+		String ip = "193.40.255.30"; // Server.
+		// String ip = "127.0.0.1"; // Local Testing.
 		int udpPort = 8081, tcpPort = 8082;
 
 
