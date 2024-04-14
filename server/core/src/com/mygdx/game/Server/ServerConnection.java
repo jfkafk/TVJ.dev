@@ -20,7 +20,7 @@ import java.util.*;
 public class ServerConnection {
 
 	static Server server;
-	static final int udpPort = 8081, tcpPort = 8082;
+	static final int tcpPort = 8089;
 
 	private ServerUpdateThread serverUpdateThread;
 
@@ -39,7 +39,7 @@ public class ServerConnection {
 		try {
 			server = new Server();
 			server.start();
-			server.bind(tcpPort, udpPort);
+			server.bind(tcpPort);
 
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(null, "Can not start the Server.");
@@ -94,7 +94,7 @@ public class ServerConnection {
 					for (Map.Entry<Integer, PlayerGameCharacter> entry : serverWorld.getClients().entrySet()) {
 						if (entry.getKey() != connection.getID()) {
 							PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(entry.getKey(), entry.getValue().xPosition, entry.getValue().yPosition);
-							server.sendToUDP(connection.getID(), packet);
+							server.sendToTCP(connection.getID(), packet);
 						}
 					}
 
@@ -141,7 +141,7 @@ public class ServerConnection {
 					packetSendNewLobby.setLobbyHash(lobby.getLobbyHash());
 					packetSendNewLobby.setCreatorId(connection.getID());
 
-					server.sendToAllUDP(packetSendNewLobby);
+					server.sendToAllTCP(packetSendNewLobby);
 					//System.out.println(availableLobbies);
 
 				} else if (object instanceof PacketGetAvailableLobbies) {
@@ -170,7 +170,7 @@ public class ServerConnection {
 							availableLobbies.get(packetLobbyInfo.getLobbyHash()).getServerWorld().addGameCharacter(playerId, PlayerGameCharacter
 									.createPlayerGameCharacter(playerGameCharacterX, playerGameCharacterY, availableLobbies.get(packetLobbyInfo.getLobbyHash()).getServerWorld(), playerId));
 							if (playerId != connection.getID()) {
-								server.sendToUDP(playerId, packetLobbyInfo);
+								server.sendToTCP(playerId, packetLobbyInfo);
 							}
 						}
 						// Add lobby to ongoing lobbies
@@ -185,24 +185,24 @@ public class ServerConnection {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						Set<Integer> players = lobby.getPlayers();
 						packetLobbyInfo.setPlayers(players);
-						server.sendToUDP(connection.getID(), packetLobbyInfo);
+						server.sendToTCP(connection.getID(), packetLobbyInfo);
 
 					} else if (packetLobbyInfo.getPlayerToAdd() != null && availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null) {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						lobby.addPlayer(packetLobbyInfo.getPlayerToAdd());
 						// TODO dont send to all
-						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
 
 					} else if (availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null && packetLobbyInfo.getPlayerToRemove() != null) {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						lobby.removePlayer(packetLobbyInfo.getPlayerToRemove());
-						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
 
 					} else if (packetLobbyInfo.isToDelete()) {
 						// Remove lobby from available lobbies
 						removeAvailableLobby(packetLobbyInfo.getLobbyHash());
 						// Send to all that lobby is to be deleted
-						server.sendToAllExceptUDP(connection.getID(), packetLobbyInfo);
+						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
 
 					}
 				} else if (object instanceof PacketBullet) {
@@ -249,7 +249,7 @@ public class ServerConnection {
 					// Send to other players in lobby that client has disconnected from the game.
 					for (Integer playerId : playerLobby.getServerWorld().getClientsIds()) {
 						if (playerId != c.getID()) {
-							server.sendToUDP(playerId, packetClientDisconnect);
+							server.sendToTCP(playerId, packetClientDisconnect);
 						}
 					}
 				}
@@ -283,7 +283,7 @@ public class ServerConnection {
 
 		// Send packet to players who are in lobby
 		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
-			server.sendToUDP(playerId, addCharacter);
+			server.sendToTCP(playerId, addCharacter);
 		}
 	}
 
@@ -303,7 +303,7 @@ public class ServerConnection {
 		// Send packet to players in given lobby
 		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
 			if (playerId != id) {
-				server.sendToUDP(playerId, packet);
+				server.sendToTCP(playerId, packet);
 			}
 		}
 	}
@@ -335,7 +335,7 @@ public class ServerConnection {
 			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
 			// Send enemy info to all players in lobby
 			for (Integer playerId : lobby.getServerWorld().getClientsIds()) {
-				server.sendToUDP(playerId, packetUpdateEnemy);
+				server.sendToTCP(playerId, packetUpdateEnemy);
 			}
 		}
 	}
@@ -347,7 +347,7 @@ public class ServerConnection {
 		for (Lobby lobby : availableLobbies.values()) {
 			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash());
 			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers()));
-			server.sendToUDP(playerId, packetLobbyInfo);
+			server.sendToTCP(playerId, packetLobbyInfo);
 		}
 	}
 
@@ -358,7 +358,7 @@ public class ServerConnection {
 	public void sendRemoveLobby(String lobbyHash) {
 		PacketRemoveLobby packetRemoveLobby = new PacketRemoveLobby();
 		packetRemoveLobby.setLobbyHash(lobbyHash);
-		server.sendToAllUDP(packetRemoveLobby);
+		server.sendToAllTCP(packetRemoveLobby);
 	}
 
 	/**
@@ -393,7 +393,7 @@ public class ServerConnection {
 			packetBullet.setBulletId(bullet.getBulletId());
 
 			for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
-				server.sendToUDP(id, packetBullet);
+				server.sendToTCP(id, packetBullet);
 			}
 		}
 	}
@@ -405,7 +405,7 @@ public class ServerConnection {
 	 */
 	public void sendKilledEnemy(String lobbyHash, PacketBullet packetBullet) {
 		for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
-			server.sendToUDP(id, packetBullet);
+			server.sendToTCP(id, packetBullet);
 		}
 	}
 
