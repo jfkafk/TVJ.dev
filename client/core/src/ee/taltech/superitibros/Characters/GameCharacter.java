@@ -33,7 +33,7 @@ public class GameCharacter {
     private final Integer possiblyDealingWithSheetSize = 8;
     private final Integer boundingBoxHeight = 128;
     private final Integer boundingBoxWidth = 128;
-    private Integer playerSize = 64;
+    public Integer playerSize = 64;
 
     // World where physics are applied
     ClientWorld clientWorld;
@@ -91,7 +91,8 @@ public class GameCharacter {
      * Making frames for character
      */
     public void createFrames() {
-        skinCreator.makeFrames();
+        skinCreator.makeFrames(this);
+        this.playerSize = skinCreator.getPlayerSize();
         walkAnimationRight = skinCreator.getWalkAnimationRight();
         walkAnimationLeft = skinCreator.getWalkAnimationLeft();
         idleAnimationRight = skinCreator.getIdleAnimationRight();
@@ -289,6 +290,5 @@ public class GameCharacter {
             clientWorld.getGdxWorld().destroyBody(b2body);
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
-
     }
 }
