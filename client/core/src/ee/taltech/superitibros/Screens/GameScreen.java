@@ -247,7 +247,8 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for updating player's position
      */
     public void updatePlayersPositions() {
-        for (GameCharacter player : clientWorld.getWorldGameCharactersMap().values()) {
+        List<GameCharacter> players = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
+        for (GameCharacter player : players) {
             if (player != clientWorld.getMyPlayerGameCharacter()) {
                 player.updatePosition();
             }
@@ -260,15 +261,13 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawEnemies() {
         Map<String, Enemy> enemyMap = clientWorld.getEnemyMap();
         if (enemyMap != null && !enemyMap.isEmpty()) {
-            List<Enemy> enemies = new ArrayList<>(enemyMap.values());
-            for (Enemy enemy : enemies) {
+            for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
                     enemy.draw(batch);
                 }
             }
         }
     }
-
 
     /**
      * Draw bullets.
