@@ -1,7 +1,5 @@
 package ee.taltech.superitibros.Connection;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Rectangle;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -258,24 +256,41 @@ public class ClientConnection {
 		client.sendUDP(packetGetAvailableLobbies);
 	}
 
+	/**
+	 * Send packet that requests info about the lobby from server.
+	 * @param lobbyHash lobby's hash.
+	 */
 	public void sendUpdateLobbyInfo(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setUpdateInfo(true);
 		client.sendUDP(packetLobbyInfo);
 	}
 
+	/**
+	 * Send packet that informs that player joined the lobby.
+	 * @param lobbyHash lobby's hash.
+	 */
 	public void sendAddPlayerToLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setPlayerToAdd(gameClient.getConnectionId());
 		client.sendUDP(packetLobbyInfo);
 	}
 
+	/**
+	 * Send packet that informs that player left the lobby.
+	 * @param lobbyHash lobby's hash.
+	 */
 	public void sendRemovePlayerFromLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setPlayerToRemove(gameClient.getConnectionId());
 		client.sendUDP(packetLobbyInfo);
 	}
 
+	/**
+	 * Send packet that informs that host started the game.
+	 * @param lobbyHash lobby's hash.
+	 * @param mapPath chosen map's path.
+	 */
 	public void sendLobbyStartGame(String lobbyHash, String mapPath) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setStartGame(true);
@@ -283,12 +298,24 @@ public class ClientConnection {
 		client.sendUDP(packetLobbyInfo);
 	}
 
+	/**
+	 * Send packet that informs that lobby is going to be deleted.
+	 * @param lobbyHash lobby's hash.
+	 */
 	public void sendDeleteLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setToDelete(true);
 		client.sendUDP(packetLobbyInfo);
 	}
 
+	/**
+	 * Send info that bullet was shot.
+	 * @param lobbyHash lobby's hash.
+	 * @param playerX player x coordinate.
+	 * @param playerY player y coordinate.
+	 * @param mouseX mouse x coordinate.
+	 * @param mouseY mouse y coordinate.
+	 */
 	public void sendBullet(String lobbyHash, float playerX, float playerY, float mouseX, float mouseY) {
 		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
 		packetBullet.setPlayerX(playerX);
@@ -298,6 +325,11 @@ public class ClientConnection {
 		client.sendUDP(packetBullet);
 	}
 
+	/**
+	 * Send packet that informs that enemy is killed.
+	 * @param lobbyHash lobby's hash.
+	 * @param botHash bot's hash.
+	 */
 	public void sendKilledEnemy(String lobbyHash, String botHash) {
 		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
 		packetBullet.setKilled(true);

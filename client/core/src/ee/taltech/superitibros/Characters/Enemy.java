@@ -105,10 +105,19 @@ public class Enemy extends GameCharacter {
         }
     }
 
+    /**
+     * Get enemy's state.
+     * @return state.
+     */
     public State getState() {
+        // TODO state should come from server.
         return State.IDLE;
     }
 
+    /**
+     * Draw enemy.
+     * @param batch batch.
+     */
     public void draw(SpriteBatch batch) {
 
         if (!animationCreated) {

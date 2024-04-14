@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
 import com.badlogic.gdx.Gdx;
@@ -25,6 +24,7 @@ import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameScreen implements Screen, InputProcessor {
 
@@ -214,9 +214,18 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Get world width.
+     * @return world width.
+     */
     public Integer getWorldWidth() {
         return ((int) WORLD_WIDTH);
     }
+
+    /**
+     * Get world height.
+     * @return world height.
+     */
     public Integer getWorldHeight() {
         return ((int) WORLD_HEIGHT);
     }
@@ -234,6 +243,9 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Method for updating player's position
+     */
     public void updatePlayersPositions() {
         for (GameCharacter player : clientWorld.getWorldGameCharactersMap().values()) {
             if (player != clientWorld.getMyPlayerGameCharacter()) {
@@ -246,14 +258,17 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for drawing Enemies.
      */
     public void drawEnemies() {
-        if (!clientWorld.getEnemyMap().values().isEmpty()) {
-            List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
+        Map<String, Enemy> enemyMap = clientWorld.getEnemyMap();
+        if (enemyMap != null && !enemyMap.isEmpty()) {
+            List<Enemy> enemies = new ArrayList<>(enemyMap.values());
             for (Enemy enemy : enemies) {
-                // System.out.println("Enemy y: " + enemy.yPosition);
-                enemy.draw(batch);
+                if (enemy != null) {
+                    enemy.draw(batch);
+                }
             }
         }
     }
+
 
     /**
      * Draw bullets.
