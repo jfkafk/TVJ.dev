@@ -15,7 +15,7 @@ public class Enemy extends GameCharacter {
     String botHash;
     public Body b2body;
     private boolean bodyDefined = false;
-    private Integer playerSize = 64;
+    private Integer playerSize = 50;
 
     /**
      * GameCharacter constructor.
@@ -157,14 +157,14 @@ public class Enemy extends GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
 
         b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
-        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
+        boundingBox.x = b2body.getPosition().x ;
+        boundingBox.y = b2body.getPosition().y;
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {

@@ -51,7 +51,6 @@ public class ServerConnection {
 		server.getKryo().register(Packet.class);
 		server.getKryo().register(PacketConnect.class);
 		server.getKryo().register(PacketAddCharacter.class);
-		server.getKryo().register(GameCharacter.class);
 		server.getKryo().register(PacketUpdateCharacterInformation.class);
 		server.getKryo().register(PacketCreator.class);
 		server.getKryo().register(ArrayList.class);
@@ -143,7 +142,7 @@ public class ServerConnection {
 					packetSendNewLobby.setCreatorId(connection.getID());
 
 					server.sendToAllUDP(packetSendNewLobby);
-					System.out.println(availableLobbies);
+					//System.out.println(availableLobbies);
 
 				} else if (object instanceof PacketGetAvailableLobbies) {
 					sendAvailableLobbies(connection.getID());

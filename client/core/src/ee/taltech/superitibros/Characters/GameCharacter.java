@@ -1,14 +1,11 @@
 package ee.taltech.superitibros.Characters;
 
-import ee.taltech.superitibros.Characters.CreateCharacterFrames;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-import ee.taltech.superitibros.Screens.GameScreen;
 
 public class GameCharacter {
 
@@ -31,9 +28,8 @@ public class GameCharacter {
     protected float width, height;
     protected Rectangle boundingBox;
     private final Integer possiblyDealingWithSheetSize = 8;
-    private final Integer boundingBoxHeight = 128;
-    private final Integer boundingBoxWidth = 128;
-    private Integer playerSize = 64;
+
+    private Integer playerSize = 50;
 
     // World where physics are applied
     ClientWorld clientWorld;
@@ -144,7 +140,8 @@ public class GameCharacter {
      * @param yPos of the GameCharacter's new coordinates
      */
     public void moveToNewPos(float xPos, float yPos) {
-        this.boundingBox.set(xPos, yPos, boundingBoxWidth, boundingBoxHeight);
+        this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
+        //System.out.println("Move to y: " + yPos);
         if (b2body != null) {
             // Store the new position for later update
             this.newPosition.set(xPos, yPos);
@@ -156,7 +153,7 @@ public class GameCharacter {
      * This method should be called outside the physics simulation loop.
      */
     public void updatePosition() {
-        if (b2body != null && newPosition != null) {
+        if (b2body != null && newPosition != null && !clientWorld.getGdxWorld().isLocked()) {
             b2body.setTransform(newPosition, b2body.getAngle());
         }
     }
@@ -263,16 +260,20 @@ public class GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
+        System.out.println("Bounding box height: " + boundingBox.getHeight());
+        System.out.println("Bounding box width: " + boundingBox.getWidth());
+        System.out.println("Position y: " + b2body.getPosition().y);
+        System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
-        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
+        boundingBox.x = b2body.getPosition().x ;
+        boundingBox.y = b2body.getPosition().y;
 
         // Update coordinates
-        xPosition = b2body.getPosition().x + ((float) playerSize / 50);
-        yPosition = b2body.getPosition().y + ((float) playerSize / 50);
+        xPosition = b2body.getPosition().x;
+        yPosition = b2body.getPosition().y;
 
 
         // Draw the current frame at the Box2D body position
