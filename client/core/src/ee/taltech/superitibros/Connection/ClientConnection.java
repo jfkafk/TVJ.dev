@@ -35,8 +35,8 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
-		// Server 193.40.255.23
+		String ip = "127.0.0.1";
+		// Server 193.40.255.30
 		// local  127.0.0.1
 		int udpPort = 8081, tcpPort = 8082;
 
@@ -48,7 +48,6 @@ public class ClientConnection {
 		client.getKryo().register(Packet.class);
 		client.getKryo().register(PacketConnect.class);
 		client.getKryo().register(PacketAddCharacter.class);
-		client.getKryo().register(GameCharacter.class);
 		client.getKryo().register(PacketUpdateCharacterInformation.class);
 		client.getKryo().register(PacketCreator.class);
 		client.getKryo().register(ArrayList.class);
@@ -101,7 +100,8 @@ public class ClientConnection {
 							// Update PlayerGameCharacter's coordinates.
 							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
 							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
-							System.out.println(packetUpdateCharacterInformation.getCurrentState());
+							// System.out.println(packetUpdateCharacterInformation.getCurrentState());
+							System.out.println("Got y: " + packetUpdateCharacterInformation.getY());
 							gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
 							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
@@ -234,7 +234,9 @@ public class ClientConnection {
 	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
 		packet.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
-		System.out.println("send update character with lobby hash: " + gameClient.getMyLobby().getLobbyHash());
+		// System.out.println("send update character with lobby hash: " + gameClient.getMyLobby().getLobbyHash());
+		System.out.println("Sent y: " + y);
+		//System.out.println("My player y: " + clientWorld.getMyPlayerGameCharacter().yPosition);
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
 		client.sendUDP(packet);

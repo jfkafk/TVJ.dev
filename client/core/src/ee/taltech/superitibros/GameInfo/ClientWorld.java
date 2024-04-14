@@ -24,21 +24,21 @@ import java.util.*;
 
 public class ClientWorld {
 
-    private com.badlogic.gdx.physics.box2d.World gdxWorld;
+    private final com.badlogic.gdx.physics.box2d.World gdxWorld;
     private TiledMap tiledMap;
-    private String path;
+    private final String path;
     MapLayer mapLayer;
     private ClientConnection clientConnection;
     private MyPlayerGameCharacter myPlayerGameCharacter;
     private final HashMap<Integer, GameCharacter> worldGameCharactersMap = new HashMap<>();
-    private Map<String, Enemy> enemyMap = new HashMap<>();
+    private final Map<String, Enemy> enemyMap = new HashMap<>();
     public final Box2DDebugRenderer b2dr;
 
-    private Map<Integer, Bullet> bullets = new HashMap<>();
-    private Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
-    private List<Bullet> bulletsToRemove = new ArrayList<>();
-    private List<Integer> collidedBullets = new ArrayList<>();
-    private Sprite bulletSprite = new Sprite(new Texture("Bullet/bullet.png"));
+    private final Map<Integer, Bullet> bullets = new HashMap<>();
+    private final Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
+    private final List<Bullet> bulletsToRemove = new ArrayList<>();
+    private final List<Integer> collidedBullets = new ArrayList<>();
+    private final Sprite bulletSprite = new Sprite(new Texture("Bullet/bullet.png"));
 
     public ClientWorld(String path) {
         // Map and physics

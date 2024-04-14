@@ -61,7 +61,7 @@ public class Enemy extends GameCharacter {
      */
     public void spin() {
         sense();
-        System.out.println("State: " + currentState);
+        //System.out.println("State: " + currentState);
         act();
     }
 
@@ -71,14 +71,14 @@ public class Enemy extends GameCharacter {
     private void sense() {
         float minDistance = DETECTION_RANGE;
         for (GameCharacter player : getWorld().getClients().values()) {
-            System.out.println("Player x: " + player.xPosition);
+            //System.out.println("Player x: " + player.xPosition);
             float distance = Math.abs(xPosition - player.xPosition) + Math.abs(yPosition - player.yPosition);
-            System.out.println("Enemy x: " + xPosition + " | Player x: " + player.xPosition);
-            System.out.println("Enemy y: " + yPosition + " | Player y: " + player.yPosition);
-            System.out.println("Min distance: " + minDistance + " | Distance: " + distance);
+            //System.out.println("Enemy x: " + xPosition + " | Player x: " + player.xPosition);
+            //System.out.println("Enemy y: " + yPosition + " | Player y: " + player.yPosition);
+            //System.out.println("Min distance: " + minDistance + " | Distance: " + distance);
             if (distance < minDistance) {
                 minDistance = distance;
-                System.out.println("Setting state to run");
+                //System.out.println("Setting state to run");
                 currentState = (player.xPosition < xPosition) ? State.RUNNING_LEFT : State.RUNNING_RIGHT;
             }
         }

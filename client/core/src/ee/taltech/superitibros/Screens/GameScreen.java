@@ -129,6 +129,9 @@ public class GameScreen implements Screen, InputProcessor {
         // Render game objects
         batch.begin();
         updatePlayersPositions();
+        if (clientWorld.getMyPlayerGameCharacter() != null) {
+            //System.out.println("My player Y: " + clientWorld.getMyPlayerGameCharacter().yPosition);
+        }
         drawPlayerGameCharacters();
         clientWorld.moveEnemies();
         drawEnemies();
@@ -197,13 +200,12 @@ public class GameScreen implements Screen, InputProcessor {
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
 
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().b2body.getPosition().x, clientWorld.getMyPlayerGameCharacter().b2body.getPosition().y, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
                 lastPacketCount = 0;
-            }
 
-            // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
-            if (lastPacketCount < 3) {
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+            } else if (lastPacketCount < 3) {
+                // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
+                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().b2body.getPosition().x, clientWorld.getMyPlayerGameCharacter().b2body.getPosition().y, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
                 lastPacketCount++;
             }
 
@@ -227,7 +229,7 @@ public class GameScreen implements Screen, InputProcessor {
         for (GameCharacter character : characterValues) {
             character.draw(batch);
             if (character != clientWorld.getMyPlayerGameCharacter()) {
-                System.out.println(character.b2body.getLinearVelocity().x);
+                // System.out.println(character.b2body.getLinearVelocity().x);
             }
         }
     }
@@ -244,10 +246,12 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for drawing Enemies.
      */
     public void drawEnemies() {
-        List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
-        for (Enemy enemy : enemies) {
-            // System.out.println("Enemy y: " + enemy.yPosition);
-            enemy.draw(batch);
+        if (!clientWorld.getEnemyMap().values().isEmpty()) {
+            List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
+            for (Enemy enemy : enemies) {
+                // System.out.println("Enemy y: " + enemy.yPosition);
+                enemy.draw(batch);
+            }
         }
     }
 
@@ -260,7 +264,7 @@ public class GameScreen implements Screen, InputProcessor {
             //System.out.println(clientWorld.getBulletsToRemove());
             for (Bullet bullet : clientWorld.getBulletsToRemove()) {
                 clientWorld.removeBullet(bullet);
-                System.out.println("removed");
+                //System.out.println("removed");
             }
             clientWorld.clearBulletsToRemove();
             //System.out.println(clientWorld.getBulletsToRemove());
@@ -268,7 +272,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         if (!clientWorld.getBulletsToAdd().isEmpty()) {
             for (Bullet bullet : clientWorld.getBulletsToAdd()) {
-                System.out.println("added");
+                //System.out.println("added");
                 clientWorld.addBullet(bullet);
             }
             clientWorld.clearBulletsToAdd();
