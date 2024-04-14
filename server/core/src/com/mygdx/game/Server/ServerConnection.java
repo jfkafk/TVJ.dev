@@ -26,7 +26,6 @@ public class ServerConnection {
 
 	private float playerGameCharacterX = 280f;
 	private float playerGameCharacterY = 250f;
-	private int playerCount = 0;
 
 	Map<String, Lobby> availableLobbies = new LinkedHashMap<>();
 
@@ -381,6 +380,10 @@ public class ServerConnection {
 		server.sendToTCP(connectionId, packetNewEnemy);
 	}
 
+	/**
+	 * Send updated bullet info.
+	 * @param lobbyHash lobby's hash.
+	 */
 	public void sendUpdatedBullet(String lobbyHash) {
 
 		// To prevent modifying list while iterating
@@ -416,6 +419,10 @@ public class ServerConnection {
 		playerGameCharacterX = 280f;
 	}
 
+	/**
+	 * Get server connection.
+	 * @return server connection.
+	 */
 	public ServerConnection getServerConnection() {
 		return this;
 	}

@@ -130,6 +130,10 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Get bounding box.
+     * @return bounding box.
+     */
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
@@ -160,6 +164,9 @@ public class GameCharacter {
     }
 
 
+    /**
+     * Method for jumping.
+     */
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
@@ -169,28 +176,42 @@ public class GameCharacter {
         }
     }
 
-    // Fall faster
+    /**
+     * Method for faster falling.
+     */
     public void fallDown() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed * 70);
     }
 
-    // Move right
+    /**
+     * Method for moving character to right.
+     */
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
         facingRight = true;
     }
 
-    // Move left
+    /**
+     * Method for moving character to left.
+     */
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
         facingRight = false;
     }
 
+    /**
+     * Return if character is on the ground.
+     * @return true if on the ground, otherwise false.
+     */
     public boolean isGrounded() {
         return b2body.getLinearVelocity().y == 0;
     }
 
+    /**
+     * Get character state.
+     * @return state.
+     */
     public State getState() {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
@@ -206,10 +227,18 @@ public class GameCharacter {
         return State.IDLE;
     }
 
+    /**
+     * Get if player is facing right.
+     * @return true if facing right, otherwise false.
+     */
     public boolean getFacingRight() {
         return this.facingRight;
     }
 
+    /**
+     * Draw game character.
+     * @param batch batch.
+     */
     public void draw(SpriteBatch batch) {
 
         if (!animationCreated) {
@@ -263,10 +292,10 @@ public class GameCharacter {
         // Set the position of the current frame to match the position of the Box2D body
         float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() - 0.1 * playerSize); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
-        System.out.println("Bounding box height: " + boundingBox.getHeight());
-        System.out.println("Bounding box width: " + boundingBox.getWidth());
-        System.out.println("Position y: " + b2body.getPosition().y);
-        System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
+        //System.out.println("Bounding box height: " + boundingBox.getHeight());
+        //System.out.println("Bounding box width: " + boundingBox.getWidth());
+        //System.out.println("Position y: " + b2body.getPosition().y);
+        //System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
 
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;

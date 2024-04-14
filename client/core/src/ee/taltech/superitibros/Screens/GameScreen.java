@@ -6,7 +6,6 @@ import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
 import com.badlogic.gdx.Gdx;
@@ -25,6 +24,7 @@ import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameScreen implements Screen, InputProcessor {
 
@@ -37,8 +37,7 @@ public class GameScreen implements Screen, InputProcessor {
     // Graphics and Texture
     private final SpriteBatch batch;
     private TiledMap tiledMap;
-    private TiledMapRenderer tiledMapRenderer;
-    private String path;
+    private final TiledMapRenderer tiledMapRenderer;
     private float desiredCameraWidth;
     private float desiredCameraHeight;
 
@@ -173,9 +172,6 @@ public class GameScreen implements Screen, InputProcessor {
     /**
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
-    /**
-     * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
-     */
     private void detectInput(){
 
         if (clientWorld.getMyPlayerGameCharacter() != null) {
@@ -214,9 +210,18 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Get world width.
+     * @return world width.
+     */
     public Integer getWorldWidth() {
         return ((int) WORLD_WIDTH);
     }
+
+    /**
+     * Get world height.
+     * @return world height.
+     */
     public Integer getWorldHeight() {
         return ((int) WORLD_HEIGHT);
     }
@@ -234,8 +239,12 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Method for updating player's position
+     */
     public void updatePlayersPositions() {
-        for (GameCharacter player : clientWorld.getWorldGameCharactersMap().values()) {
+        List<GameCharacter> players = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
+        for (GameCharacter player : players) {
             if (player != clientWorld.getMyPlayerGameCharacter()) {
                 player.updatePosition();
             }
@@ -246,11 +255,12 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for drawing Enemies.
      */
     public void drawEnemies() {
-        if (!clientWorld.getEnemyMap().values().isEmpty()) {
-            List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
-            for (Enemy enemy : enemies) {
-                // System.out.println("Enemy y: " + enemy.yPosition);
-                enemy.draw(batch);
+        Map<String, Enemy> enemyMap = clientWorld.getEnemyMap();
+        if (enemyMap != null && !enemyMap.isEmpty()) {
+            for (Enemy enemy : enemyMap.values()) {
+                if (enemy != null) {
+                    enemy.draw(batch);
+                }
             }
         }
     }
