@@ -37,8 +37,7 @@ public class GameScreen implements Screen, InputProcessor {
     // Graphics and Texture
     private final SpriteBatch batch;
     private TiledMap tiledMap;
-    private TiledMapRenderer tiledMapRenderer;
-    private String path;
+    private final TiledMapRenderer tiledMapRenderer;
     private float desiredCameraWidth;
     private float desiredCameraHeight;
 
@@ -170,9 +169,6 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
-    /**
-     * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
-     */
     /**
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
