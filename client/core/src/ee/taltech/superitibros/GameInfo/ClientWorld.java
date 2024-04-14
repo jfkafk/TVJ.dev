@@ -79,7 +79,8 @@ public class ClientWorld {
             short obstacleMask = CollisionBits.MASK_OBSTACLE;
 
             // Determine the type of object and set category and mask bits accordingly
-            String type = obj.getProperties().get("type", String.class);
+            String type = obj.getProperties().get("ground", String.class);
+            System.out.println(type);
             if ("player".equals(type)) {
                 fixtureDef.filter.categoryBits = playerCategory;
                 fixtureDef.filter.maskBits = playerMask;

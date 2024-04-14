@@ -35,10 +35,10 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "127.0.0.1";
+		String ip = "193.40.255.30";
 		// Server 193.40.255.30
 		// local  127.0.0.1
-		int udpPort = 8081, tcpPort = 8082;
+		int tcpPort = 8089;
 
 
 		client = new Client(49152, 49152);
@@ -207,7 +207,7 @@ public class ClientConnection {
 
 		try {
 			// Connected to the server - wait 5000ms before failing.
-			client.connect(5000, ip, tcpPort, udpPort);
+			client.connect(5000, ip, tcpPort);
 		} catch (IOException exception) {
 			JOptionPane.showMessageDialog(null, "Can not connect to the Server.");
 			return;
@@ -239,7 +239,7 @@ public class ClientConnection {
 		//System.out.println("My player y: " + clientWorld.getMyPlayerGameCharacter().yPosition);
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
-		client.sendUDP(packet);
+		client.sendTCP(packet);
 	}
 
 	/**
@@ -247,7 +247,7 @@ public class ClientConnection {
 	 */
 	public void sendCreateNewLobby() {
 		PacketSendNewLobby packetSendNewLobby = PacketCreator.createPacketSendNewLobby();
-		client.sendUDP(packetSendNewLobby);
+		client.sendTCP(packetSendNewLobby);
 	}
 
 	/**
@@ -255,38 +255,38 @@ public class ClientConnection {
 	 */
 	public void sendGetAvailableLobbies() {
 		PacketGetAvailableLobbies packetGetAvailableLobbies = new PacketGetAvailableLobbies();
-		client.sendUDP(packetGetAvailableLobbies);
+		client.sendTCP(packetGetAvailableLobbies);
 	}
 
 	public void sendUpdateLobbyInfo(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setUpdateInfo(true);
-		client.sendUDP(packetLobbyInfo);
+		client.sendTCP(packetLobbyInfo);
 	}
 
 	public void sendAddPlayerToLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setPlayerToAdd(gameClient.getConnectionId());
-		client.sendUDP(packetLobbyInfo);
+		client.sendTCP(packetLobbyInfo);
 	}
 
 	public void sendRemovePlayerFromLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setPlayerToRemove(gameClient.getConnectionId());
-		client.sendUDP(packetLobbyInfo);
+		client.sendTCP(packetLobbyInfo);
 	}
 
 	public void sendLobbyStartGame(String lobbyHash, String mapPath) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setStartGame(true);
 		packetLobbyInfo.setMapPath(mapPath);
-		client.sendUDP(packetLobbyInfo);
+		client.sendTCP(packetLobbyInfo);
 	}
 
 	public void sendDeleteLobby(String lobbyHash) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
 		packetLobbyInfo.setToDelete(true);
-		client.sendUDP(packetLobbyInfo);
+		client.sendTCP(packetLobbyInfo);
 	}
 
 	public void sendBullet(String lobbyHash, float playerX, float playerY, float mouseX, float mouseY) {
@@ -295,14 +295,14 @@ public class ClientConnection {
 		packetBullet.setPlayerY(playerY);
 		packetBullet.setMouseX(mouseX);
 		packetBullet.setMouseY(mouseY);
-		client.sendUDP(packetBullet);
+		client.sendTCP(packetBullet);
 	}
 
 	public void sendKilledEnemy(String lobbyHash, String botHash) {
 		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
 		packetBullet.setKilled(true);
 		packetBullet.setKilledBot(botHash);
-		client.sendUDP(packetBullet);
+		client.sendTCP(packetBullet);
 	}
 
 	/**

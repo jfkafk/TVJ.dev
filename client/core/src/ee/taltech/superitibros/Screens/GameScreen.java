@@ -81,9 +81,9 @@ public class GameScreen implements Screen, InputProcessor {
         if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
             this.desiredCameraHeight = tileHeight * mapHeightInTiles; // Set the desired width of the camera
         } else {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles * 2;
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
         }
-        this.desiredCameraWidth = desiredCameraHeight * aspectRatio * 2; // Calculate the corresponding height
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
