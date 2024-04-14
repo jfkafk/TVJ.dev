@@ -78,6 +78,7 @@ public class GameCharacter {
         this.mapWidth = clientWorld.getMapWidth();
         if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
             playerSize = 256;
+            boundingBox.setSize(60, 105);
         }
         defineCharacter();
     }
@@ -260,7 +261,7 @@ public class GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() - 0.1 * playerSize); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
         System.out.println("Bounding box height: " + boundingBox.getHeight());
         System.out.println("Bounding box width: " + boundingBox.getWidth());
