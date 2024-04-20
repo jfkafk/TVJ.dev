@@ -240,22 +240,15 @@ public class ClientWorld {
         Collection<Bullet> bulletList = new ArrayList<>(bullets.values()); // Make a copy of the bullets collection
         Collection<Enemy> enemiesList = new ArrayList<>(enemyMap.values()); // Make a copy of the enemies collection
 
-        List<Enemy> enemiesToRemove = new ArrayList<>(); // Create a list to store enemies to remove
-
         Iterator<Bullet> bulletIterator = bulletList.iterator();
         while (bulletIterator.hasNext()) {
             Bullet bullet = bulletIterator.next();
             for (Enemy enemy : enemiesList) {
                 if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
                     // Collision detected, handle accordingly
-                    handleBulletCollisionWithEnemy(bullet, enemy, enemiesToRemove); // Pass the list as an argument
+                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash(), bullet.getBulletId());
                 }
             }
-        }
-
-        // Remove the enemies from the enemyMap
-        for (Enemy enemyToRemove : enemiesToRemove) {
-            enemyMap.remove(enemyToRemove.getBotHash());
         }
     }
 
@@ -263,27 +256,22 @@ public class ClientWorld {
      * Handle bullet collision with enemy.
      * @param bullet object.
      * @param enemy object.
-     * @param enemiesToRemove list of enemies to remove.
      */
-    private void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy, List<Enemy> enemiesToRemove) {
+    public void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy) {
         // Remove the bullet from the world
-        bulletsToRemove.add(bullet);
         collidedBullets.add(bullet.getBulletId());
+        bulletsToRemove.add(bullet);
 
         // Update enemy health
         enemy.updateHealth(-20);
 
         if (enemy.getHealth() <= 0) {
-            // Send packet to server that informs that enemy is dead
-            clientConnection.sendKilledEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
 
-            // Add the enemy to the list of enemies to remove
-            enemiesToRemove.add(enemy);
+            // Remove enemy
+            enemyMap.remove(enemy.getBotHash());
 
             // Remove enemies b2body
             enemy.removeBodyFromWorld();
-        } else {
-            clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
         }
 
         // System.out.println("Enemy health: " + enemy.getHealth());

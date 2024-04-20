@@ -67,7 +67,17 @@ public class Enemy extends GameCharacter {
      * @param amount health.
      */
     public void updateHealth(float amount) {
-        health = amount;
+        health += amount;
+
+        // Ensure health doesn't exceed maximum
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+
+        // Ensure health doesn't go below 0
+        if (health < 0) {
+            health = 0;
+        }
     }
 
     /**

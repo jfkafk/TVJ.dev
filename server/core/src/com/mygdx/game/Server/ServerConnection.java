@@ -131,14 +131,9 @@ public class ServerConnection {
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
                     World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
 
-                    if (packetUpdateEnemy.isDead()) {
-                        world.removeEnemy(packetUpdateEnemy.getBotHash());
-					} else {
-                        if (world.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
-							Enemy enemy = world.getEnemyMap().get(packetUpdateEnemy.getBotHash());
-							enemy.updateHealth(packetUpdateEnemy.getHealth());
-							enemy.setyPosition(packetUpdateEnemy.getyPosition());
-						}
+					if (world.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
+						Enemy enemy = world.getEnemyMap().get(packetUpdateEnemy.getBotHash());
+						enemy.setyPosition(packetUpdateEnemy.getyPosition());
 					}
 
 				} else if (object instanceof PacketSendNewLobby) {
@@ -221,15 +216,20 @@ public class ServerConnection {
 					PacketBullet packetBullet = (PacketBullet) object;
 
 					// Check if arrived packet that informs that enemy wask killed
-					if (packetBullet.isKilled()) {
+					if (packetBullet.isHit()) {
 						World world = onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld();
 
 						// Check if enemy is in server world
-						if (world.getEnemyMap().containsKey(packetBullet.getKilledBot())) {
-							// Remove enemy from world
-							world.removeEnemy(packetBullet.getKilledBot());
-							// Inform other clients that enemy
-							sendKilledEnemy(packetBullet.getLobbyHash(), packetBullet);
+						if (world.getEnemyMap().containsKey(packetBullet.getHitEnemy())) {
+							Enemy enemy = world.getEnemyMap().get(packetBullet.getHitEnemy());
+							// Decrease health
+							enemy.updateHealth(-20);
+							// Check if dead
+							if (enemy.getHealth() <= 0) {
+								world.removeEnemy(enemy.getBotHash());
+							}
+							// Inform other clients that enemy is hit
+							sendHitEnemy(packetBullet.getLobbyHash(), packetBullet);
 						}
 
 					} else {
@@ -450,7 +450,7 @@ public class ServerConnection {
 	 * @param lobbyHash lobby's hash.
 	 * @param packetBullet bullet packet.
 	 */
-	public void sendKilledEnemy(String lobbyHash, PacketBullet packetBullet) {
+	public void sendHitEnemy(String lobbyHash, PacketBullet packetBullet) {
 		for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
 			server.sendToTCP(id, packetBullet);
 		}

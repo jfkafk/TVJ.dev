@@ -271,6 +271,9 @@ public class GameScreen implements Screen, InputProcessor {
             for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
                     enemy.draw(batch, clientWorld.getHealthBarTexture());
+                    if (enemy.b2body.getLinearVelocity().y != 0) {
+                        clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+                    }
                 }
             }
         }

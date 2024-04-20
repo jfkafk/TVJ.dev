@@ -185,9 +185,11 @@ public class ClientConnection {
 						PacketBullet packetBullet = (PacketBullet) object;
 
 						// If bullet collided with enemy, then remove enemy from game
-						if (packetBullet.isKilled()) {
-							if (clientWorld.getEnemyMap().containsKey(packetBullet.getKilledBot())) {
-								clientWorld.removeEnemy(packetBullet.getKilledBot());
+						if (packetBullet.isHit()) {
+							if (clientWorld.getEnemyMap().containsKey(packetBullet.getHitEnemy())) {
+								Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
+								Enemy enemy = clientWorld.getEnemy(packetBullet.getHitEnemy());
+								clientWorld.handleBulletCollisionWithEnemy(bullet, enemy);
 							}
 						} else {
 
@@ -345,10 +347,11 @@ public class ClientConnection {
 	 * @param lobbyHash lobby's hash.
 	 * @param botHash bot's hash.
 	 */
-	public void sendKilledEnemy(String lobbyHash, String botHash) {
+	public void sendEnemyHit(String lobbyHash, String botHash, int bulletId) {
 		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
-		packetBullet.setKilled(true);
-		packetBullet.setKilledBot(botHash);
+		packetBullet.setIsHit(true);
+		packetBullet.setHitEnemy(botHash);
+		packetBullet.setBulletId(bulletId);
 		client.sendTCP(packetBullet);
 	}
 
@@ -360,7 +363,6 @@ public class ClientConnection {
 	public void sendUpdatedEnemy(String lobbyHash, String botHash) {
 		PacketUpdateEnemy packetUpdateEnemy = new PacketUpdateEnemy();
 		packetUpdateEnemy.setBotHash(botHash);
-		packetUpdateEnemy.setHealth(clientWorld.getEnemy(botHash).getHealth());
 		packetUpdateEnemy.setLobbyHash(lobbyHash);
 		packetUpdateEnemy.setyPosition(clientWorld.getEnemyMap().get(botHash).yPosition);
 		client.sendTCP(packetUpdateEnemy);
