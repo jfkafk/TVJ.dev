@@ -87,7 +87,7 @@ public class ServerConnection {
 					addCharacterToClientsGame(connection, newPlayerGameCharacter, packetConnect.getLobbyHash());
 
 					// Send connected player position to other players
-					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY, GameCharacter.State.IDLE, true, packetConnect.getLobbyHash());
+					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY, GameCharacter.State.IDLE, true, packetConnect.getLobbyHash(), 100);
 
 					// Send other players positions to joined player in lobby
 					for (Map.Entry<Integer, PlayerGameCharacter> entry : serverWorld.getClients().entrySet()) {
@@ -112,20 +112,33 @@ public class ServerConnection {
 					// Packet for updating player position
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 
-					// Update PlayerGameCharacter's coordinates in lobby.
-					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
-					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).yPosition = packet.getY();
+					if (packet.isDead()) {
+						// If player has died, then remove him from server world
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().removeClient(packet.getId());
+						// Send packet that informs other clients in lobby that player is dead
+						sendDeadPlayer(packet.getLobbyHash(), packet.getId());
+					} else {
+						// Update PlayerGameCharacter's coordinates in lobby.
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).yPosition = packet.getY();
 
-					// Send players new coordinates and direction to all players in lobby
-					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash());
+						// Send players new coordinates and direction to all players in lobby
+						sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash(), packet.getHealth());
+					}
 
 				} else if (object instanceof PacketUpdateEnemy) {
 					// Packet for updating enemy position
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
+                    World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
 
-					if (packetUpdateEnemy.isDead()) {
-						World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
-						world.removeEnemy(packetUpdateEnemy.getBotHash());
+                    if (packetUpdateEnemy.isDead()) {
+                        world.removeEnemy(packetUpdateEnemy.getBotHash());
+					} else {
+                        if (world.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
+							Enemy enemy = world.getEnemyMap().get(packetUpdateEnemy.getBotHash());
+							enemy.updateHealth(packetUpdateEnemy.getHealth());
+							enemy.setyPosition(packetUpdateEnemy.getyPosition());
+						}
 					}
 
 				} else if (object instanceof PacketSendNewLobby) {
@@ -293,16 +306,36 @@ public class ServerConnection {
 	 * @param xPos new x coordinate of the PlayerGameCharacter (float)
 	 * @param yPos new y coordinate of the PlayerGameCharacter (float)
 	 */
-	public void sendUpdatedGameCharacter(int id, float xPos, float yPos, GameCharacter.State state, boolean isFacingRight, String lobbyHash) {
+	public void sendUpdatedGameCharacter(int id, float xPos, float yPos, GameCharacter.State state, boolean isFacingRight, String lobbyHash, float health) {
 		// Create packet
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(id, xPos, yPos);
 		// Set player's state and if he's facing right
 		packet.setCurrentState(state);
 		packet.setFacingRight(isFacingRight);
+		// Set health
+		packet.setHealth(health);
 		// Send packet to players in given lobby
 		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
 			if (playerId != id) {
 				server.sendToTCP(playerId, packet);
+			}
+		}
+	}
+
+	/**
+	 * Send packet to clients in lobby informing that player has died.
+	 * @param lobbyHash lobby hash.
+	 * @param id died player id.
+	 */
+	public void sendDeadPlayer(String lobbyHash, int id) {
+		PacketUpdateCharacterInformation packetUpdateCharacterInformation = new PacketUpdateCharacterInformation();
+		packetUpdateCharacterInformation.setDead(true);
+		packetUpdateCharacterInformation.setId(id);
+		packetUpdateCharacterInformation.setLobbyHash(lobbyHash);
+		// Send packet to players in given lobby
+		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
+			if (playerId != id) {
+				server.sendToTCP(playerId, packetUpdateCharacterInformation);
 			}
 		}
 	}
@@ -331,8 +364,19 @@ public class ServerConnection {
 		serverWorld.updateEnemyInTheWorldEnemyMap();
 		// Enemy instance id (key) and new coordinates (value) are sent.
 		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
-			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
+
+			// Arguments
+			String botHash = entry.getKey();
+			float xPosition = entry.getValue().getxPosition();
+			float yPosition = entry.getValue().getyPosition();
+			float health = entry.getValue().getHealth();
+
+			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(botHash, xPosition, yPosition);
+
+			// Set health
+			packetUpdateEnemy.setHealth(health);
 			// Send enemy info to all players in lobby
+
 			for (Integer playerId : lobby.getServerWorld().getClientsIds()) {
 				server.sendToTCP(playerId, packetUpdateEnemy);
 			}

@@ -1,7 +1,10 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -30,6 +33,15 @@ public class GameCharacter {
     private final Integer possiblyDealingWithSheetSize = 8;
 
     private Integer playerSize = 50;
+
+    // Health bar properties
+    private float maxHealth;
+    private float health;
+    private float healthBarWidth;
+    private float healthBarHeight;
+    private Color healthBarColor;
+    private float healthBarX;
+    private float healthBarY;
 
     // World where physics are applied
     ClientWorld clientWorld;
@@ -81,6 +93,12 @@ public class GameCharacter {
             boundingBox.setSize(60, 105);
         }
         defineCharacter();
+        // Initialize health bar properties
+        maxHealth = 100f;
+        health = maxHealth;
+        healthBarWidth = 25;
+        healthBarHeight = 2;
+        healthBarColor = Color.GREEN;
     }
 
 
@@ -172,7 +190,7 @@ public class GameCharacter {
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
-            System.out.println("jumped");
+            // System.out.println("jumped");
         }
     }
 
@@ -239,7 +257,7 @@ public class GameCharacter {
      * Draw game character.
      * @param batch batch.
      */
-    public void draw(SpriteBatch batch) {
+    public void draw(SpriteBatch batch, Texture whiteTexture) {
 
         if (!animationCreated) {
             createFrames();
@@ -297,6 +315,10 @@ public class GameCharacter {
         //System.out.println("Position y: " + b2body.getPosition().y);
         //System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
 
+        // Calculate health bar position
+        healthBarX = frameX + boundingBox.width / 2;
+        healthBarY = frameY + boundingBox.height;
+
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;
         boundingBox.y = b2body.getPosition().y;
@@ -308,8 +330,73 @@ public class GameCharacter {
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
+            batch.setColor(Color.WHITE); // Reset batch color to default (white)
             batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
+
+        // Draw health bar
+        drawHealthBar(batch, whiteTexture);
+    }
+
+    // Draw health bar method
+    public void drawHealthBar(Batch batch, Texture whiteTexture) {
+        // Calculate health bar fill percentage
+        float healthPercentage = health / maxHealth;
+
+        // Set the color of the health bar based on health percentage
+        if (healthPercentage > 0.5f) {
+            healthBarColor = Color.GREEN;
+        } else if (healthPercentage > 0.2f) {
+            healthBarColor = Color.YELLOW;
+        } else {
+            healthBarColor = Color.RED;
+        }
+
+        // Calculate the width of the filled portion of the health bar
+        float filledWidth = healthBarWidth * healthPercentage;
+
+        // Calculate health bar position
+        float healthBarX = xPosition - healthBarWidth / 2;
+        float healthBarY = yPosition + height + 5;
+
+        // Draw the health bar outline (border) using the Batch
+        batch.setColor(Color.BLACK);
+        batch.draw(whiteTexture, (float) (healthBarX - 0.5), (float) (healthBarY - 0.5), healthBarWidth + 1, healthBarHeight + 1);
+
+        // Draw the health bar fill using the Batch
+        batch.setColor(healthBarColor);
+        batch.draw(whiteTexture, healthBarX, healthBarY, filledWidth, healthBarHeight);
+    }
+
+    // Update health method (call this when player takes damage or heals)
+    public void updateHealth(float amount) {
+        health += amount;
+
+        // Ensure health doesn't exceed maximum
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+
+        // Ensure health doesn't go below 0
+        if (health < 0) {
+            health = 0;
+        }
+    }
+
+    /**
+     * Get game character health.
+     * @return health.
+     */
+    public float getHealth() {
+        return health;
+    }
+
+    /**
+     * Set game character health.
+     * @param health health.
+     */
+    public void setHealth(float health) {
+        this.health = health;
     }
 
     /**

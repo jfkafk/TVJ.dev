@@ -33,7 +33,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
 		// local  127.0.0.1
 		int tcpPort = 8089;
@@ -94,15 +94,25 @@ public class ClientConnection {
 					} else if (object instanceof PacketUpdateCharacterInformation && clientWorld != null) {
 						// Packet for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
+
 						if (gameScreen != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
-							// Update PlayerGameCharacter's coordinates.
-							PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
-							gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
-							// System.out.println(packetUpdateCharacterInformation.getCurrentState());
-							System.out.println("Got y: " + packetUpdateCharacterInformation.getY());
-							gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
-							clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
-									packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
+
+							if (packetUpdateCharacterInformation.isDead()) {
+								PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
+								clientWorld.removeClient(packetUpdateCharacterInformation.getId());
+								gameCharacter.removeBodyFromWorld();
+							} else {
+								// Update PlayerGameCharacter's coordinates.
+								PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
+								gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
+								// System.out.println(packetUpdateCharacterInformation.getCurrentState());
+								//System.out.println("Got y: " + packetUpdateCharacterInformation.getY());
+								gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
+								//System.out.println("Got health: " + packetUpdateCharacterInformation.getHealth());
+								gameCharacter.setHealth(packetUpdateCharacterInformation.getHealth());
+								clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
+										packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
+							}
 						}
 
 					} else if (object instanceof PacketClientDisconnect && clientWorld != null) {
@@ -122,7 +132,10 @@ public class ClientConnection {
 						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
-							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
+							Enemy enemy = clientWorld.getEnemy(packetUpdateEnemy.getBotHash());
+							enemy.xPosition = packetUpdateEnemy.getxPosition();
+							//System.out.println("Health from packet: " + packetUpdateEnemy.getHealth());
+							enemy.setHealth(packetUpdateEnemy.getHealth());
 							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
 						}
@@ -229,14 +242,16 @@ public class ClientConnection {
 	 * @param x of the PlayerGameCharacters x coordinate (float)
 	 * @param y of the PlayerGameCharacters y coordinate (float)
 	 */
-	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight) {
+	public void sendPlayerInformation(float x, float y, GameCharacter.State currentState, boolean isFacingRight, float health) {
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(client.getID(), x, y);
 		packet.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
 		// System.out.println("send update character with lobby hash: " + gameClient.getMyLobby().getLobbyHash());
-		System.out.println("Sent y: " + y);
+		// System.out.println("Sent y: " + y);
 		//System.out.println("My player y: " + clientWorld.getMyPlayerGameCharacter().yPosition);
 		packet.setCurrentState(currentState);
 		packet.setFacingRight(isFacingRight);
+		packet.setHealth(health);
+		// System.out.println("Sent health: " + health);
 		client.sendTCP(packet);
 	}
 
@@ -335,6 +350,33 @@ public class ClientConnection {
 		packetBullet.setKilled(true);
 		packetBullet.setKilledBot(botHash);
 		client.sendTCP(packetBullet);
+	}
+
+	/**
+	 * Send updated enemy info.
+	 * @param lobbyHash lobby hash.
+	 * @param botHash bot hash.
+	 */
+	public void sendUpdatedEnemy(String lobbyHash, String botHash) {
+		PacketUpdateEnemy packetUpdateEnemy = new PacketUpdateEnemy();
+		packetUpdateEnemy.setBotHash(botHash);
+		packetUpdateEnemy.setHealth(clientWorld.getEnemy(botHash).getHealth());
+		packetUpdateEnemy.setLobbyHash(lobbyHash);
+		packetUpdateEnemy.setyPosition(clientWorld.getEnemyMap().get(botHash).yPosition);
+		client.sendTCP(packetUpdateEnemy);
+	}
+
+	/**
+	 * Method for sending info that player has died.
+	 * @param lobbyHash lobby hash.
+	 * @param id died player id.
+	 */
+	public void sendPlayerDead(String lobbyHash, int id) {
+		PacketUpdateCharacterInformation packetUpdateCharacterInformation = new PacketUpdateCharacterInformation();
+		packetUpdateCharacterInformation.setLobbyHash(lobbyHash);
+		packetUpdateCharacterInformation.setId(id);
+		packetUpdateCharacterInformation.setDead(true);
+		client.sendTCP(packetUpdateCharacterInformation);
 	}
 
 	/**
