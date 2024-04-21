@@ -21,15 +21,13 @@ public class ServerConnection {
 
 	static Server server;
 	static final int tcpPort = 8089;
-
 	private ServerUpdateThread serverUpdateThread;
-
 	private float playerGameCharacterX = 280f;
-	private float playerGameCharacterY = 250f;
-
+	private final float playerGameCharacterY = 250f;
 	Map<String, Lobby> availableLobbies = new LinkedHashMap<>();
-
 	Map<String, Lobby> onGoingLobbies = new LinkedHashMap<>();
+	List<Integer> connectedPlayers = new ArrayList<>();
+
 
 	/**
 	 * Server connection.
@@ -73,6 +71,9 @@ public class ServerConnection {
 			// Receive packets from clients.
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
+
+					// Add connection to list
+					connectedPlayers.add(connection.getID());
 
 					PacketConnect packetConnect = (PacketConnect) object;
 
@@ -144,6 +145,8 @@ public class ServerConnection {
 					lobby.addPlayer(connection.getID());
 
 					availableLobbies.put(lobby.getLobbyHash(), lobby);
+					System.out.println("got new lobby");
+					System.out.println(availableLobbies);
 
 					packetSendNewLobby.setLobbyHash(lobby.getLobbyHash());
 					packetSendNewLobby.setCreatorId(connection.getID());
@@ -243,6 +246,12 @@ public class ServerConnection {
 
 			// Client disconnects from the Server.
 			public void disconnected (Connection c) {
+				// Remove connection from list
+				connectedPlayers.remove(Integer.valueOf(c.getID()));
+
+				// Check if any lobby is empty
+				checkIfLobbyEmpty();
+
 				PacketClientDisconnect packetClientDisconnect = PacketCreator.createPacketClientDisconnect(c.getID());
 				// Player's lobby if he was in game
 				Lobby playerLobby = null;
@@ -252,8 +261,6 @@ public class ServerConnection {
 						playerLobby = lobby;
 					}
 				}
-
-				System.out.println("Client " + c.getID() + " disconnected.");
 
 				// Remove client from the game.
 				if (playerLobby != null) {
@@ -265,6 +272,8 @@ public class ServerConnection {
 						}
 					}
 				}
+
+				System.out.println("Client " + c.getID() + " disconnected.");
 			}
 		});
 
@@ -387,9 +396,12 @@ public class ServerConnection {
 	 * Method for sending list of available lobbies to clients.
 	 */
 	public void sendAvailableLobbies(Integer playerId) {
+		System.out.println(availableLobbies);
+		System.out.println(playerId);
 		for (Lobby lobby : availableLobbies.values()) {
 			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash());
 			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers()));
+			System.out.println("sent lobby");
 			server.sendToTCP(playerId, packetLobbyInfo);
 		}
 	}
@@ -453,6 +465,32 @@ public class ServerConnection {
 	public void sendHitEnemy(String lobbyHash, PacketBullet packetBullet) {
 		for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
 			server.sendToTCP(id, packetBullet);
+		}
+	}
+
+	/**
+	 * Check whether lobby is empty.
+	 * If is then remove lobby.
+	 */
+	public void checkIfLobbyEmpty() {
+
+		for (Lobby lobby : availableLobbies.values()) {
+			boolean isEmpty = true;
+
+			for (Integer playerId : lobby.getPlayers()) {
+                if (connectedPlayers.contains(playerId)) {
+                    isEmpty = false;
+                    break;
+                }
+			}
+
+			if (lobby.getPlayers().isEmpty()) {
+				isEmpty = false;
+			}
+
+			if (isEmpty) {
+				sendRemoveLobby(lobby.getLobbyHash());
+			}
 		}
 	}
 

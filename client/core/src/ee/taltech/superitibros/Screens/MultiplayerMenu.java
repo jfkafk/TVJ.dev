@@ -73,8 +73,8 @@ public class MultiplayerMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 JoinLobby joinLobby = new JoinLobby(gameClient);
+                gameClient.getClientConnection().sendGetAvailableLobbies();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(joinLobby);
-
             }
         });
 

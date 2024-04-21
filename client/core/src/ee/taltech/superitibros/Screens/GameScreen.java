@@ -146,7 +146,7 @@ public class GameScreen implements Screen, InputProcessor {
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
 
-        if (clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
+        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
             clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
@@ -241,9 +241,7 @@ public class GameScreen implements Screen, InputProcessor {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
             character.draw(batch, clientWorld.getHealthBarTexture());
-            if (character != clientWorld.getMyPlayerGameCharacter()) {
-                // System.out.println(character.b2body.getLinearVelocity().x);
-            }
+            // System.out.println(character.b2body.getLinearVelocity().x);
         }
     }
 
@@ -364,7 +362,7 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (canShoot) {
             // Convert screen coordinates to world coordinates
-            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
+            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY, 0));
 
             // Player coordinates
             float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter().getBoundingBox().width;

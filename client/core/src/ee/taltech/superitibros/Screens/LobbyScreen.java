@@ -82,7 +82,9 @@ public class LobbyScreen implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
+                if (gameClient.getMyLobby() != null) {
+                    gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
+                }
                 refreshScreen();
             }
         });
@@ -90,10 +92,10 @@ public class LobbyScreen implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 gameClient.getMyLobby().getPlayers().remove(gameClient.getConnectionId());
                 gameClient.getClientConnection().sendRemovePlayerFromLobby(gameClient.getMyLobby().getLobbyHash());
-                ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
+                gameClient.setMyLobby(null);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(gameClient.getMultiplayerMenu());
             }
         });
 

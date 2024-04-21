@@ -144,29 +144,34 @@ public class ClientConnection {
 						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
 						Optional<Lobby> lobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
 
-						// Start game if startGame true
-						if (packetLobbyInfo.isStartGame()) {
-							gameClient.readyToStart(packetLobbyInfo.getMapPath());
+						if (lobby.isPresent()) {
+							if (packetLobbyInfo.isStartGame()) {
+								gameClient.readyToStart(packetLobbyInfo.getMapPath());
 
-						} else if (packetLobbyInfo.isToDelete()) {
-							gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
-							gameClient.hostLeft();
+							} else if (packetLobbyInfo.isToDelete()) {
+								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
+								gameClient.hostLeft();
 
-						} else if (packetLobbyInfo.isUpdateInfo()) {
-							lobby.get().setPlayers(packetLobbyInfo.getPlayers());
-							gameClient.refreshLobbyScreen();
-							gameClient.refreshHostLobbyScreen();
+							} else if (packetLobbyInfo.isUpdateInfo()) {
+								lobby.get().setPlayers(packetLobbyInfo.getPlayers());
+								gameClient.refreshLobbyScreen();
+								gameClient.refreshHostLobbyScreen();
 
-						} else if (packetLobbyInfo.getPlayerToAdd() != null) {
-							lobby.get().addPLayer(packetLobbyInfo.getPlayerToAdd());
-							gameClient.refreshLobbyScreen();
-							gameClient.refreshHostLobbyScreen();
+							} else if (packetLobbyInfo.getPlayerToAdd() != null) {
+								lobby.get().addPLayer(packetLobbyInfo.getPlayerToAdd());
+								gameClient.refreshLobbyScreen();
+								gameClient.refreshHostLobbyScreen();
 
-						} else if (packetLobbyInfo.getPlayerToRemove() != null) {
-							lobby.get().removePlayer(packetLobbyInfo.getPlayerToRemove());
-							gameClient.refreshLobbyScreen();
-							gameClient.refreshHostLobbyScreen();
-						}
+							} else if (packetLobbyInfo.getPlayerToRemove() != null) {
+								lobby.get().removePlayer(packetLobbyInfo.getPlayerToRemove());
+								gameClient.refreshLobbyScreen();
+								gameClient.refreshHostLobbyScreen();
+							}
+						} else {
+							Lobby newLobby = new Lobby(packetLobbyInfo.getLobbyHash());
+							newLobby.setPlayers(packetLobbyInfo.getPlayers());
+							gameClient.addAvailableLobby(newLobby);
+							}
 
 					} else if (object instanceof PacketSendNewLobby) {
 						PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;

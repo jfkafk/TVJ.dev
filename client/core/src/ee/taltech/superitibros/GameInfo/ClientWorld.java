@@ -259,8 +259,10 @@ public class ClientWorld {
      */
     public void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy) {
         // Remove the bullet from the world
-        collidedBullets.add(bullet.getBulletId());
-        bulletsToRemove.add(bullet);
+        if (bullet != null) {
+            collidedBullets.add(bullet.getBulletId());
+            bulletsToRemove.add(bullet);
+        }
 
         // Update enemy health
         enemy.updateHealth(-20);
