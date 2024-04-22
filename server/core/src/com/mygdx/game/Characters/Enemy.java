@@ -19,6 +19,10 @@ public class Enemy extends GameCharacter {
     private State currentState = State.IDLE;
     private long lastUpdateTime;
 
+    // Health
+    private float maxHealth;
+    private float health;
+
     /**
      * GameCharacter constructor.
      *
@@ -34,6 +38,8 @@ public class Enemy extends GameCharacter {
         botHash = "Bot" + nextBotHashNumber;
         lastUpdateTime = System.currentTimeMillis();
         nextBotHashNumber++; // Incrementing here
+        maxHealth = 100f;
+        health = maxHealth;
     }
 
     /**
@@ -54,6 +60,32 @@ public class Enemy extends GameCharacter {
      */
     public String getBotHash() {
         return botHash;
+    }
+
+    /**
+     * Update enemy health.
+     * @param amount health.
+     */
+    public void updateHealth(float amount) {
+        health += amount;
+
+        // Ensure health doesn't exceed maximum
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+
+        // Ensure health doesn't go below 0
+        if (health < 0) {
+            health = 0;
+        }
+    }
+
+    /**
+     * Get enemy health.
+     * @return health.
+     */
+    public float getHealth() {
+        return health;
     }
 
     /**

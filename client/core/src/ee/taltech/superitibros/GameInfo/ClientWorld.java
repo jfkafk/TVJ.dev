@@ -28,6 +28,7 @@ public class ClientWorld {
     private final String path;
     MapLayer mapLayer;
     private ClientConnection clientConnection;
+    private int myPlayerId;
     private MyPlayerGameCharacter myPlayerGameCharacter;
     private final HashMap<Integer, GameCharacter> worldGameCharactersMap = new HashMap<>();
     private final Map<String, Enemy> enemyMap = new HashMap<>();
@@ -38,6 +39,7 @@ public class ClientWorld {
     private final List<Bullet> bulletsToRemove = new ArrayList<>();
     private final List<Integer> collidedBullets = new ArrayList<>();
     private final Sprite bulletSprite = new Sprite(new Texture("Bullet/bullet.png"));
+    private final Texture healthBarTexture = new Texture("HealthBar/white-texture.jpg");
 
     public ClientWorld(String path) {
         // Map and physics
@@ -235,23 +237,18 @@ public class ClientWorld {
      * Check bullet collisions with enemies.
      */
     public void checkBulletEnemyCollisions() {
-        Collection<Bullet> bulletList = bullets.values();
-        Collection<Enemy> enemiesList = enemyMap.values();
+        Collection<Bullet> bulletList = new ArrayList<>(bullets.values()); // Make a copy of the bullets collection
+        Collection<Enemy> enemiesList = new ArrayList<>(enemyMap.values()); // Make a copy of the enemies collection
 
-        List<Enemy> enemiesToRemove = new ArrayList<>(); // Create a list to store enemies to remove
-
-        for (Bullet bullet : bulletList) {
+        Iterator<Bullet> bulletIterator = bulletList.iterator();
+        while (bulletIterator.hasNext()) {
+            Bullet bullet = bulletIterator.next();
             for (Enemy enemy : enemiesList) {
                 if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
                     // Collision detected, handle accordingly
-                    handleBulletCollisionWithEnemy(bullet, enemy, enemiesToRemove); // Pass the list as an argument
+                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash(), bullet.getBulletId());
                 }
             }
-        }
-
-        // Remove the enemies from the enemyMap
-        for (Enemy enemyToRemove : enemiesToRemove) {
-            enemyMap.remove(enemyToRemove.getBotHash());
         }
     }
 
@@ -259,21 +256,60 @@ public class ClientWorld {
      * Handle bullet collision with enemy.
      * @param bullet object.
      * @param enemy object.
-     * @param enemiesToRemove list of enemies to remove.
      */
-    private void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy, List<Enemy> enemiesToRemove) {
+    public void handleBulletCollisionWithEnemy(Bullet bullet, Enemy enemy) {
         // Remove the bullet from the world
-        bulletsToRemove.add(bullet);
-        collidedBullets.add(bullet.getBulletId());
+        if (bullet != null) {
+            collidedBullets.add(bullet.getBulletId());
+            bulletsToRemove.add(bullet);
+        }
 
-        // Send packet to server that informs that enemy is dead
-        clientConnection.sendKilledEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+        // Update enemy health
+        enemy.updateHealth(-20);
 
-        // Add the enemy to the list of enemies to remove
-        enemiesToRemove.add(enemy);
+        if (enemy.getHealth() <= 0) {
 
-        // Remove enemies b2body
-        enemy.removeBodyFromWorld();
+            // Remove enemy
+            enemyMap.remove(enemy.getBotHash());
+
+            // Remove enemies b2body
+            enemy.removeBodyFromWorld();
+        }
+
+        // System.out.println("Enemy health: " + enemy.getHealth());
+
+    }
+
+    public void checkPlayerEnemyCollisions() {
+        MyPlayerGameCharacter playerCharacter = myPlayerGameCharacter;
+        for (Enemy enemy : enemyMap.values()) {
+            if (playerCharacter.getBoundingBox().overlaps(enemy.getBoundingBox())) {
+                // Collision detected between player character and enemy
+                handlePlayerEnemyCollision(playerCharacter);
+            }
+        }
+    }
+
+    // Method to handle collision between player character and enemy
+    private void handlePlayerEnemyCollision(MyPlayerGameCharacter playerCharacter) {
+        // Example action: Reduce player's health points
+        playerCharacter.updateHealth(-1);
+        sendMyPlayerCharacterInfo();
+    }
+
+    /**
+     * Method for sending my player character info.
+     */
+    public void sendMyPlayerCharacterInfo() {
+
+        // Arguments
+        float xPosition = getMyPlayerGameCharacter().b2body.getPosition().x;
+        float yPosition = getMyPlayerGameCharacter().b2body.getPosition().y;
+        GameCharacter.State  state = getMyPlayerGameCharacter().getState();
+        boolean isFacingRight = getMyPlayerGameCharacter().getFacingRight();
+        float health = getMyPlayerGameCharacter().getHealth();
+
+        clientConnection.sendPlayerInformation(xPosition, yPosition, state, isFacingRight, health);
     }
 
     /**
@@ -380,9 +416,18 @@ public class ClientWorld {
     public void addGameCharacter(Integer id, GameCharacter newCharacter) {
         if (newCharacter instanceof MyPlayerGameCharacter) {
             setMyPlayerGameCharacter((MyPlayerGameCharacter) newCharacter);
+            myPlayerId = id;
         }
-        System.out.println("characters: " + worldGameCharactersMap.keySet());
+        // System.out.println("characters: " + worldGameCharactersMap.keySet());
         worldGameCharactersMap.put(id, newCharacter);
+    }
+
+    /**
+     * Get my player id.
+     * @return my player id.
+     */
+    public int getMyPlayerId() {
+        return myPlayerId;
     }
 
     /**
@@ -392,7 +437,7 @@ public class ClientWorld {
      * @param id of the moving character - id is key in worldGameCharactersMap.
      */
     public void movePlayerGameCharacter(Integer id, float xPos, float yPos) {
-        System.out.println("moving player to x: " + xPos + " y: " + yPos);
+        // System.out.println("moving player to x: " + xPos + " y: " + yPos);
         getGameCharacter(id).moveToNewPos(xPos, yPos);
         getGameCharacter(id).updatePosition();
     }
@@ -428,8 +473,10 @@ public class ClientWorld {
      * @param botHash bot's hash.
      */
     public void removeEnemy(String botHash) {
-        getEnemy(botHash).removeBodyFromWorld();
-        enemyMap.remove(botHash);
+        if (getEnemy(botHash) != null) {
+            getEnemy(botHash).removeBodyFromWorld();
+            enemyMap.remove(botHash);
+        }
     }
 
     /**
@@ -439,5 +486,21 @@ public class ClientWorld {
      */
     public Enemy getEnemy(String botHash) {
         return enemyMap.get(botHash);
+    }
+
+    /**
+     * Get health bar texture.
+     * @return texture.
+     */
+    public Texture getHealthBarTexture() {
+        return healthBarTexture;
+    }
+
+    /**
+     * Remove client from world.
+     * @param id client id.
+     */
+    public void removeClient(int id) {
+        worldGameCharactersMap.remove(id);
     }
 }

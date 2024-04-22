@@ -10,6 +10,7 @@ public class PacketUpdateEnemy extends Packet {
     private float xPosition;
     private float yPosition;
     private boolean isDead;
+    private float health;
 
     public void setBotHash(String botHash) {
         this.botHash = botHash;
@@ -49,5 +50,13 @@ public class PacketUpdateEnemy extends Packet {
 
     public void setDead(boolean dead) {
         isDead = dead;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
     }
 }

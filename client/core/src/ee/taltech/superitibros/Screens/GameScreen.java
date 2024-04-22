@@ -1,6 +1,8 @@
 package ee.taltech.superitibros.Screens;
 
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -8,11 +10,7 @@ import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -55,6 +53,8 @@ public class GameScreen implements Screen, InputProcessor {
     private boolean canShoot = true;
     private float shootCooldown = 1f;
 
+    ShapeRenderer shapeRenderer;
+
     /**
      * GameScreen constructor
      *
@@ -89,6 +89,8 @@ public class GameScreen implements Screen, InputProcessor {
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     /**
@@ -128,9 +130,6 @@ public class GameScreen implements Screen, InputProcessor {
         // Render game objects
         batch.begin();
         updatePlayersPositions();
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
-            //System.out.println("My player Y: " + clientWorld.getMyPlayerGameCharacter().yPosition);
-        }
         drawPlayerGameCharacters();
         clientWorld.moveEnemies();
         drawEnemies();
@@ -141,8 +140,18 @@ public class GameScreen implements Screen, InputProcessor {
         clientWorld.checkBulletCollisions();
         clientWorld.checkBulletEnemyCollisions();
 
+        // Check enemy and player collision
+        clientWorld.checkPlayerEnemyCollisions();
+
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
+
+        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+        }
     }
 
     /**
@@ -195,13 +204,12 @@ public class GameScreen implements Screen, InputProcessor {
 
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
-
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().b2body.getPosition().x, clientWorld.getMyPlayerGameCharacter().b2body.getPosition().y, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientWorld.sendMyPlayerCharacterInfo();
                 lastPacketCount = 0;
 
             } else if (lastPacketCount < 3) {
                 // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().b2body.getPosition().x, clientWorld.getMyPlayerGameCharacter().b2body.getPosition().y, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientWorld.sendMyPlayerCharacterInfo();
                 lastPacketCount++;
             }
 
@@ -232,10 +240,8 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawPlayerGameCharacters() {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
-            character.draw(batch);
-            if (character != clientWorld.getMyPlayerGameCharacter()) {
-                // System.out.println(character.b2body.getLinearVelocity().x);
-            }
+            character.draw(batch, clientWorld.getHealthBarTexture());
+            // System.out.println(character.b2body.getLinearVelocity().x);
         }
     }
 
@@ -243,10 +249,13 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for updating player's position
      */
     public void updatePlayersPositions() {
-        List<GameCharacter> players = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
-        for (GameCharacter player : players) {
-            if (player != clientWorld.getMyPlayerGameCharacter()) {
-                player.updatePosition();
+        Map<Integer, GameCharacter> gameCharactersMap = clientWorld.getWorldGameCharactersMap();
+        if (!gameCharactersMap.isEmpty()) {
+            List<GameCharacter> players = new ArrayList<>(gameCharactersMap.values());
+            for (GameCharacter player : players) {
+                if (player != clientWorld.getMyPlayerGameCharacter()) {
+                    player.updatePosition();
+                }
             }
         }
     }
@@ -259,7 +268,10 @@ public class GameScreen implements Screen, InputProcessor {
         if (enemyMap != null && !enemyMap.isEmpty()) {
             for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
-                    enemy.draw(batch);
+                    enemy.draw(batch, clientWorld.getHealthBarTexture());
+                    if (enemy.b2body.getLinearVelocity().y != 0) {
+                        clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+                    }
                 }
             }
         }
@@ -350,7 +362,7 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (canShoot) {
             // Convert screen coordinates to world coordinates
-            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
+            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY, 0));
 
             // Player coordinates
             float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter().getBoundingBox().width;

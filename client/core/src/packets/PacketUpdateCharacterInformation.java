@@ -3,23 +3,20 @@ package packets;
 import ee.taltech.superitibros.Characters.GameCharacter;
 
 /**
- * Packet superclass.
+ * Packet for updating player info.
  */
 public class PacketUpdateCharacterInformation extends Packet {
 
     private int id;
-
     private float x;
-
     private float y;
-
     private enum State {IDLE, WALKING, JUMPING, FALL}
-
     private GameCharacter.State currentState;
-
     private boolean facingRight;
-
     String lobbyHash;
+    float health;
+    boolean isDead;
+
 
     public void setId(int id) {
         this.id = id;
@@ -61,5 +58,21 @@ public class PacketUpdateCharacterInformation extends Packet {
 
     public String getLobbyHash() {
         return lobbyHash;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setDead(boolean dead) {
+        isDead = dead;
+    }
+
+    public boolean isDead() {
+        return isDead;
     }
 }
