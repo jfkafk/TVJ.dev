@@ -22,10 +22,6 @@ public class Enemy extends GameCharacter {
 
     private State currentState;
 
-    // Health
-    private float maxHealth;
-    private float health;
-
     /**
      * GameCharacter constructor.
      *
