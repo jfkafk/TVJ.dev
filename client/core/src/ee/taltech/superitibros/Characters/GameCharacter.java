@@ -10,8 +10,8 @@ import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
-    Sound jump = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/jump.mp3"));
-    Sound dead = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/dead.mp3"));
+    Sound jump = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/jump.mp3"));
+    Sound dead = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/dead.mp3"));
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String temporarySkin = "Skeleton";
