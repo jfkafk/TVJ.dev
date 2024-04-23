@@ -53,7 +53,8 @@ public class GameScreen implements Screen, InputProcessor {
     private boolean canShoot = true;
     private float shootCooldown = 1f;
 
-    ShapeRenderer shapeRenderer;
+    // Shooting sound.
+    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/shot.MP3"));
 
     /**
      * GameScreen constructor
@@ -369,6 +370,7 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
+            shot.play(1f);
             clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer
