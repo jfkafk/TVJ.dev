@@ -156,9 +156,6 @@ public class HostLobby implements Screen {
             }
         });
 
-        int buttonLocationPadding = 20;
-        int buttonImageSize = 300;
-
 
         //Add listeners to buttons
 
@@ -197,14 +194,6 @@ public class HostLobby implements Screen {
             }
         });
 
-        backButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                MenuScreen menuScreen = new MenuScreen(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
-            }
-        });
-
         if (gameClient.getMapPath() != null) {
             startGameButton.addListener(new ClickListener() {
                 @Override
@@ -225,6 +214,7 @@ public class HostLobby implements Screen {
             }
         });
 
+        int buttonLocationPadding = 5;
 
         // Display players
         if (gameClient.getMyLobby() != null) {
@@ -237,19 +227,25 @@ public class HostLobby implements Screen {
             }
         }
 
-        mapTable.add(refreshButton);
-        mapTable.add(mapLabel);
-        mapTable.row();
-        mapTable.add(moonButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.row();
-        mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-
-        parentTable.add(backButton).size(40, 40).padRight(1500);
-        parentTable.row();
-        parentTable.add(mapTable).padTop(200).padRight(800);
-        stage.addActor(parentTable);
+        mainTable.add(gameLabel).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(menuLabel).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(superMButton).pad(buttonLocationPadding).size(100, 100);
+        mainTable.add(desertButton).pad(buttonLocationPadding).size(100, 100);;
+        mainTable.row();
+        mainTable.add(castleButton).pad(buttonLocationPadding).size(100, 100);;
+        mainTable.add(moonButton).pad(buttonLocationPadding).size(100, 100);;
+        mainTable.row();
+        mainTable.add(startGameButton).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(refreshButton).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(back).pad(buttonLocationPadding);
+        //Add table to stage
+        stage.addActor(mainTable);
     }
 
     public void refreshPlayers() {
@@ -266,7 +262,6 @@ public class HostLobby implements Screen {
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);
         batch.end();
-
         stage.act();
         stage.draw();
     }
