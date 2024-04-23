@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.GameInfo.GameClient;
+import org.w3c.dom.Text;
 
 
 public class SinglePlayerMenu implements Screen {
@@ -134,6 +135,7 @@ public class SinglePlayerMenu implements Screen {
 
         // Create Table for maps.
         Table mapTable = new Table();
+        Label mapLabel = new Label("Choose Map!", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
         //Set alignment of contents in the table.
 
         // Buttons Table.
@@ -193,14 +195,17 @@ public class SinglePlayerMenu implements Screen {
         });
         int buttonLocationPadding = 20;
         int buttonImageSize = 300;
+        mapTable.add(mapLabel);
+        mapTable.row();
         mapTable.add(moonButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
         mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
+        mapTable.row();
         mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
         mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
 
-        parentTable.add(backButton).size(35, 35).padBottom(300).padRight(1500);
+        parentTable.add(backButton).size(40, 40).padRight(1500);
         parentTable.row();
-        parentTable.add(mapTable).padTop(310);
+        parentTable.add(mapTable).padTop(200).padRight(800);
         stage.addActor(parentTable);
     }
     /**
