@@ -43,10 +43,10 @@ public class CreateCharacterFrames {
 //            jumpAnimationPath = "Characters/TestCharacter.png";
 //            fallAnimationPath = "Characters/TestCharacter.png";
 //        }
-        walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
-        idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
-        jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
-        fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
+            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
+            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
+            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
+            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
     }
 
     private void createFrames(String animationPath) {

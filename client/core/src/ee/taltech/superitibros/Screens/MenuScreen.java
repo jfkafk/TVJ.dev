@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -33,7 +34,7 @@ public class MenuScreen implements Screen {
     GameClient gameClient;
 
     // Menu background music.
-    Sound sound = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/backgroundMusic.mp3"));
+    Sound sound = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/backgroundMusic.mp3"));
 
     // Background picture.
     private Sprite background;
@@ -46,7 +47,7 @@ public class MenuScreen implements Screen {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
-        background = new Sprite(new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/forest2.png")));
+        background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();

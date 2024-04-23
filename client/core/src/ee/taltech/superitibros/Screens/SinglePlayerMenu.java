@@ -82,37 +82,37 @@ public class SinglePlayerMenu implements Screen {
         gameClient.getClientConnection().sendCreateNewLobby();
 
         // Background.
-        background = new Sprite(new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/forest2.png")));
+        background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
 
         // Map representation pictures.
 
         // Desert.
-        desertTexture = new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/desert.png"));
+        desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
         desertRegion = new TextureRegion(desertTexture);
         desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
         desertButton.setSize(100, 100);
 
         // Moon.
-        moonTexture = new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/moon.png"));
+        moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
         moonRegion = new TextureRegion(moonTexture);
         moonDrawable = new TextureRegionDrawable(moonRegion);
         moonButton = new ImageButton(moonDrawable);
 
         // Castle.
-        castleTexture = new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/castle.png"));
+        castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
         castleRegion = new TextureRegion(castleTexture);
         castleDrawable = new TextureRegionDrawable(castleRegion);
         castleButton = new ImageButton(castleDrawable);
 
         // SuperMario Map.
-        superMTexture = new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/superM.png"));
+        superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
         superMRegion = new TextureRegion(superMTexture);
         superMDrawable = new TextureRegionDrawable(superMRegion);
         superMButton = new ImageButton(superMDrawable);
 
         // Back Button.
-        backTexture = new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/back.jpeg"));
+        backTexture = new Texture(Gdx.files.internal("Images/back.jpeg"));
         backRegion = new TextureRegion(backTexture);
         backDrawable = new TextureRegionDrawable(backRegion);
         backButton = new ImageButton(backDrawable);

@@ -44,7 +44,7 @@ public class HostLobby implements Screen {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
-        background = new Sprite(new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/forest2.png")));
+        background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();

@@ -57,7 +57,7 @@ public class GameScreen implements Screen, InputProcessor {
     private float shootCooldown = 1f;
 
     // Shooting sound.
-    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/shot.MP3"));
+    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/shot.MP3"));
 
     /**
      * GameScreen constructor
