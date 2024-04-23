@@ -46,10 +46,10 @@ public class CreateCharacterFrames {
 //            fallAnimationPath = "Characters/TestCharacter.png";
 //        }
         if (character instanceof Enemy) {
-            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
-            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
-            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
-            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
+            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
+            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
+            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
+            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
             playerSize = 54;
 
 
@@ -69,10 +69,10 @@ public class CreateCharacterFrames {
 //            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
 //            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
 //            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
-            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
-            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
-            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
-            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
+            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
+            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
+            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
+            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
             playerSize = 64;
         }
     }
