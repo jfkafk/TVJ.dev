@@ -21,15 +21,13 @@ public class ServerConnection {
 
 	static Server server;
 	static final int tcpPort = 8089;
-
 	private ServerUpdateThread serverUpdateThread;
-
 	private float playerGameCharacterX = 280f;
-	private float playerGameCharacterY = 250f;
-
+	private final float playerGameCharacterY = 250f;
 	Map<String, Lobby> availableLobbies = new LinkedHashMap<>();
-
 	Map<String, Lobby> onGoingLobbies = new LinkedHashMap<>();
+	List<Integer> connectedPlayers = new ArrayList<>();
+
 
 	/**
 	 * Server connection.
@@ -74,6 +72,9 @@ public class ServerConnection {
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
 
+					// Add connection to list
+					connectedPlayers.add(connection.getID());
+
 					PacketConnect packetConnect = (PacketConnect) object;
 
 					// Get lobby's server world
@@ -87,7 +88,7 @@ public class ServerConnection {
 					addCharacterToClientsGame(connection, newPlayerGameCharacter, packetConnect.getLobbyHash());
 
 					// Send connected player position to other players
-					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY, GameCharacter.State.IDLE, true, packetConnect.getLobbyHash());
+					sendUpdatedGameCharacter(connection.getID(), playerGameCharacterX, playerGameCharacterY, GameCharacter.State.IDLE, true, packetConnect.getLobbyHash(), 100);
 
 					// Send other players positions to joined player in lobby
 					for (Map.Entry<Integer, PlayerGameCharacter> entry : serverWorld.getClients().entrySet()) {
@@ -112,20 +113,28 @@ public class ServerConnection {
 					// Packet for updating player position
 					PacketUpdateCharacterInformation packet = (PacketUpdateCharacterInformation) object;
 
-					// Update PlayerGameCharacter's coordinates in lobby.
-					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
-					onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).yPosition = packet.getY();
+					if (packet.isDead()) {
+						// If player has died, then remove him from server world
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().removeClient(packet.getId());
+						// Send packet that informs other clients in lobby that player is dead
+						sendDeadPlayer(packet.getLobbyHash(), packet.getId());
+					} else {
+						// Update PlayerGameCharacter's coordinates in lobby.
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).xPosition = packet.getX();
+						onGoingLobbies.get(packet.getLobbyHash()).getServerWorld().getClients().get(connection.getID()).yPosition = packet.getY();
 
-					// Send players new coordinates and direction to all players in lobby
-					sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash());
+						// Send players new coordinates and direction to all players in lobby
+						sendUpdatedGameCharacter(connection.getID(), packet.getX(), packet.getY(), packet.getCurrentState(), packet.getFacingRight(), packet.getLobbyHash(), packet.getHealth());
+					}
 
 				} else if (object instanceof PacketUpdateEnemy) {
 					// Packet for updating enemy position
 					PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
+                    World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
 
-					if (packetUpdateEnemy.isDead()) {
-						World world = onGoingLobbies.get(packetUpdateEnemy.getLobbyHash()).getServerWorld();
-						world.removeEnemy(packetUpdateEnemy.getBotHash());
+					if (world.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
+						Enemy enemy = world.getEnemyMap().get(packetUpdateEnemy.getBotHash());
+						enemy.setyPosition(packetUpdateEnemy.getyPosition());
 					}
 
 				} else if (object instanceof PacketSendNewLobby) {
@@ -136,6 +145,8 @@ public class ServerConnection {
 					lobby.addPlayer(connection.getID());
 
 					availableLobbies.put(lobby.getLobbyHash(), lobby);
+					System.out.println("got new lobby");
+					System.out.println(availableLobbies);
 
 					packetSendNewLobby.setLobbyHash(lobby.getLobbyHash());
 					packetSendNewLobby.setCreatorId(connection.getID());
@@ -208,15 +219,20 @@ public class ServerConnection {
 					PacketBullet packetBullet = (PacketBullet) object;
 
 					// Check if arrived packet that informs that enemy wask killed
-					if (packetBullet.isKilled()) {
+					if (packetBullet.isHit()) {
 						World world = onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld();
 
 						// Check if enemy is in server world
-						if (world.getEnemyMap().containsKey(packetBullet.getKilledBot())) {
-							// Remove enemy from world
-							world.removeEnemy(packetBullet.getKilledBot());
-							// Inform other clients that enemy
-							sendKilledEnemy(packetBullet.getLobbyHash(), packetBullet);
+						if (world.getEnemyMap().containsKey(packetBullet.getHitEnemy())) {
+							Enemy enemy = world.getEnemyMap().get(packetBullet.getHitEnemy());
+							// Decrease health
+							enemy.updateHealth(-20);
+							// Check if dead
+							if (enemy.getHealth() <= 0) {
+								world.removeEnemy(enemy.getBotHash());
+							}
+							// Inform other clients that enemy is hit
+							sendHitEnemy(packetBullet.getLobbyHash(), packetBullet);
 						}
 
 					} else {
@@ -230,6 +246,12 @@ public class ServerConnection {
 
 			// Client disconnects from the Server.
 			public void disconnected (Connection c) {
+				// Remove connection from list
+				connectedPlayers.remove(Integer.valueOf(c.getID()));
+
+				// Check if any lobby is empty
+				checkIfLobbyEmpty();
+
 				PacketClientDisconnect packetClientDisconnect = PacketCreator.createPacketClientDisconnect(c.getID());
 				// Player's lobby if he was in game
 				Lobby playerLobby = null;
@@ -239,8 +261,6 @@ public class ServerConnection {
 						playerLobby = lobby;
 					}
 				}
-
-				System.out.println("Client " + c.getID() + " disconnected.");
 
 				// Remove client from the game.
 				if (playerLobby != null) {
@@ -252,6 +272,8 @@ public class ServerConnection {
 						}
 					}
 				}
+
+				System.out.println("Client " + c.getID() + " disconnected.");
 			}
 		});
 
@@ -293,16 +315,36 @@ public class ServerConnection {
 	 * @param xPos new x coordinate of the PlayerGameCharacter (float)
 	 * @param yPos new y coordinate of the PlayerGameCharacter (float)
 	 */
-	public void sendUpdatedGameCharacter(int id, float xPos, float yPos, GameCharacter.State state, boolean isFacingRight, String lobbyHash) {
+	public void sendUpdatedGameCharacter(int id, float xPos, float yPos, GameCharacter.State state, boolean isFacingRight, String lobbyHash, float health) {
 		// Create packet
 		PacketUpdateCharacterInformation packet = PacketCreator.createPacketUpdateCharacterInformation(id, xPos, yPos);
 		// Set player's state and if he's facing right
 		packet.setCurrentState(state);
 		packet.setFacingRight(isFacingRight);
+		// Set health
+		packet.setHealth(health);
 		// Send packet to players in given lobby
 		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
 			if (playerId != id) {
 				server.sendToTCP(playerId, packet);
+			}
+		}
+	}
+
+	/**
+	 * Send packet to clients in lobby informing that player has died.
+	 * @param lobbyHash lobby hash.
+	 * @param id died player id.
+	 */
+	public void sendDeadPlayer(String lobbyHash, int id) {
+		PacketUpdateCharacterInformation packetUpdateCharacterInformation = new PacketUpdateCharacterInformation();
+		packetUpdateCharacterInformation.setDead(true);
+		packetUpdateCharacterInformation.setId(id);
+		packetUpdateCharacterInformation.setLobbyHash(lobbyHash);
+		// Send packet to players in given lobby
+		for (Integer playerId : onGoingLobbies.get(lobbyHash).getServerWorld().getClientsIds()) {
+			if (playerId != id) {
+				server.sendToTCP(playerId, packetUpdateCharacterInformation);
 			}
 		}
 	}
@@ -332,7 +374,17 @@ public class ServerConnection {
 		// Enemy instance id (key) and new coordinates (value) are sent.
 		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
 			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
+			packetUpdateEnemy.setCurrentState(entry.getValue().getCurrentState());
+			packetUpdateEnemy.setFacingRight(entry.getValue().isFacingRight());
+			// Arguments
+			String botHash = entry.getKey();
+			float xPosition = entry.getValue().getxPosition();
+			float yPosition = entry.getValue().getyPosition();
+			float health = entry.getValue().getHealth();
+			// Set health
+			packetUpdateEnemy.setHealth(health);
 			// Send enemy info to all players in lobby
+
 			for (Integer playerId : lobby.getServerWorld().getClientsIds()) {
 				server.sendToTCP(playerId, packetUpdateEnemy);
 			}
@@ -343,9 +395,12 @@ public class ServerConnection {
 	 * Method for sending list of available lobbies to clients.
 	 */
 	public void sendAvailableLobbies(Integer playerId) {
+		System.out.println(availableLobbies);
+		System.out.println(playerId);
 		for (Lobby lobby : availableLobbies.values()) {
 			PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobby.getLobbyHash());
 			packetLobbyInfo.setPlayers(new HashSet<>(lobby.getPlayers()));
+			System.out.println("sent lobby");
 			server.sendToTCP(playerId, packetLobbyInfo);
 		}
 	}
@@ -406,9 +461,35 @@ public class ServerConnection {
 	 * @param lobbyHash lobby's hash.
 	 * @param packetBullet bullet packet.
 	 */
-	public void sendKilledEnemy(String lobbyHash, PacketBullet packetBullet) {
+	public void sendHitEnemy(String lobbyHash, PacketBullet packetBullet) {
 		for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
 			server.sendToTCP(id, packetBullet);
+		}
+	}
+
+	/**
+	 * Check whether lobby is empty.
+	 * If is then remove lobby.
+	 */
+	public void checkIfLobbyEmpty() {
+
+		for (Lobby lobby : availableLobbies.values()) {
+			boolean isEmpty = true;
+
+			for (Integer playerId : lobby.getPlayers()) {
+                if (connectedPlayers.contains(playerId)) {
+                    isEmpty = false;
+                    break;
+                }
+			}
+
+			if (lobby.getPlayers().isEmpty()) {
+				isEmpty = false;
+			}
+
+			if (isEmpty) {
+				sendRemoveLobby(lobby.getLobbyHash());
+			}
 		}
 	}
 

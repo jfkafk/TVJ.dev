@@ -11,21 +11,17 @@ public class PlayerGameCharacter extends GameCharacter{
 
     public float width;
     public float height;
-    private final float movementSpeed;
-    // Player sprite
-    private TextureRegion characterTexture;
     // Box2D
     public ClientWorld world;
     private int playerGameCharacterId;
     public GameCharacter.State state = GameCharacter.State.IDLE;
-
     private boolean facingRight = true;
+    float health;
 
 
     public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
                                float yPosition, float width, float height, ClientWorld world) {
         super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
-        this.movementSpeed = movementSpeed;
         this.boundingBox = boundingBox;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -33,6 +29,7 @@ public class PlayerGameCharacter extends GameCharacter{
         this.height = height;
         this.world = world;
         defineCharacter();
+        this.health = 100;
     }
 
     public void setPlayerGameCharacterId(int playerGameCharacterId) {
@@ -44,7 +41,7 @@ public class PlayerGameCharacter extends GameCharacter{
     }
 
     public void setCharacterTexture(TextureRegion texture) {
-        this.characterTexture = texture;
+        // Player sprite
     }
 
     public void setCurrentState(GameCharacter.State currentState) {
