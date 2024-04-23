@@ -14,6 +14,8 @@ public class PacketUpdateEnemy extends Packet {
     private GameCharacter.State currentState;
     private boolean facingRight;
 
+    private float health;
+
     public void setBotHash(String botHash) {
         this.botHash = botHash;
     }

@@ -80,6 +80,14 @@ public class GameCharacter {
         this.boundingBox.set(boundingBox.getX() + xPos, boundingBox.getY() + yPos, boundingBox.getWidth(), boundingBox.getHeight());
     }
 
+    /**
+     * Set y coordinate.
+     * @param yPosition y coordinate.
+     */
+    public void setyPosition(float yPosition) {
+        this.yPosition = yPosition;
+    }
+
     public boolean isFacingRight() {
         return facingRight;
     }

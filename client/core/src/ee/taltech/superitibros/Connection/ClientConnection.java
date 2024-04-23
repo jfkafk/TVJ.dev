@@ -126,6 +126,8 @@ public class ClientConnection {
 							enemy.xPosition = packetUpdateEnemy.getxPosition();
 							enemy.setCurrentState(packetUpdateEnemy.getCurrentState());
 							enemy.setFacingRight(packetUpdateEnemy.getFacingRight());
+							//System.out.println("Health from packet: " + packetUpdateEnemy.getHealth());
+							enemy.setHealth(packetUpdateEnemy.getHealth());
 
 							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());

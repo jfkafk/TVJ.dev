@@ -334,6 +334,13 @@ public class ServerConnection {
 			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
 			packetUpdateEnemy.setCurrentState(entry.getValue().getCurrentState());
 			packetUpdateEnemy.setFacingRight(entry.getValue().isFacingRight());
+			// Arguments
+			String botHash = entry.getKey();
+			float xPosition = entry.getValue().getxPosition();
+			float yPosition = entry.getValue().getyPosition();
+			float health = entry.getValue().getHealth();
+			// Set health
+			packetUpdateEnemy.setHealth(health);
 			// Send enemy info to all players in lobby
 			for (Integer playerId : lobby.getServerWorld().getClientsIds()) {
 				server.sendToTCP(playerId, packetUpdateEnemy);

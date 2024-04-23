@@ -16,6 +16,9 @@ public class Enemy extends GameCharacter {
     private static final float MOVEMENT_SPEED = 0.1f;
     private static final float DETECTION_RANGE = 100f;
     private long lastUpdateTime;
+    // Health
+    private float maxHealth;
+    private float health;
 
     private State currentState;
 
