@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -16,6 +17,7 @@ public class Enemy extends GameCharacter {
     public Body b2body;
     private boolean bodyDefined = false;
     private Integer playerSize = 50;
+    private final Sound dead = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/dead.mp3"));
 
     /**
      * GameCharacter constructor.
@@ -186,8 +188,10 @@ public class Enemy extends GameCharacter {
      */
     public void removeBodyFromWorld() {
         if (b2body != null) {
+            dead.play(1f);
             System.out.println("isnt null");
             clientWorld.getGdxWorld().destroyBody(b2body);
+
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
 

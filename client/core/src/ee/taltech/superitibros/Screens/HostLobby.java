@@ -22,12 +22,12 @@ import ee.taltech.superitibros.Lobbies.Lobby;
 import java.util.ArrayList;
 
 public class HostLobby implements Screen {
-    private SpriteBatch batch;
-    private BitmapFont font;
+    private final SpriteBatch batch;
+    private final BitmapFont font;
 
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
     private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
@@ -40,31 +40,31 @@ public class HostLobby implements Screen {
     private Texture desertTexture;
     private TextureRegion desertRegion;
     private TextureRegionDrawable desertDrawable;
-    private ImageButton desertButton;
+    private final ImageButton desertButton;
 
     // Moon
     private Texture moonTexture;
     private TextureRegion moonRegion;
     private TextureRegionDrawable moonDrawable;
-    private ImageButton moonButton;
+    private final ImageButton moonButton;
 
     // Castle
     private Texture castleTexture;
     private TextureRegion castleRegion;
     private TextureRegionDrawable castleDrawable;
-    private ImageButton castleButton;
+    private final ImageButton castleButton;
 
     // SuperMario Map.
     private Texture superMTexture;
     private TextureRegion superMRegion;
     private TextureRegionDrawable superMDrawable;
-    private ImageButton superMButton;
+    private final ImageButton superMButton;
 
     // Back Button.
     private Texture backTexture;
     private TextureRegion backRegion;
     private TextureRegionDrawable backDrawable;
-    private ImageButton backButton;
+    private final ImageButton backButton;
 
 
     public HostLobby(GameClient gameClient) {
@@ -89,7 +89,6 @@ public class HostLobby implements Screen {
         desertRegion = new TextureRegion(desertTexture);
         desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
-        desertButton.setSize(100, 100);
 
         // Moon.
         moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
