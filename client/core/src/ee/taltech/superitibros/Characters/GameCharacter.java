@@ -106,7 +106,8 @@ public class GameCharacter {
      * Making frames for character
      */
     public void createFrames() {
-        skinCreator.makeFrames();
+        skinCreator.makeFrames(this);
+        this.playerSize = skinCreator.getPlayerSize();
         walkAnimationRight = skinCreator.getWalkAnimationRight();
         walkAnimationLeft = skinCreator.getWalkAnimationLeft();
         idleAnimationRight = skinCreator.getIdleAnimationRight();
@@ -416,6 +417,5 @@ public class GameCharacter {
             clientWorld.getGdxWorld().destroyBody(b2body);
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
-
     }
 }
