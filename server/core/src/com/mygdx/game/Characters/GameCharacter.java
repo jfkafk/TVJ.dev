@@ -24,6 +24,10 @@ public class GameCharacter {
 
     private World world;
 
+    private State currentState;
+
+    private boolean facingRight = true;
+
     /**
      * GameCharacter constructor.
      *
@@ -74,6 +78,18 @@ public class GameCharacter {
      */
     public void moveToNewPos(float xPos, float yPos) {
         this.boundingBox.set(boundingBox.getX() + xPos, boundingBox.getY() + yPos, boundingBox.getWidth(), boundingBox.getHeight());
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     @Override

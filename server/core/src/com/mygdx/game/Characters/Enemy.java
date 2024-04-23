@@ -11,13 +11,13 @@ public class Enemy extends GameCharacter {
     static int nextBotHashNumber = 0;
 
     // Enemy (AI) states
-    enum State {IDLE, RUNNING_LEFT, RUNNING_RIGHT, ATTACKING}
+    enum State {IDLE, RUNNING_LEFT, RUNNING_RIGHT, JUMPING, FALL, WALKING, ATTACKING}
 
     private static final float MOVEMENT_SPEED = 0.1f;
     private static final float DETECTION_RANGE = 100f;
-
-    private State currentState = State.IDLE;
     private long lastUpdateTime;
+
+    private State currentState;
 
     /**
      * GameCharacter constructor.
@@ -88,18 +88,35 @@ public class Enemy extends GameCharacter {
     }
 
     /**
+     * Return if character is on the ground.
+     * @return true if on the ground, otherwise false.
+     */
+
+
+    /**
      * Act method for acting.
      */
     private void act() {
         switch (currentState) {
             case RUNNING_LEFT:
+                setFacingRight(false);
                 xPosition -= MOVEMENT_SPEED;
                 break;
             case RUNNING_RIGHT:
+                setFacingRight(true);
                 xPosition += MOVEMENT_SPEED;
                 break;
             case IDLE:
                 break;
+        }
+    }
+
+    @Override
+    public GameCharacter.State getCurrentState() {
+        if (currentState == State.RUNNING_LEFT || currentState == State.RUNNING_RIGHT) {
+            return GameCharacter.State.WALKING;
+        } else {
+            return GameCharacter.State.IDLE;
         }
     }
 }

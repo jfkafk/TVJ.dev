@@ -33,9 +33,9 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
-		// local  127.0.0.1
+		// local 127.0.0.1
 		int tcpPort = 8089;
 
 
@@ -122,7 +122,11 @@ public class ClientConnection {
 						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
-							clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).xPosition = packetUpdateEnemy.getxPosition();
+							Enemy enemy = clientWorld.getEnemy(packetUpdateEnemy.getBotHash());
+							enemy.xPosition = packetUpdateEnemy.getxPosition();
+							enemy.setCurrentState(packetUpdateEnemy.getCurrentState());
+							enemy.setFacingRight(packetUpdateEnemy.getFacingRight());
+
 							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
 							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
 						}

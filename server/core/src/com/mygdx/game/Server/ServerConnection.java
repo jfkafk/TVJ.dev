@@ -332,6 +332,8 @@ public class ServerConnection {
 		// Enemy instance id (key) and new coordinates (value) are sent.
 		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
 			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
+			packetUpdateEnemy.setCurrentState(entry.getValue().getCurrentState());
+			packetUpdateEnemy.setFacingRight(entry.getValue().isFacingRight());
 			// Send enemy info to all players in lobby
 			for (Integer playerId : lobby.getServerWorld().getClientsIds()) {
 				server.sendToTCP(playerId, packetUpdateEnemy);
