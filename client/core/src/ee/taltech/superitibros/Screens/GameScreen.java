@@ -1,5 +1,6 @@
 package ee.taltech.superitibros.Screens;
 
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
@@ -54,6 +55,9 @@ public class GameScreen implements Screen, InputProcessor {
     // Shooting cooldown
     private boolean canShoot = true;
     private float shootCooldown = 1f;
+
+    // Shooting sound.
+    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/shot.MP3"));
 
     /**
      * GameScreen constructor
@@ -357,6 +361,7 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
+            shot.play(1f);
             clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer

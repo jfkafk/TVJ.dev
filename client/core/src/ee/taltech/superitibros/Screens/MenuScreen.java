@@ -3,9 +3,12 @@ package ee.taltech.superitibros.Screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -19,7 +22,6 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
-
 public class MenuScreen implements Screen {
 
     private SpriteBatch batch;
@@ -30,6 +32,12 @@ public class MenuScreen implements Screen {
     protected Skin skin;
     GameClient gameClient;
 
+    // Menu background music.
+    Sound sound = Gdx.audio.newSound(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/backgroundMusic.mp3"));
+
+    // Background picture.
+    private Sprite background;
+
     /**
      * Constructor for the Menu class.
      * Define texture
@@ -37,14 +45,19 @@ public class MenuScreen implements Screen {
     public MenuScreen(GameClient gameClient) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
-        int worldHeight = 1100;
-        atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
-        skin = new Skin(Gdx.files.internal("Skins/quantum-horizon/skin/quantum-horizon-ui.json"), atlas);
+        int worldHeight = 1000;
+        background = new Sprite(new Texture(Gdx.files.internal("/Users/mactamm/IdeaProjects/iti0301-2024-tvj-dev/client/assets/forest2.png")));
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(worldWidth, worldHeight, camera);
         viewport.apply();
         camera.update();
+
+        // Sound settings.
+        sound.loop();
+        sound.play(0.5f);
 
         stage = new Stage(viewport, batch);
     }
@@ -55,19 +68,14 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void show() {
-
         //Stage should check input:
         Gdx.input.setInputProcessor(stage);
 
         //Create Table
         Table mainTable = new Table();
-        //Set table to fill stage
-        mainTable.setFillParent(true);
-        //Set alignment of contents in the table.
-        mainTable.center();
 
         //Create game title
-        Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
+        Label gameLabel = new Label("SuperITIBros", skin, "title", new Color(0f, 66f, 64f, 100f));
 
         //Create buttons
         TextButton multiplayerButton = new TextButton("Multiplayer", skin);
@@ -106,6 +114,7 @@ public class MenuScreen implements Screen {
                 Gdx.app.exit();
             }
         });
+        mainTable.toFront();
         int buttonLocationPadding = 7;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
         mainTable.row();
@@ -117,6 +126,10 @@ public class MenuScreen implements Screen {
         mainTable.row();
         mainTable.add(exitButton).pad(buttonLocationPadding);
         //Add table to stage
+        stage.act();
+        //Set alignment of contents in the table.
+        mainTable.center();
+        mainTable.setFillParent(true);
         stage.addActor(mainTable);
     }
 
@@ -128,7 +141,11 @@ public class MenuScreen implements Screen {
         Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        stage.act();
+        // Background.
+        batch.begin();
+        background.setSize(camera.viewportWidth, camera.viewportHeight);
+        background.draw(batch);
+        batch.end();
         stage.draw();
     }
 
@@ -158,5 +175,13 @@ public class MenuScreen implements Screen {
     public void dispose() {
         skin.dispose();
         atlas.dispose();
+    }
+
+    public void stopSound() {
+        this.sound.stop();
+    }
+
+    public Sprite getBackground() {
+        return this.background;
     }
 }

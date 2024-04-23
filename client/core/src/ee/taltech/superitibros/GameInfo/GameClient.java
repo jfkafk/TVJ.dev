@@ -63,6 +63,7 @@ public class GameClient extends Game {
         clientWorld = new ClientWorld(path);
         gameScreen = new GameScreen(clientWorld);
         setScreen(gameScreen);
+        menuScreen.stopSound();
         try {
             createClient(gameScreen);
         } catch (IOException e) {
