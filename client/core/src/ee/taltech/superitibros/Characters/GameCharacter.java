@@ -1,14 +1,14 @@
 package ee.taltech.superitibros.Characters;
 
-import ee.taltech.superitibros.Characters.CreateCharacterFrames;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
-import ee.taltech.superitibros.Screens.GameScreen;
 
 public class GameCharacter {
 
@@ -31,9 +31,17 @@ public class GameCharacter {
     protected float width, height;
     protected Rectangle boundingBox;
     private final Integer possiblyDealingWithSheetSize = 8;
-    private final Integer boundingBoxHeight = 128;
-    private final Integer boundingBoxWidth = 128;
-    public Integer playerSize = 64;
+
+    private Integer playerSize = 50;
+
+    // Health bar properties
+    private float maxHealth;
+    private float health;
+    private float healthBarWidth;
+    private float healthBarHeight;
+    private Color healthBarColor;
+    private float healthBarX;
+    private float healthBarY;
 
     // World where physics are applied
     ClientWorld clientWorld;
@@ -82,8 +90,15 @@ public class GameCharacter {
         this.mapWidth = clientWorld.getMapWidth();
         if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
             playerSize = 256;
+            boundingBox.setSize(60, 105);
         }
         defineCharacter();
+        // Initialize health bar properties
+        maxHealth = 100f;
+        health = maxHealth;
+        healthBarWidth = 25;
+        healthBarHeight = 2;
+        healthBarColor = Color.GREEN;
     }
 
 
@@ -134,6 +149,10 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Get bounding box.
+     * @return bounding box.
+     */
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
@@ -145,7 +164,8 @@ public class GameCharacter {
      * @param yPos of the GameCharacter's new coordinates
      */
     public void moveToNewPos(float xPos, float yPos) {
-        this.boundingBox.set(xPos, yPos, boundingBoxWidth, boundingBoxHeight);
+        this.boundingBox.set(xPos, yPos, boundingBox.getWidth(), boundingBox.getHeight());
+        //System.out.println("Move to y: " + yPos);
         if (b2body != null) {
             // Store the new position for later update
             this.newPosition.set(xPos, yPos);
@@ -157,43 +177,69 @@ public class GameCharacter {
      * This method should be called outside the physics simulation loop.
      */
     public void updatePosition() {
-        if (b2body != null && newPosition != null) {
+        if (b2body != null && newPosition != null && !clientWorld.getGdxWorld().isLocked()) {
             b2body.setTransform(newPosition, b2body.getAngle());
         }
     }
 
 
+    public void setCurrentState(GameCharacter.State currentState) {
+        this.currentState = currentState;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+
+    /**
+     * Method for jumping.
+     */
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
-            System.out.println("jumped");
+            // System.out.println("jumped");
         }
     }
 
-    // Fall faster
+    /**
+     * Method for faster falling.
+     */
     public void fallDown() {
         this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed * 70);
     }
 
-    // Move right
+    /**
+     * Method for moving character to right.
+     */
     public void moveRight() {
         this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
         facingRight = true;
     }
 
-    // Move left
+    /**
+     * Method for moving character to left.
+     */
     public void moveLeft() {
         // Apply a force to the left
         this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
         facingRight = false;
     }
 
+    /**
+     * Return if character is on the ground.
+     * @return true if on the ground, otherwise false.
+     */
     public boolean isGrounded() {
         return b2body.getLinearVelocity().y == 0;
     }
 
+    /**
+     * Get character state.
+     * @return state.
+     */
     public State getState() {
         if((b2body.getLinearVelocity().y > 0)) {
             return State.JUMPING;
@@ -209,11 +255,19 @@ public class GameCharacter {
         return State.IDLE;
     }
 
+    /**
+     * Get if player is facing right.
+     * @return true if facing right, otherwise false.
+     */
     public boolean getFacingRight() {
         return this.facingRight;
     }
 
-    public void draw(SpriteBatch batch) {
+    /**
+     * Draw game character.
+     * @param batch batch.
+     */
+    public void draw(SpriteBatch batch, Texture whiteTexture) {
 
         if (!animationCreated) {
             createFrames();
@@ -264,22 +318,95 @@ public class GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() - 0.1 * playerSize); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
+        //System.out.println("Bounding box height: " + boundingBox.getHeight());
+        //System.out.println("Bounding box width: " + boundingBox.getWidth());
+        //System.out.println("Position y: " + b2body.getPosition().y);
+        //System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
+
+        // Calculate health bar position
+        healthBarX = frameX + boundingBox.width / 2;
+        healthBarY = frameY + boundingBox.height;
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
-        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
+        boundingBox.x = b2body.getPosition().x ;
+        boundingBox.y = b2body.getPosition().y;
 
         // Update coordinates
-        xPosition = b2body.getPosition().x + ((float) playerSize / 50);
-        yPosition = b2body.getPosition().y + ((float) playerSize / 50);
+        xPosition = b2body.getPosition().x;
+        yPosition = b2body.getPosition().y;
 
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
+            batch.setColor(Color.WHITE); // Reset batch color to default (white)
             batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
+
+        // Draw health bar
+        drawHealthBar(batch, whiteTexture);
+    }
+
+    // Draw health bar method
+    public void drawHealthBar(Batch batch, Texture whiteTexture) {
+        // Calculate health bar fill percentage
+        float healthPercentage = health / maxHealth;
+
+        // Set the color of the health bar based on health percentage
+        if (healthPercentage > 0.5f) {
+            healthBarColor = Color.GREEN;
+        } else if (healthPercentage > 0.2f) {
+            healthBarColor = Color.YELLOW;
+        } else {
+            healthBarColor = Color.RED;
+        }
+
+        // Calculate the width of the filled portion of the health bar
+        float filledWidth = healthBarWidth * healthPercentage;
+
+        // Calculate health bar position
+        float healthBarX = xPosition - healthBarWidth / 2;
+        float healthBarY = yPosition + height + 5;
+
+        // Draw the health bar outline (border) using the Batch
+        batch.setColor(Color.BLACK);
+        batch.draw(whiteTexture, (float) (healthBarX - 0.5), (float) (healthBarY - 0.5), healthBarWidth + 1, healthBarHeight + 1);
+
+        // Draw the health bar fill using the Batch
+        batch.setColor(healthBarColor);
+        batch.draw(whiteTexture, healthBarX, healthBarY, filledWidth, healthBarHeight);
+    }
+
+    // Update health method (call this when player takes damage or heals)
+    public void updateHealth(float amount) {
+        health += amount;
+
+        // Ensure health doesn't exceed maximum
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+
+        // Ensure health doesn't go below 0
+        if (health < 0) {
+            health = 0;
+        }
+    }
+
+    /**
+     * Get game character health.
+     * @return health.
+     */
+    public float getHealth() {
+        return health;
+    }
+
+    /**
+     * Set game character health.
+     * @param health health.
+     */
+    public void setHealth(float health) {
+        this.health = health;
     }
 
     /**

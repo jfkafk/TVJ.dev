@@ -34,8 +34,8 @@ public class Bullet {
         directionX /= length;
         directionY /= length;
 
-        System.out.println("Player X: " + playerX + " | Mouse X: " + mouseX);
-        System.out.println("Player Y: " + playerY + " | Mouse Y: " + mouseY);
+        //System.out.println("Player X: " + playerX + " | Mouse X: " + mouseX);
+        //System.out.println("Player Y: " + playerY + " | Mouse Y: " + mouseY);
 
         // Define the maximum speed of the bullet
         float maxSpeed = 2.0f; // You can adjust this value as needed
@@ -43,8 +43,8 @@ public class Bullet {
         // Calculate the final movement values for the bullet
         float addX = directionX * maxSpeed;
         float addY = directionY * maxSpeed;
-        System.out.println("Add X: " + addX);
-        System.out.println("Add Y: " + addY);
+        //System.out.println("Add X: " + addX);
+        //System.out.println("Add Y: " + addY);
 
         // Create a new instance of Bullet with calculated values and return it
         return new Bullet(lobbyHash, playerX, playerY, addX, addY);

@@ -1,19 +1,16 @@
 package ee.taltech.superitibros.Screens;
 
+import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
-import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -25,6 +22,7 @@ import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GameScreen implements Screen, InputProcessor {
 
@@ -37,8 +35,7 @@ public class GameScreen implements Screen, InputProcessor {
     // Graphics and Texture
     private final SpriteBatch batch;
     private TiledMap tiledMap;
-    private TiledMapRenderer tiledMapRenderer;
-    private String path;
+    private final TiledMapRenderer tiledMapRenderer;
     private float desiredCameraWidth;
     private float desiredCameraHeight;
 
@@ -55,6 +52,8 @@ public class GameScreen implements Screen, InputProcessor {
     // Shooting cooldown
     private boolean canShoot = true;
     private float shootCooldown = 1f;
+
+    ShapeRenderer shapeRenderer;
 
     /**
      * GameScreen constructor
@@ -81,15 +80,17 @@ public class GameScreen implements Screen, InputProcessor {
         if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
             this.desiredCameraHeight = tileHeight * mapHeightInTiles; // Set the desired width of the camera
         } else {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles * 2;
+            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
         }
-        this.desiredCameraWidth = desiredCameraHeight * aspectRatio * 2; // Calculate the corresponding height
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+
+        shapeRenderer = new ShapeRenderer();
     }
 
     /**
@@ -139,8 +140,18 @@ public class GameScreen implements Screen, InputProcessor {
         clientWorld.checkBulletCollisions();
         clientWorld.checkBulletEnemyCollisions();
 
+        // Check enemy and player collision
+        clientWorld.checkPlayerEnemyCollisions();
+
         // Render Box2D debug
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
+
+        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+        }
     }
 
     /**
@@ -170,9 +181,6 @@ public class GameScreen implements Screen, InputProcessor {
     /**
      * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
      */
-    /**
-     * Method for sending information about client's PlayerGameCharacter's new position based on keyboard input.
-     */
     private void detectInput(){
 
         if (clientWorld.getMyPlayerGameCharacter() != null) {
@@ -196,14 +204,12 @@ public class GameScreen implements Screen, InputProcessor {
 
             // If player moves (has non-zero velocity in x or y direction), send player position to server
             if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
-
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+                clientWorld.sendMyPlayerCharacterInfo();
                 lastPacketCount = 0;
-            }
 
-            // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
-            if (lastPacketCount < 3) {
-                clientConnection.sendPlayerInformation(clientWorld.getMyPlayerGameCharacter().xPosition, clientWorld.getMyPlayerGameCharacter().yPosition, clientWorld.getMyPlayerGameCharacter().getState(), clientWorld.getMyPlayerGameCharacter().getFacingRight());
+            } else if (lastPacketCount < 3) {
+                // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
+                clientWorld.sendMyPlayerCharacterInfo();
                 lastPacketCount++;
             }
 
@@ -212,9 +218,18 @@ public class GameScreen implements Screen, InputProcessor {
         }
     }
 
+    /**
+     * Get world width.
+     * @return world width.
+     */
     public Integer getWorldWidth() {
         return ((int) WORLD_WIDTH);
     }
+
+    /**
+     * Get world height.
+     * @return world height.
+     */
     public Integer getWorldHeight() {
         return ((int) WORLD_HEIGHT);
     }
@@ -225,17 +240,22 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawPlayerGameCharacters() {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
-            character.draw(batch);
-            if (character != clientWorld.getMyPlayerGameCharacter()) {
-                System.out.println(character.b2body.getLinearVelocity().x);
-            }
+            character.draw(batch, clientWorld.getHealthBarTexture());
+            // System.out.println(character.b2body.getLinearVelocity().x);
         }
     }
 
+    /**
+     * Method for updating player's position
+     */
     public void updatePlayersPositions() {
-        for (GameCharacter player : clientWorld.getWorldGameCharactersMap().values()) {
-            if (player != clientWorld.getMyPlayerGameCharacter()) {
-                player.updatePosition();
+        Map<Integer, GameCharacter> gameCharactersMap = clientWorld.getWorldGameCharactersMap();
+        if (!gameCharactersMap.isEmpty()) {
+            List<GameCharacter> players = new ArrayList<>(gameCharactersMap.values());
+            for (GameCharacter player : players) {
+                if (player != clientWorld.getMyPlayerGameCharacter()) {
+                    player.updatePosition();
+                }
             }
         }
     }
@@ -244,10 +264,16 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for drawing Enemies.
      */
     public void drawEnemies() {
-        List<Enemy> enemies = new ArrayList<>(clientWorld.getEnemyMap().values());
-        for (Enemy enemy : enemies) {
-            // System.out.println("Enemy y: " + enemy.yPosition);
-            enemy.draw(batch);
+        Map<String, Enemy> enemyMap = clientWorld.getEnemyMap();
+        if (enemyMap != null && !enemyMap.isEmpty()) {
+            for (Enemy enemy : enemyMap.values()) {
+                if (enemy != null) {
+                    enemy.draw(batch, clientWorld.getHealthBarTexture());
+                    if (enemy.b2body.getLinearVelocity().y != 0) {
+                        clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+                    }
+                }
+            }
         }
     }
 
@@ -260,7 +286,7 @@ public class GameScreen implements Screen, InputProcessor {
             //System.out.println(clientWorld.getBulletsToRemove());
             for (Bullet bullet : clientWorld.getBulletsToRemove()) {
                 clientWorld.removeBullet(bullet);
-                System.out.println("removed");
+                //System.out.println("removed");
             }
             clientWorld.clearBulletsToRemove();
             //System.out.println(clientWorld.getBulletsToRemove());
@@ -268,7 +294,7 @@ public class GameScreen implements Screen, InputProcessor {
 
         if (!clientWorld.getBulletsToAdd().isEmpty()) {
             for (Bullet bullet : clientWorld.getBulletsToAdd()) {
-                System.out.println("added");
+                //System.out.println("added");
                 clientWorld.addBullet(bullet);
             }
             clientWorld.clearBulletsToAdd();
@@ -336,7 +362,7 @@ public class GameScreen implements Screen, InputProcessor {
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         if (canShoot) {
             // Convert screen coordinates to world coordinates
-            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY + 150, 0));
+            Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY, 0));
 
             // Player coordinates
             float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter().getBoundingBox().width;

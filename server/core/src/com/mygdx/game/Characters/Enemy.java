@@ -11,13 +11,16 @@ public class Enemy extends GameCharacter {
     static int nextBotHashNumber = 0;
 
     // Enemy (AI) states
-    enum State {IDLE, RUNNING_LEFT, RUNNING_RIGHT, ATTACKING}
+    enum State {IDLE, RUNNING_LEFT, RUNNING_RIGHT, JUMPING, FALL, WALKING, ATTACKING}
 
     private static final float MOVEMENT_SPEED = 0.1f;
     private static final float DETECTION_RANGE = 100f;
-
-    private State currentState = State.IDLE;
     private long lastUpdateTime;
+    // Health
+    private float maxHealth;
+    private float health;
+
+    private State currentState;
 
     /**
      * GameCharacter constructor.
@@ -34,6 +37,8 @@ public class Enemy extends GameCharacter {
         botHash = "Bot" + nextBotHashNumber;
         lastUpdateTime = System.currentTimeMillis();
         nextBotHashNumber++; // Incrementing here
+        maxHealth = 100f;
+        health = maxHealth;
     }
 
     /**
@@ -57,11 +62,37 @@ public class Enemy extends GameCharacter {
     }
 
     /**
+     * Update enemy health.
+     * @param amount health.
+     */
+    public void updateHealth(float amount) {
+        health += amount;
+
+        // Ensure health doesn't exceed maximum
+        if (health > maxHealth) {
+            health = maxHealth;
+        }
+
+        // Ensure health doesn't go below 0
+        if (health < 0) {
+            health = 0;
+        }
+    }
+
+    /**
+     * Get enemy health.
+     * @return health.
+     */
+    public float getHealth() {
+        return health;
+    }
+
+    /**
      * Main method for looping.
      */
     public void spin() {
         sense();
-        System.out.println("State: " + currentState);
+        //System.out.println("State: " + currentState);
         act();
     }
 
@@ -71,14 +102,14 @@ public class Enemy extends GameCharacter {
     private void sense() {
         float minDistance = DETECTION_RANGE;
         for (GameCharacter player : getWorld().getClients().values()) {
-            System.out.println("Player x: " + player.xPosition);
+            //System.out.println("Player x: " + player.xPosition);
             float distance = Math.abs(xPosition - player.xPosition) + Math.abs(yPosition - player.yPosition);
-            System.out.println("Enemy x: " + xPosition + " | Player x: " + player.xPosition);
-            System.out.println("Enemy y: " + yPosition + " | Player y: " + player.yPosition);
-            System.out.println("Min distance: " + minDistance + " | Distance: " + distance);
+            //System.out.println("Enemy x: " + xPosition + " | Player x: " + player.xPosition);
+            //System.out.println("Enemy y: " + yPosition + " | Player y: " + player.yPosition);
+            //System.out.println("Min distance: " + minDistance + " | Distance: " + distance);
             if (distance < minDistance) {
                 minDistance = distance;
-                System.out.println("Setting state to run");
+                //System.out.println("Setting state to run");
                 currentState = (player.xPosition < xPosition) ? State.RUNNING_LEFT : State.RUNNING_RIGHT;
             }
         }
@@ -88,18 +119,35 @@ public class Enemy extends GameCharacter {
     }
 
     /**
+     * Return if character is on the ground.
+     * @return true if on the ground, otherwise false.
+     */
+
+
+    /**
      * Act method for acting.
      */
     private void act() {
         switch (currentState) {
             case RUNNING_LEFT:
+                setFacingRight(false);
                 xPosition -= MOVEMENT_SPEED;
                 break;
             case RUNNING_RIGHT:
+                setFacingRight(true);
                 xPosition += MOVEMENT_SPEED;
                 break;
             case IDLE:
                 break;
+        }
+    }
+
+    @Override
+    public GameCharacter.State getCurrentState() {
+        if (currentState == State.RUNNING_LEFT || currentState == State.RUNNING_RIGHT) {
+            return GameCharacter.State.WALKING;
+        } else {
+            return GameCharacter.State.IDLE;
         }
     }
 }

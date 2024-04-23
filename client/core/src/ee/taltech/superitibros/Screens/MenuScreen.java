@@ -89,8 +89,9 @@ public class MenuScreen implements Screen {
         });
         multiplayerButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
-                MultiplayerMenu lobby = new MultiplayerMenu(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(lobby);
+                MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
+                gameClient.setMultiplayerMenu(multiplayerMenu);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
             }
         });
         optionsButton.addListener(new ClickListener() {

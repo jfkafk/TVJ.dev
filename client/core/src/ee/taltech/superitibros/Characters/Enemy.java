@@ -1,6 +1,8 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -15,7 +17,7 @@ public class Enemy extends GameCharacter {
     String botHash;
     public Body b2body;
     private boolean bodyDefined = false;
-    private Integer playerSize = 64;
+    private Integer playerSize = 50;
 
     /**
      * GameCharacter constructor.
@@ -105,22 +107,21 @@ public class Enemy extends GameCharacter {
         }
     }
 
+    /**
+     * Get enemy's state.
+     * @return state.
+     */
     public State getState() {
-        if((b2body.getLinearVelocity().y > 0)) {
-            return State.JUMPING;
-        }
-        //if negative in Y-Axis, mario is falling
-        else if(b2body.getLinearVelocity().y < 0)
-            return State.FALL;
-            //if mario is positive or negative in the X axis, he is running
-        else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
-            return State.WALKING;
-        }
-        //if none of these returns, then he must be standing
-        return State.IDLE;
+        // TODO state should come from server.
+        return currentState;
     }
 
-    public void draw(SpriteBatch batch) {
+
+    /**
+     * Draw enemy.
+     * @param batch batch.
+     */
+    public void draw(SpriteBatch batch, Texture whiteTexture) {
 
         if (!animationCreated) {
             createFrames();
@@ -168,19 +169,25 @@ public class Enemy extends GameCharacter {
         }
 
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (b2body.getPosition().x - boundingBox.getHeight()); // Somehow needed -4 to match the sprite.
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
 
         b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
 
         // Bounding box
-        boundingBox.x = b2body.getPosition().x + ((float) playerSize / 50);
-        boundingBox.y = b2body.getPosition().y  + ((float) playerSize / 50);
+        boundingBox.x = b2body.getPosition().x ;
+        boundingBox.y = b2body.getPosition().y;
+
+        yPosition = b2body.getPosition().y;
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
+            batch.setColor(Color.WHITE); // Reset batch color to default (white)
             batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
+
+        // Draw health bar
+        drawHealthBar(batch, whiteTexture);
     }
 
     /**
@@ -188,11 +195,11 @@ public class Enemy extends GameCharacter {
      */
     public void removeBodyFromWorld() {
         if (b2body != null) {
-            System.out.println("isnt null");
             clientWorld.getGdxWorld().destroyBody(b2body);
-            b2body = null; // Set the reference to null to indicate that the body has been destroyed
+            if (b2body != null) {
+                b2body = null; // Set the reference to null to indicate that the body has been destroyed
+            }
         }
-
     }
 
 }

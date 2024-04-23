@@ -121,14 +121,6 @@ public class HostLobby implements Screen {
             }
         });
 
-        back.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                MenuScreen menuScreen = new MenuScreen(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
-            }
-        });
-
         if (gameClient.getMapPath() != null) {
             startGameButton.addListener(new ClickListener() {
                 @Override
