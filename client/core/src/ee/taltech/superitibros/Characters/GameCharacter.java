@@ -182,6 +182,15 @@ public class GameCharacter {
     }
 
 
+    public void setCurrentState(GameCharacter.State currentState) {
+        this.currentState = currentState;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+
     /**
      * Method for jumping.
      */

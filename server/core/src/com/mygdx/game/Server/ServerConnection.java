@@ -373,15 +373,14 @@ public class ServerConnection {
 		serverWorld.updateEnemyInTheWorldEnemyMap();
 		// Enemy instance id (key) and new coordinates (value) are sent.
 		for (Map.Entry<String, Enemy> entry : serverWorld.getEnemyMap().entrySet()) {
-
+			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(entry.getKey(), entry.getValue().getxPosition(), entry.getValue().getyPosition());
+			packetUpdateEnemy.setCurrentState(entry.getValue().getCurrentState());
+			packetUpdateEnemy.setFacingRight(entry.getValue().isFacingRight());
 			// Arguments
 			String botHash = entry.getKey();
 			float xPosition = entry.getValue().getxPosition();
 			float yPosition = entry.getValue().getyPosition();
 			float health = entry.getValue().getHealth();
-
-			PacketUpdateEnemy packetUpdateEnemy = PacketCreator.createPacketUpdateEnemy(botHash, xPosition, yPosition);
-
 			// Set health
 			packetUpdateEnemy.setHealth(health);
 			// Send enemy info to all players in lobby

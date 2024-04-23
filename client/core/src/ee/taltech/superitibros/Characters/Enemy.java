@@ -113,8 +113,9 @@ public class Enemy extends GameCharacter {
      */
     public State getState() {
         // TODO state should come from server.
-        return State.IDLE;
+        return currentState;
     }
+
 
     /**
      * Draw enemy.

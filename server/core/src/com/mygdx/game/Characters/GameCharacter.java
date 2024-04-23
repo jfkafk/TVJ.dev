@@ -24,6 +24,10 @@ public class GameCharacter {
 
     private World world;
 
+    private State currentState;
+
+    private boolean facingRight = true;
+
     /**
      * GameCharacter constructor.
      *
@@ -82,6 +86,18 @@ public class GameCharacter {
      */
     public void setyPosition(float yPosition) {
         this.yPosition = yPosition;
+    }
+
+    public boolean isFacingRight() {
+        return facingRight;
+    }
+
+    public void setFacingRight(boolean facingRight) {
+        this.facingRight = facingRight;
+    }
+
+    public State getCurrentState() {
+        return currentState;
     }
 
     @Override
