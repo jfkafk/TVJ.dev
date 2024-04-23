@@ -18,6 +18,7 @@ public class GameClient extends Game {
     private ClientConnection clientConnection;
     private ClientWorld clientWorld;
     private MenuScreen menuScreen;
+    private MultiplayerMenu multiplayerMenu;
     List<Lobby> availableLobbies = new LinkedList<>();
     Lobby myLobby;
     LobbyScreen lobbyScreen;
@@ -186,6 +187,22 @@ public class GameClient extends Game {
      */
     public void setHostLobbyScreen(HostLobby hostLobbyScreen) {
         this.hostLobbyScreen = hostLobbyScreen;
+    }
+
+    /**
+     * Set multiplayer menu.
+     * @param multiplayerMenu multiplayer menu.
+     */
+    public void setMultiplayerMenu(MultiplayerMenu multiplayerMenu) {
+        this.multiplayerMenu = multiplayerMenu;
+    }
+
+    /**
+     * Get multiplayer menu.
+     * @return multiplayer menu.
+     */
+    public MultiplayerMenu getMultiplayerMenu() {
+        return multiplayerMenu;
     }
 
     /**

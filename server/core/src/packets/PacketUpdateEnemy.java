@@ -70,4 +70,12 @@ public class PacketUpdateEnemy extends Packet {
     public void setDead(boolean dead) {
         isDead = dead;
     }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setHealth(float health) {
+        this.health = health;
+    }
 }

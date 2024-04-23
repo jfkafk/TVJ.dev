@@ -1,6 +1,8 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -119,7 +121,7 @@ public class Enemy extends GameCharacter {
      * Draw enemy.
      * @param batch batch.
      */
-    public void draw(SpriteBatch batch) {
+    public void draw(SpriteBatch batch, Texture whiteTexture) {
 
         if (!animationCreated) {
             createFrames();
@@ -176,10 +178,16 @@ public class Enemy extends GameCharacter {
         boundingBox.x = b2body.getPosition().x ;
         boundingBox.y = b2body.getPosition().y;
 
+        yPosition = b2body.getPosition().y;
+
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
+            batch.setColor(Color.WHITE); // Reset batch color to default (white)
             batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
+
+        // Draw health bar
+        drawHealthBar(batch, whiteTexture);
     }
 
     /**
@@ -187,11 +195,11 @@ public class Enemy extends GameCharacter {
      */
     public void removeBodyFromWorld() {
         if (b2body != null) {
-            System.out.println("isnt null");
             clientWorld.getGdxWorld().destroyBody(b2body);
-            b2body = null; // Set the reference to null to indicate that the body has been destroyed
+            if (b2body != null) {
+                b2body = null; // Set the reference to null to indicate that the body has been destroyed
+            }
         }
-
     }
 
 }
