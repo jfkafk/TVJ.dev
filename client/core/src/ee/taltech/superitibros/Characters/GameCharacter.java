@@ -33,7 +33,6 @@ public class GameCharacter {
 
     protected float width, height;
     protected Rectangle boundingBox;
-    private final Integer possiblyDealingWithSheetSize = 8;
 
     private Integer playerSize = 50;
 

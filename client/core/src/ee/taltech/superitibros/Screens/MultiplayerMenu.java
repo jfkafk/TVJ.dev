@@ -64,7 +64,6 @@ public class MultiplayerMenu implements Screen {
         mainTable.setFillParent(true);
         mainTable.center();
 
-        Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         nameField = new TextField("", skin);
@@ -110,8 +109,6 @@ public class MultiplayerMenu implements Screen {
 
         int buttonLocationPadding = 5;
 
-        mainTable.add(gameLabel).pad(buttonLocationPadding);
-        mainTable.row();
         mainTable.add(menuLabel).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(joinLobbyButton).pad(buttonLocationPadding);
