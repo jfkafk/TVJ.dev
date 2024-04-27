@@ -55,7 +55,7 @@ public class GameScreen implements Screen, InputProcessor {
     private boolean canShoot = true;
     private float shootCooldown = 1f;
 
-    // Shooting sound.
+    // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     /**

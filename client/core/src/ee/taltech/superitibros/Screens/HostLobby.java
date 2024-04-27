@@ -207,6 +207,7 @@ public class HostLobby implements Screen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
+                    audioHelper.stopAllMusic();
                     gameClient.startGame(gameClient.getMapPath());
                 }
             });

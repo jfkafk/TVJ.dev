@@ -114,6 +114,7 @@ public class LobbyScreen implements Screen {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
                     audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                    audioHelper.stopAllMusic();
                     // Add logic here to start the game
                     gameClient.startGame(mapPath);
                 }

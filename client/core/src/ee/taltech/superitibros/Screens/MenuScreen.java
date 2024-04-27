@@ -56,9 +56,6 @@ public class MenuScreen implements Screen {
         viewport.apply();
         camera.update();
 
-        // Sound settings.
-        audioHelper.playMusicLoop("MusicSounds/backgroundMusic.mp3");
-
         stage = new Stage(viewport, batch);
     }
 
@@ -69,6 +66,8 @@ public class MenuScreen implements Screen {
     @Override
     public void show() {
         //Stage should check input:
+        // Sound settings.
+        audioHelper.playMusicLoop("MusicSounds/backgroundMusic.mp3");
         Gdx.input.setInputProcessor(stage);
 
         //Create Table

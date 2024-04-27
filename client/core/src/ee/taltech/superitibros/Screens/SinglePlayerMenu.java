@@ -164,6 +164,7 @@ public class SinglePlayerMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level1/level1.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -173,6 +174,7 @@ public class SinglePlayerMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level4/gameart2d-desert.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -182,6 +184,7 @@ public class SinglePlayerMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level3/MagicLand.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -190,6 +193,7 @@ public class SinglePlayerMenu implements Screen {
         optionsButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }

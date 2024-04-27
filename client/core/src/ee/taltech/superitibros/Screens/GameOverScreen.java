@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class GameOverScreen implements Screen {
@@ -26,6 +27,9 @@ public class GameOverScreen implements Screen {
     private Skin skin;
     private TextButton restartButton;
     private TextButton mainMenuButton;
+
+    // Sounds.
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     public GameOverScreen(GameClient gameClient) {
         int worldWidth = 1600;
@@ -44,6 +48,8 @@ public class GameOverScreen implements Screen {
         mainTable.setFillParent(true);
         mainTable.center();
 
+        audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
+
         Label gameOverLabel = new Label("Game Over", skin, "title", Color.RED);
 
         restartButton = new TextButton("Back to lobby", skin);
@@ -53,6 +59,7 @@ public class GameOverScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 LobbyScreen lobbyScreen = new LobbyScreen(gameClient, gameClient.getMyLobby());
+                audioHelper.stopAllMusic();
                 gameClient.setLobbyScreen(lobbyScreen);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
             }
@@ -63,6 +70,7 @@ public class GameOverScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 // Return to the main menu
                 MenuScreen menuScreen = new MenuScreen(gameClient);
+                audioHelper.stopAllMusic();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
