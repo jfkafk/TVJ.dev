@@ -9,6 +9,12 @@
 4. Finally locate the client[run], from Run/Debug configurations, and run the game.
 5. If you wish you can run multiple games at once, by running the 4th step again.
 
+## Controls
+For moving you can use arrows or W,A,S,D. With space, arrow-up or W you can jump. With left mouse click you can shoot.
+
+## Game Description
+Goal is to get to the finish point, which is on the right side of the map. Right now we don't have finish point, but you can still kill enemies.
+
 
 ## Getting started
 
