@@ -3,9 +3,7 @@ package ee.taltech.superitibros.Screens;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -17,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.sun.org.apache.xpath.internal.operations.Minus;
 import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
@@ -75,17 +72,15 @@ public class Options implements Screen {
         mainTable.center();;
 
         // Create Buttons and Labels.
-        Label optionsLabel = new Label("Options", skin, "title", Color.CYAN);
-
         // Buttons for music.
-        Label musicVolumeLabel = new Label("Change Music Volume", skin, "subtitle", Color.CYAN);
+        Label musicVolumeLabel = new Label("Music Volume", skin, "subtitle", Color.CYAN);
         TextButton musicVolumeUp = new TextButton("+", skin);
         TextButton musicVolumeDown = new TextButton("-", skin);
         musicVolumeUp.pad(10);
         musicVolumeDown.pad(10);
 
         // Buttons for sounds.
-        Label sfxVolumeLabel = new Label("Change SFX Volume", skin, "subtitle", Color.CYAN);
+        Label sfxVolumeLabel = new Label("Sound Volume", skin, "subtitle", Color.CYAN);
         TextButton sfxVolumeUp = new TextButton("+", skin);
         TextButton sfxVolumeDown = new TextButton("-", skin);
         sfxVolumeUp.pad(10);
@@ -135,33 +130,31 @@ public class Options implements Screen {
                 updateVolume();
             }
         });
-        int settingsPadding = 20;
 
+        final int buttonSize = 100;
         // Music volume table.
-        musicVolumeTable.add(musicVolumeLabel);
+        musicVolumeTable.add(musicVolumeLabel).width(buttonSize).uniform(true);
         musicVolumeTable.row();
-        musicVolumeTable.add(musicVolumeDown).left();
-        musicVolumeTable.add(musicVolumeLevel);
-        musicVolumeTable.add(musicVolumeUp).right();
+        musicVolumeTable.add(musicVolumeDown).width(buttonSize).padBottom(20).uniform(true);
+        musicVolumeTable.add(musicVolumeLevel).uniform(true);
+        musicVolumeTable.add(musicVolumeUp).width(buttonSize).padBottom(20).uniform(true);
         musicVolumeTable.row();
 
         // SFX volume table.
-        sfxVolumeTable.add(sfxVolumeLabel);
         sfxVolumeTable.row();
-        sfxVolumeTable.add(sfxVolumeDown).left();
-        sfxVolumeTable.add(sfxVolumeLevel);
-        sfxVolumeTable.add(sfxVolumeUp).right();
+        sfxVolumeTable.add(sfxVolumeLabel).width(buttonSize).uniform(true);
+        sfxVolumeTable.row();
+        sfxVolumeTable.add(sfxVolumeDown).width(buttonSize).padBottom(20).uniform(true);
+        sfxVolumeTable.add(sfxVolumeLevel).uniform(true);
+        sfxVolumeTable.add(sfxVolumeUp).width(buttonSize).padBottom(20).uniform(true);
         sfxVolumeTable.row();
 
         // Main Table.
-        int buttonLocationPadding = 14;
-        mainTable.add(optionsLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding * 2);
-        mainTable.row();
         mainTable.add(musicVolumeTable);
         mainTable.row();
         mainTable.add(sfxVolumeTable);
         mainTable.row();
-        mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.add(back);
         stage.addActor(mainTable);
     }
 
