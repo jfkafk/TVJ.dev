@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
@@ -37,6 +38,7 @@ public class JoinLobby implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     // Fetch available lobbies
     List<Lobby> availableLobbies = new ArrayList<>();
@@ -89,6 +91,7 @@ public class JoinLobby implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 refreshLobbies();
             }
         });
@@ -96,6 +99,7 @@ public class JoinLobby implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
             }
@@ -109,6 +113,7 @@ public class JoinLobby implements Screen {
             lobbyButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
                     // Join the selected lobby
                     joinLobby(lobby);
                 }
@@ -159,8 +164,6 @@ public class JoinLobby implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

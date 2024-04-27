@@ -15,6 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
@@ -32,6 +33,7 @@ public class HostLobby implements Screen {
     protected Skin skin;
     GameClient gameClient;
     String mapPath;
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     private final Sprite background;
 
@@ -152,6 +154,7 @@ public class HostLobby implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 refreshPlayers();
             }
         });
@@ -162,6 +165,7 @@ public class HostLobby implements Screen {
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level1/level1.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
@@ -171,6 +175,7 @@ public class HostLobby implements Screen {
         desertButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level4/gameart2d-desert.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
@@ -179,6 +184,7 @@ public class HostLobby implements Screen {
         moonButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level2/level2.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
@@ -187,6 +193,7 @@ public class HostLobby implements Screen {
         castleButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level3/MagicLand.tmx";
                 gameClient.updateMapPath(mapPath);
                 System.out.println(gameClient.getMapPath());
@@ -195,6 +202,7 @@ public class HostLobby implements Screen {
         });
 
         if (gameClient.getMapPath() != null) {
+            audioHelper.playSound("MusicSounds/buttonClick.mp3");
             startGameButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -207,6 +215,7 @@ public class HostLobby implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
                 gameClient.removeAvailableLobby(gameClient.getMyLobby());
@@ -255,9 +264,6 @@ public class HostLobby implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

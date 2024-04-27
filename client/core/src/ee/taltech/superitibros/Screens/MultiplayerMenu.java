@@ -18,6 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
@@ -33,6 +34,9 @@ public class MultiplayerMenu implements Screen {
     private TextButton joinLobbyButton;
     private TextButton hostLobbyButton;
     GameClient gameClient;
+
+    // Audio.
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     private Sprite background;
 
@@ -77,6 +81,7 @@ public class MultiplayerMenu implements Screen {
         joinLobbyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 JoinLobby joinLobby = new JoinLobby(gameClient);
                 gameClient.getClientConnection().sendGetAvailableLobbies();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(joinLobby);
@@ -86,6 +91,7 @@ public class MultiplayerMenu implements Screen {
         hostLobbyButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 HostLobby hostLobby = new HostLobby(gameClient);
                 gameClient.setHostLobbyScreen(hostLobby);
                 gameClient.getClientConnection().sendCreateNewLobby();
@@ -96,6 +102,7 @@ public class MultiplayerMenu implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MenuScreen menuScreen = new MenuScreen(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
@@ -117,8 +124,6 @@ public class MultiplayerMenu implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

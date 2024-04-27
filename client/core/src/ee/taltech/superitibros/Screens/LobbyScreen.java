@@ -20,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
@@ -30,6 +31,7 @@ public class LobbyScreen implements Screen {
     private SpriteBatch batch;
     private BitmapFont font;
     private ArrayList<String> joinedPlayers;
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     protected Stage stage;
     private Viewport viewport;
@@ -87,6 +89,7 @@ public class LobbyScreen implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 if (gameClient.getMyLobby() != null) {
                     gameClient.getClientConnection().sendUpdateLobbyInfo(gameClient.getMyLobby().getLobbyHash());
                 }
@@ -97,6 +100,7 @@ public class LobbyScreen implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.getMyLobby().getPlayers().remove(gameClient.getConnectionId());
                 gameClient.getClientConnection().sendRemovePlayerFromLobby(gameClient.getMyLobby().getLobbyHash());
                 gameClient.setMyLobby(null);
@@ -109,6 +113,7 @@ public class LobbyScreen implements Screen {
             startGameButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
                     // Add logic here to start the game
                     gameClient.startGame(mapPath);
                 }
@@ -122,6 +127,7 @@ public class LobbyScreen implements Screen {
             startGameButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
                     // Add logic here to start the game
                     gameClient.startGame(mapPath);
                 }
@@ -170,8 +176,6 @@ public class LobbyScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

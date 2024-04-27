@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -21,6 +20,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class MenuScreen implements Screen {
@@ -30,11 +30,9 @@ public class MenuScreen implements Screen {
     private Viewport viewport;
     private OrthographicCamera camera;
     private TextureAtlas atlas;
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
     protected Skin skin;
     GameClient gameClient;
-
-    // Menu background music.
-    Sound sound = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/backgroundMusic.mp3"));
 
     // Background picture.
     private Sprite background;
@@ -47,9 +45,11 @@ public class MenuScreen implements Screen {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
+
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
+
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(worldWidth, worldHeight, camera);
@@ -57,8 +57,7 @@ public class MenuScreen implements Screen {
         camera.update();
 
         // Sound settings.
-        sound.loop();
-        sound.play(0.5f);
+        audioHelper.playMusicLoop("MusicSounds/backgroundMusic.mp3");
 
         stage = new Stage(viewport, batch);
     }
@@ -90,6 +89,7 @@ public class MenuScreen implements Screen {
         singlePlayerButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 SinglePlayerMenu singlePlayerMenu = new SinglePlayerMenu(gameClient);
                 // Create a new player to server.
                 ((Game) Gdx.app.getApplicationListener()).setScreen(singlePlayerMenu);
@@ -98,6 +98,7 @@ public class MenuScreen implements Screen {
         });
         multiplayerButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 gameClient.setMultiplayerMenu(multiplayerMenu);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
@@ -106,6 +107,7 @@ public class MenuScreen implements Screen {
         optionsButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
@@ -113,6 +115,7 @@ public class MenuScreen implements Screen {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 Gdx.app.exit();
             }
         });
@@ -140,9 +143,6 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
         // Background.
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
@@ -179,11 +179,9 @@ public class MenuScreen implements Screen {
         atlas.dispose();
     }
 
-    public void stopSound() {
-        this.sound.stop();
-    }
 
     public Sprite getBackground() {
         return this.background;
     }
+
 }

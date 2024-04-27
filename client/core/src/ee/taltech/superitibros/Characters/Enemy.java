@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class Enemy extends GameCharacter {
@@ -19,7 +20,7 @@ public class Enemy extends GameCharacter {
     public Body b2body;
     private boolean bodyDefined = false;
     private Integer playerSize = 50;
-    private final Sound dead = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/dead.mp3"));
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     /**
      * GameCharacter constructor.
@@ -197,7 +198,7 @@ public class Enemy extends GameCharacter {
      */
     public void removeBodyFromWorld() {
         if (b2body != null) {
-            dead.play(1f);
+            audioHelper.playSound("MusicSounds/dead.mp3");
             System.out.println("isnt null");
             clientWorld.getGdxWorld().destroyBody(b2body);
 
