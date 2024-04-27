@@ -34,8 +34,8 @@ public class GameOverScreen implements Screen {
     public GameOverScreen(GameClient gameClient) {
         int worldWidth = 1600;
         int worldHeight = 1000;
-        atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
-        skin = new Skin(Gdx.files.internal("Skins/quantum-horizon/skin/quantum-horizon-ui.json"), atlas);
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(worldWidth, worldHeight, camera);
