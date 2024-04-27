@@ -4,7 +4,7 @@
 ## Running the game
 
 1. To run the game you should build your server first by running the build.gradle
-2. Then find src.main.Java.ee.taltech.game.Server and run server.core.src.com.mygdx.game.Server.ServerConnection.java (To run from Taltech server at the moment you should write us to activate the server.)
+2. Then find and run server.core.src.com.mygdx.game.Server.ServerConnection.java (To run from Taltech server at the moment you should write us to activate the server.)
 3. Next thing you should to is go to client part of the project and again run build.gradle
 4. Finally locate the client[run], from Run/Debug configurations, and run the game.
 5. If you wish you can run multiple games at once, by running the 4th step again.
