@@ -129,8 +129,8 @@ public class HostLobby implements Screen {
         mainTable.center();
 
         //Create game title
-        Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
-        Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
+        Label menuLabel = new Label("Host Lobby", skin, "title", Color.CYAN);
+        Label placeholder = new Label("", skin, "subtitle", Color.CYAN);
 
         Table parentTable = new Table();
         parentTable.setFillParent(true);
@@ -228,32 +228,41 @@ public class HostLobby implements Screen {
 
         // Display players
         if (gameClient.getMyLobby() != null) {
+            int playersCount = 0;
             for (Integer playerId : gameClient.getMyLobby().getPlayers()) {
+                playersCount++;
                 // Create a button for each lobby
                 TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
                 // Add the lobby button to the table
-                mainTable.add(lobbyButton).pad(buttonLocationPadding);
-                mainTable.row();
+                if (playersCount % 4 == 0) {
+                    mainTable.add(lobbyButton).pad(buttonLocationPadding).uniform(true).row();
+                } else {
+                    mainTable.add(lobbyButton).pad(buttonLocationPadding).uniform(true);
+                }
             }
         }
-
-        mainTable.add(gameLabel).pad(buttonLocationPadding);
+        int mapButtonSize = 150;
         mainTable.row();
-        mainTable.add(menuLabel).pad(buttonLocationPadding);
+        mainTable.add(placeholder).size(buttonLocationPadding).left();
+        mainTable.add(menuLabel).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
-        mainTable.add(superMButton).pad(buttonLocationPadding).size(100, 100);
-        mainTable.add(desertButton).pad(buttonLocationPadding).size(100, 100);;
+        mainTable.add(superMButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
+        mainTable.add(desertButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
+        mainTable.add(castleButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
+        mainTable.add(moonButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
         mainTable.row();
-        mainTable.add(castleButton).pad(buttonLocationPadding).size(100, 100);;
-        mainTable.add(moonButton).pad(buttonLocationPadding).size(100, 100);;
+        mainTable.add(placeholder).size(buttonLocationPadding).left();
+        mainTable.add(startGameButton).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
-        mainTable.add(startGameButton).pad(buttonLocationPadding);
+        mainTable.add(placeholder).size(buttonLocationPadding).left();
+        mainTable.add(refreshButton).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
-        mainTable.add(refreshButton).pad(buttonLocationPadding);
-        mainTable.row();
-        mainTable.add(back).pad(buttonLocationPadding);
-        mainTable.row();
-        mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.add(placeholder).size(buttonLocationPadding).left();
+        mainTable.add(back).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(placeholder).size(buttonLocationPadding).right();
         //Add table to stage
         stage.addActor(mainTable);
     }
