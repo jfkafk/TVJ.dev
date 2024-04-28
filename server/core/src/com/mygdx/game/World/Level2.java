@@ -3,12 +3,12 @@ package com.mygdx.game.World;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Finish.Coin;
 
-public class Level1 extends World {
+public class Level2 extends World{
 
     /**
      * Initialize necessary objects.
      */
-    public Level1() {
+    public Level2() {
         // At enemies in these x coordinate ranges: 0 -> 1090; 1140 -> 1380; 1450 -> 300
         Enemy enemy1 = Enemy.createEnemy(600, 50, 0, 1090, this);
         Enemy enemy2 = Enemy.createEnemy(1000, 50, 0, 1090, this);
@@ -22,4 +22,5 @@ public class Level1 extends World {
         addEnemy(enemy5.getBotHash(), enemy5);
         coin = new Coin(3450, 25);
     }
+
 }

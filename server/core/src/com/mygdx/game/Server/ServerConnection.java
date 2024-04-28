@@ -12,6 +12,7 @@ import com.mygdx.game.Finish.Coin;
 import com.mygdx.game.Lobbies.Lobby;
 import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.Level1;
+import com.mygdx.game.World.Level2;
 import com.mygdx.game.World.World;
 import packets.*;
 
@@ -183,10 +184,13 @@ public class ServerConnection {
 					// Check if host set lobby to started
 					if (packetLobbyInfo.isStartGame()) {
 						// Get lobby
+						System.out.println("Got path: " + packetLobbyInfo.getMapPath());
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						// Set for each new ongoing lobby new server world
 						if (Objects.equals(packetLobbyInfo.getMapPath(), "Maps/level1/level1.tmx")) {
 							lobby.setServerWorld(new Level1());
+						} else if (Objects.equals(packetLobbyInfo.getMapPath(), "Maps/level4/gameart2d-desert.tmx")) {
+							lobby.setServerWorld(new Level2());
 						}
 						// Set for each new ongoing lobby new server update thread
 						serverUpdateThread = new ServerUpdateThread();
