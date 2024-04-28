@@ -44,6 +44,8 @@ public class Enemy extends GameCharacter {
             bodyDef.position.set(boundingBox.getX(), boundingBox.getY());
             bodyDef.type = BodyDef.BodyType.DynamicBody;
 
+            bodyDef.gravityScale = 1.0f;
+
             this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
 
             FixtureDef fixtureDef = new FixtureDef();
@@ -102,6 +104,8 @@ public class Enemy extends GameCharacter {
     public void moveToNewPos(float xPos) {
         this.boundingBox.set(xPos, b2body.getPosition().y, boundingBox.getWidth(), boundingBox.getHeight());
         if (b2body != null) {
+            b2body.applyForceToCenter(0, -10, true);
+            yPosition = b2body.getPosition().y;
             // Store the new position for later update
             this.newPosition.set(xPos, b2body.getPosition().y);
         }
@@ -177,8 +181,6 @@ public class Enemy extends GameCharacter {
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;
         boundingBox.y = b2body.getPosition().y;
-
-        yPosition = b2body.getPosition().y;
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {

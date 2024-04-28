@@ -13,14 +13,19 @@ public class Enemy extends GameCharacter {
     // Enemy (AI) states
     enum State {IDLE, RUNNING_LEFT, RUNNING_RIGHT, JUMPING, FALL, WALKING, ATTACKING}
 
-    private static final float MOVEMENT_SPEED = 0.1f;
-    private static final float DETECTION_RANGE = 100f;
-    private long lastUpdateTime;
+    private static final float MOVEMENT_SPEED = 0.15f; // At this speed enemy can climb
+    private static final float DETECTION_RANGE = 300f;
+
     // Health
-    private float maxHealth;
+    private final float maxHealth;
     private float health;
 
+    // State
     private State currentState;
+
+    // Enemy borders
+    float minX;
+    float maxX;
 
     /**
      * GameCharacter constructor.
@@ -35,7 +40,6 @@ public class Enemy extends GameCharacter {
     public Enemy(Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
         super(MOVEMENT_SPEED, boundingBox, xPosition, yPosition, width, height, world);
         botHash = "Bot" + nextBotHashNumber;
-        lastUpdateTime = System.currentTimeMillis();
         nextBotHashNumber++; // Incrementing here
         maxHealth = 100f;
         health = maxHealth;
@@ -48,9 +52,21 @@ public class Enemy extends GameCharacter {
      * @param y coordinate of the PlayerGameCharacter (float)
      * @return new Enemy instance
      */
-    public static Enemy createEnemy(float x, float y, World world) {
+    public static Enemy createEnemy(float x, float y, float minX, float maxX, World world) {
         Rectangle enemyRectangle = new Rectangle(x, y, 10f, 20f);
-        return new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
+        Enemy enemy = new Enemy(enemyRectangle, x, y, enemyRectangle.width, enemyRectangle.height, world);
+        enemy.setMinMax(minX, maxX);
+        return enemy;
+    }
+
+    /**
+     * Set min and max coordinate of enemy.
+     * @param minX minimum x coordinate.
+     * @param maxX maximum x coordinate.
+     */
+    public void setMinMax(float minX, float maxX) {
+        this.minX = minX;
+        this.maxX = maxX;
     }
 
     /**
@@ -101,28 +117,29 @@ public class Enemy extends GameCharacter {
      */
     private void sense() {
         float minDistance = DETECTION_RANGE;
+        boolean foundPlayer = false;
         for (GameCharacter player : getWorld().getClients().values()) {
-            //System.out.println("Player x: " + player.xPosition);
-            float distance = Math.abs(xPosition - player.xPosition) + Math.abs(yPosition - player.yPosition);
-            //System.out.println("Enemy x: " + xPosition + " | Player x: " + player.xPosition);
-            //System.out.println("Enemy y: " + yPosition + " | Player y: " + player.yPosition);
-            //System.out.println("Min distance: " + minDistance + " | Distance: " + distance);
+            float distance = Math.abs(xPosition - player.getxPosition()) + Math.abs(yPosition - player.getyPosition());
             if (distance < minDistance) {
                 minDistance = distance;
-                //System.out.println("Setting state to run");
-                currentState = (player.xPosition < xPosition) ? State.RUNNING_LEFT : State.RUNNING_RIGHT;
+                foundPlayer = true;
+                if ((xPosition <= minX && player.getxPosition() < minX) || (xPosition >= maxX && player.getxPosition() > maxX)) {
+                    currentState = State.IDLE;
+                } else {
+                    currentState = (player.xPosition < xPosition) ? State.RUNNING_LEFT : State.RUNNING_RIGHT;
+                }
             }
         }
-        if (minDistance == DETECTION_RANGE) {
-            currentState = State.IDLE;
+        if (!foundPlayer) {
+            if (xPosition <= minX) {
+                currentState = State.RUNNING_RIGHT;
+            } else if (xPosition >= maxX) {
+                currentState = State.RUNNING_LEFT;
+            } else {
+                currentState = State.IDLE;
+            }
         }
     }
-
-    /**
-     * Return if character is on the ground.
-     * @return true if on the ground, otherwise false.
-     */
-
 
     /**
      * Act method for acting.

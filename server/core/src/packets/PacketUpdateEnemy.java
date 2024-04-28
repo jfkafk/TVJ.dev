@@ -13,7 +13,6 @@ public class PacketUpdateEnemy extends Packet {
     private boolean isDead;
     private GameCharacter.State currentState;
     private boolean facingRight;
-
     private float health;
 
     public void setBotHash(String botHash) {
