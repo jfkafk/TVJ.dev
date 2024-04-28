@@ -54,6 +54,9 @@ public class GameScreen implements Screen, InputProcessor {
     private boolean canShoot = true;
     private float shootCooldown = 1f;
 
+    // Shooting sound.
+    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/shot.MP3"));
+
     // Coin
     Coin coin = new Coin(3450, 25);
 
