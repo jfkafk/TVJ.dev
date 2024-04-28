@@ -12,7 +12,7 @@ public class GameCharacter {
 
     // Character characteristics.
     protected float movementSpeed; // World units per second.
-    protected int health;
+    float health;
 
     // Position & dimension.
     public float xPosition;
@@ -80,6 +80,10 @@ public class GameCharacter {
         this.boundingBox.set(boundingBox.getX() + xPos, boundingBox.getY() + yPos, boundingBox.getWidth(), boundingBox.getHeight());
     }
 
+    public void setxPosition(float xPosition) {
+        this.xPosition = xPosition;
+    }
+
     /**
      * Set y coordinate.
      * @param yPosition y coordinate.
@@ -96,8 +100,16 @@ public class GameCharacter {
         this.facingRight = facingRight;
     }
 
+    public void setCurrentState(State currentState) {
+        this.currentState = currentState;
+    }
+
     public State getCurrentState() {
         return currentState;
+    }
+
+    public float getHealth() {
+        return health;
     }
 
     @Override

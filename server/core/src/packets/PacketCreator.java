@@ -1,5 +1,7 @@
 package packets;
 
+import com.mygdx.game.Characters.GameCharacter;
+
 /**
  * Class that is used to create new Packets to keep the code readable in ClientConnection and ServerConnection.
  */
@@ -10,11 +12,15 @@ public class PacketCreator {
      *
      * @return new PacketUpdateCharacterInformation
      */
-    public static PacketUpdateCharacterInformation createPacketUpdateCharacterInformation(int id, float xPos, float yPos) {
+    public static PacketUpdateCharacterInformation createPacketUpdateCharacterInformation(String lobbyHash, int id, float xPos, float yPos, GameCharacter.State currentState, boolean facingRight, float health) {
         PacketUpdateCharacterInformation packetUpdateCharacterInformation = new PacketUpdateCharacterInformation();
+        packetUpdateCharacterInformation.setLobbyHash(lobbyHash);
         packetUpdateCharacterInformation.setId(id);
         packetUpdateCharacterInformation.setX(xPos);
         packetUpdateCharacterInformation.setY(yPos);
+        packetUpdateCharacterInformation.setCurrentState(currentState);
+        packetUpdateCharacterInformation.setFacingRight(facingRight);
+        packetUpdateCharacterInformation.setHealth(health);
         return packetUpdateCharacterInformation;
     }
 
@@ -58,12 +64,15 @@ public class PacketCreator {
      * @param botHash npc's botHash
      * @return new PacketUpdateEnemy
      */
-    public static PacketUpdateEnemy createPacketUpdateEnemy(String botHash, float xPosition, float yPosition) {
-        PacketUpdateEnemy packetEnemy = new PacketUpdateEnemy();
-        packetEnemy.setBotHash(botHash);
-        packetEnemy.setxPosition(xPosition);
-        packetEnemy.setyPosition(yPosition);
-        return packetEnemy;
+    public static PacketUpdateEnemy createPacketUpdateEnemy(String botHash, float xPosition, float yPosition, GameCharacter.State currentState, boolean facingRight, float health) {
+        PacketUpdateEnemy packetNewEnemy = new PacketUpdateEnemy();
+        packetNewEnemy.setBotHash(botHash);
+        packetNewEnemy.setxPosition(xPosition);
+        packetNewEnemy.setyPosition(yPosition);
+        packetNewEnemy.setCurrentState(currentState);
+        packetNewEnemy.setFacingRight(facingRight);
+        packetNewEnemy.setHealth(health);
+        return packetNewEnemy;
     }
 
     /**
@@ -91,7 +100,18 @@ public class PacketCreator {
     }
 
     /**
-     * Create a PacketLobbyInfo.
+     * Create PacketRemoveLobby.
+     * @param lobbyHash lobby hash.
+     * @return PacketRemoveLobby.
+     */
+    public static PacketRemoveLobby createPacketRemoveLobby(String lobbyHash) {
+        PacketRemoveLobby packetRemoveLobby = new PacketRemoveLobby();
+        packetRemoveLobby.setLobbyHash(lobbyHash);
+        return packetRemoveLobby;
+    }
+
+    /**
+     * Create  PacketLobbyInfo.
      * @param lobbyHash lobby's hash.
      * @return new PacketLobbyInfo.
      */
@@ -101,10 +121,33 @@ public class PacketCreator {
         return packetLobbyInfo;
     }
 
-    public static PacketBullet createPacketBullet(String lobbyHash) {
+    /**
+     * Create PacketBullet.
+     * @param lobbyHash lobby hash.
+     * @param bulletId bullet id.
+     * @param bulletX bullet x coordinate.
+     * @param bulletY bullet y coordinate.
+     * @return new PacketBullet.
+     */
+    public static PacketBullet createPacketBullet(String lobbyHash, int bulletId, float bulletX, float bulletY) {
         PacketBullet packetBullet = new PacketBullet();
         packetBullet.setLobbyHash(lobbyHash);
+        packetBullet.setBulletId(bulletId);
+        packetBullet.setBulletX(bulletX);
+        packetBullet.setBulletY(bulletY);
         return packetBullet;
+    }
 
+    /**
+     * Create PacketAddCoin.
+     * @param xCoordinate coin x coordinate.
+     * @param yCoordinate coin y coordinate.
+     * @return new PacketAddCoin
+     */
+    public static PacketAddCoin createPacketAddCoin(float xCoordinate, float yCoordinate) {
+        PacketAddCoin packetAddCoin = new PacketAddCoin();
+        packetAddCoin.setxCoordinate(xCoordinate);
+        packetAddCoin.setyCoordinate(yCoordinate);
+        return packetAddCoin;
     }
 }

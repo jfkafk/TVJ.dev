@@ -2,6 +2,7 @@ package com.mygdx.game.World;
 
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.PlayerGameCharacter;
+import com.mygdx.game.Finish.Coin;
 import com.mygdx.game.Weapons.Bullet;
 
 import java.util.*;
@@ -9,10 +10,19 @@ import java.util.stream.Collectors;
 
 public class World {
 
-    private Map<Integer, PlayerGameCharacter> clients = new HashMap<>();
-    private  Map<String, Enemy> enemyMap = new HashMap<>();
-    private List<Bullet> bullets = new ArrayList<>();
-    private List<Bullet> bulletsToRemove = new ArrayList<>();
+    private final Map<Integer, PlayerGameCharacter> clients = new HashMap<>();
+    private final Map<String, Enemy> enemyMap = new HashMap<>();
+    private final List<Bullet> bullets = new ArrayList<>();
+    private final List<Bullet> bulletsToRemove = new ArrayList<>();
+    Coin coin;
+
+    /**
+     * Get coin object.
+     * @return coin object.
+     */
+    public Coin getCoin() {
+        return coin;
+    }
 
     /**
      * Get list of all bullets to remove.

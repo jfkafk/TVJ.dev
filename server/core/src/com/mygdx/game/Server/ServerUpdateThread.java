@@ -42,36 +42,38 @@ public class ServerUpdateThread implements Runnable {
     public void run() {
         while (true) {
             try {
-                // Update and send Enemies.
-                if (!serverWorld.getEnemyMap().isEmpty()) {
-                    for (Enemy enemy : serverWorld.getEnemyMap().values()) {
-                        enemy.spin();
-                    }
-                    serverConnection.sendUpdatedEnemies(lobbyHash);
-                }
-
-                if(!serverWorld.getBullets().isEmpty()) {
-
-                    if (!serverWorld.getBulletsToRemove().isEmpty()) {
-
-                        for (Bullet bullet : serverWorld.getBulletsToRemove()) {
-                            serverWorld.getBullets().remove(bullet);
+                if (serverWorld != null) {
+                    // Update and send Enemies.
+                    if (!serverWorld.getEnemyMap().isEmpty()) {
+                        for (Enemy enemy : serverWorld.getEnemyMap().values()) {
+                            enemy.spin();
                         }
-                        serverWorld.getBulletsToRemove().clear();
-
+                        serverConnection.sendUpdatedEnemies(lobbyHash);
                     }
 
-                    for (Bullet bullet : serverWorld.getBullets()) {
-                        bullet.updateBullet();
+                    if(!serverWorld.getBullets().isEmpty()) {
 
-                        if (bullet.getBulletX() > 3499 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
-                            serverWorld.addBulletToRemove(bullet);
+                        if (!serverWorld.getBulletsToRemove().isEmpty()) {
+
+                            for (Bullet bullet : serverWorld.getBulletsToRemove()) {
+                                serverWorld.getBullets().remove(bullet);
+                            }
+                            serverWorld.getBulletsToRemove().clear();
+
                         }
-                    }
-                    serverConnection.sendUpdatedBullet(lobbyHash);
-                }
 
-                sleep(5);
+                        for (Bullet bullet : serverWorld.getBullets()) {
+                            bullet.updateBullet();
+
+                            if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
+                                serverWorld.addBulletToRemove(bullet);
+                            }
+                        }
+                        serverConnection.sendUpdatedBullet(lobbyHash);
+                    }
+
+                    sleep(5);
+                }
 
             } catch (InterruptedException e) {
                 System.out.println("Exception: " + Arrays.toString(e.getStackTrace()));

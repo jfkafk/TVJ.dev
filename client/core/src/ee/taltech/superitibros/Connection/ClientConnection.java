@@ -9,6 +9,7 @@ import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
+import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
@@ -47,7 +48,6 @@ public class ClientConnection {
 		client.getKryo().register(PacketConnect.class);
 		client.getKryo().register(PacketAddCharacter.class);
 		client.getKryo().register(PacketUpdateCharacterInformation.class);
-		client.getKryo().register(PacketCreator.class);
 		client.getKryo().register(ArrayList.class);
 		client.getKryo().register(Rectangle.class);
 		client.getKryo().register(HashMap.class);
@@ -62,6 +62,7 @@ public class ClientConnection {
 		client.getKryo().register(LinkedHashSet.class);
 		client.getKryo().register(PacketRemoveLobby.class);
 		client.getKryo().register(PacketBullet.class);
+		client.getKryo().register(PacketAddCoin.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -126,6 +127,7 @@ public class ClientConnection {
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
+						System.out.println("Got packet new enemy");
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy && clientWorld != null) {
@@ -187,7 +189,9 @@ public class ClientConnection {
 
 					} else if (object instanceof PacketRemoveLobby) {
 						PacketRemoveLobby packetRemoveLobby = (PacketRemoveLobby) object;
-						gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
+						if (gameClient.getLobby(packetRemoveLobby.getLobbyHash()).isPresent()) {
+							gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
+						}
 
 					} else if (object instanceof PacketBullet && clientWorld != null) {
 						PacketBullet packetBullet = (PacketBullet) object;
@@ -221,6 +225,10 @@ public class ClientConnection {
 								}
 							}
 						}
+					} else if (object instanceof PacketAddCoin) {
+						PacketAddCoin packetAddCoin = (PacketAddCoin) object;
+						// Create coin object
+						gameScreen.setCoinCoords(packetAddCoin.getxCoordinate(), packetAddCoin.getyCoordinate());
 					}
 				}
 			}

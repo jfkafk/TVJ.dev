@@ -18,6 +18,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
 
@@ -56,6 +57,9 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Shooting sound.
     private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/shot.MP3"));
+
+    // Coin
+    Coin coin = new Coin(3450, 25);
 
     /**
      * GameScreen constructor
@@ -134,6 +138,7 @@ public class GameScreen implements Screen, InputProcessor {
         clientWorld.moveEnemies();
         drawEnemies();
         drawBullets();
+        drawCoin();
         batch.end();
 
         // Check bullet collision
@@ -269,9 +274,7 @@ public class GameScreen implements Screen, InputProcessor {
             for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
                     enemy.draw(batch, clientWorld.getHealthBarTexture());
-                    if (enemy.b2body.getLinearVelocity().y != 0) {
-                        clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
-                    }
+                    clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
                 }
             }
         }
@@ -304,12 +307,31 @@ public class GameScreen implements Screen, InputProcessor {
         for (Bullet bullet : clientWorld.getBullets()) {
 
             // If bullet is beyond map borders, then remove it
-            if (bullet.getBulletX() > 3499 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
+            if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
                 clientWorld.addBulletToRemove(bullet);
             }
 
             // System.out.println("Bullet X: " + bullet.getBulletX() + " | Bullet Y: " + bullet.getBulletY() + " | Bullet ID: " + bullet.getBulletId());
             bullet.draw(batch, clientWorld.getBulletSprite());
+        }
+    }
+
+    /**
+     * Set coin coordinates.
+     * @param xCoordinate x coordinate.
+     * @param yCoordinate y coordinate.
+     */
+    public void setCoinCoords(float xCoordinate, float yCoordinate) {
+        coin.setxCoordinate(xCoordinate);
+        coin.setyCoordinate(yCoordinate);
+    }
+
+    /**
+     * Draw coin.
+     */
+    public void drawCoin() {
+        if (coin != null) {
+            coin.draw(batch);
         }
     }
 

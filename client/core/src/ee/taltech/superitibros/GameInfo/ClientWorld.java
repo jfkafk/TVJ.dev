@@ -17,6 +17,7 @@ import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
+import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.*;
@@ -34,11 +35,14 @@ public class ClientWorld {
     private final Map<String, Enemy> enemyMap = new HashMap<>();
     public final Box2DDebugRenderer b2dr;
 
+    // Bullets
     private final Map<Integer, Bullet> bullets = new HashMap<>();
     private final Map<Integer, Bullet> bulletsToAdd = new HashMap<>();
     private final List<Bullet> bulletsToRemove = new ArrayList<>();
     private final List<Integer> collidedBullets = new ArrayList<>();
     private final Sprite bulletSprite = new Sprite(new Texture("Bullet/bullet.png"));
+
+    // Health bar
     private final Texture healthBarTexture = new Texture("HealthBar/white-texture.jpg");
 
     public ClientWorld(String path) {
