@@ -63,17 +63,23 @@ public class CreateCharacterFrames {
             idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
             jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
             fallAnimationPath = "Characters/Enemy sprites/FALL.png";
-            playerSize = 54;
+            playerSize = 50;
         } else {
 //            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
 //            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
 //            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
 //            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
-            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
-            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
-            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
-            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
-            playerSize = 64;
+
+//            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
+//            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
+//            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
+//            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
+
+            walkAnimationPath = "Characters/Wizard sprites/Wizard WALK.png";
+            idleAnimationPath = "Characters/Wizard sprites/Wizard IDLE.png";
+            jumpAnimationPath = "Characters/Wizard sprites/Wizard JUMP.png";
+            fallAnimationPath = "Characters/Wizard sprites/Wizard FALL.png";
+            playerSize = 50;
         }
     }
 
