@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
@@ -390,6 +391,7 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
+            shot.play(1f);
             clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer

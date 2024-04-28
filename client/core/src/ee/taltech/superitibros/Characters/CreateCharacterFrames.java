@@ -3,6 +3,7 @@ package ee.taltech.superitibros.Characters;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import ee.taltech.superitibros.Characters.GameCharacter;
 
 public class CreateCharacterFrames {
 
@@ -18,9 +19,10 @@ public class CreateCharacterFrames {
     Animation<TextureRegion> jumpAnimationLeft;
     Animation<TextureRegion> fallAnimationRight;
     Animation<TextureRegion> fallAnimationLeft;
+    private Integer playerSize;
 
-    public void makeFrames() {
-        determineWhatPathToUse();
+    public void makeFrames(GameCharacter character) {
+        determineWhatPathToUse(character);
         createFramesIdle();
         createFramesWalking();
         createFramesFalling();
@@ -30,7 +32,7 @@ public class CreateCharacterFrames {
     /**
      * determine what path to take; right now a skeleton path is default later it is changed
      */
-    public void determineWhatPathToUse() {
+    public void determineWhatPathToUse(GameCharacter character) {
 //        if (Objects.equals(characterSkinName, "Skeleton")) {
 //            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
 //            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
@@ -43,10 +45,36 @@ public class CreateCharacterFrames {
 //            jumpAnimationPath = "Characters/TestCharacter.png";
 //            fallAnimationPath = "Characters/TestCharacter.png";
 //        }
-        walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
-        idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
-        jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
-        fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
+        if (character instanceof Enemy) {
+            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
+            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
+            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
+            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
+            playerSize = 54;
+
+
+//            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
+//            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
+//            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
+//            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
+
+        } else if (character instanceof PlayerGameCharacter) {
+            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
+            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
+            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
+            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
+            playerSize = 54;
+        } else {
+//            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
+//            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
+//            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
+//            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
+            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
+            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
+            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
+            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
+            playerSize = 64;
+        }
     }
 
     private void createFrames(String animationPath) {
@@ -139,5 +167,9 @@ public class CreateCharacterFrames {
 
     public Animation<TextureRegion> getFallAnimationLeft() {
         return fallAnimationLeft;
+    }
+
+    public Integer getPlayerSize() {
+        return playerSize;
     }
 }

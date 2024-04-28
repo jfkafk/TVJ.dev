@@ -6,6 +6,8 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -32,12 +34,15 @@ public class MultiplayerMenu implements Screen {
     private TextButton hostLobbyButton;
     GameClient gameClient;
 
+    private Sprite background;
+
     public MultiplayerMenu(GameClient gameClient) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
-        atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
-        skin = new Skin(Gdx.files.internal("Skins/quantum-horizon/skin/quantum-horizon-ui.json"), atlas);
+        background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(worldWidth, worldHeight, camera);
@@ -114,6 +119,10 @@ public class MultiplayerMenu implements Screen {
     public void render(float delta) {
         Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        background.setSize(camera.viewportWidth, camera.viewportHeight);
+        background.draw(batch);
+        batch.end();
         stage.act();
         stage.draw();
     }

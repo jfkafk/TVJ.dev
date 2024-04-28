@@ -1,6 +1,7 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -12,6 +13,8 @@ import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
+    Sound jump = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/jump.mp3"));
+    Sound dead = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/dead.mp3"));
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String temporarySkin = "Skeleton";
@@ -106,7 +109,8 @@ public class GameCharacter {
      * Making frames for character
      */
     public void createFrames() {
-        skinCreator.makeFrames();
+        skinCreator.makeFrames(this);
+        this.playerSize = skinCreator.getPlayerSize();
         walkAnimationRight = skinCreator.getWalkAnimationRight();
         walkAnimationLeft = skinCreator.getWalkAnimationLeft();
         idleAnimationRight = skinCreator.getIdleAnimationRight();
@@ -197,6 +201,7 @@ public class GameCharacter {
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
+            jump.play(1f);
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             // System.out.println("jumped");
@@ -416,6 +421,5 @@ public class GameCharacter {
             clientWorld.getGdxWorld().destroyBody(b2body);
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
-
     }
 }
