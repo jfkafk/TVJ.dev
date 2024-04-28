@@ -20,11 +20,13 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class JoinLobby implements Screen {
     private SpriteBatch batch;
@@ -37,6 +39,7 @@ public class JoinLobby implements Screen {
     private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
+    private AudioHelper audioHelper = AudioHelper.getInstance();
 
     // Fetch available lobbies
     List<Lobby> availableLobbies = new ArrayList<>();
@@ -79,8 +82,8 @@ public class JoinLobby implements Screen {
         availableLobbies.addAll(getAvailableLobbies());
 
         // Create game title
-        Label gameLabel = new Label("SuperITiBros", skin, "title", Color.CHARTREUSE);
-        Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
+        Label menuLabel = new Label("Choose Lobby", skin, "subtitle", Color.CYAN);
+        Label placeholder = new Label("", skin, "subtitle", Color.CYAN);
 
         // Create buttons
         TextButton refreshButton = new TextButton("Refresh", skin);
@@ -89,6 +92,7 @@ public class JoinLobby implements Screen {
         refreshButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 refreshLobbies();
             }
         });
@@ -96,37 +100,52 @@ public class JoinLobby implements Screen {
         back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MultiplayerMenu multiplayerMenu = new MultiplayerMenu(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(multiplayerMenu);
             }
         });
 
+        int lobbyCount = 0;
         // Display available lobbies
         for (Lobby lobby : availableLobbies) {
+            lobbyCount++;
             // Create a button for each lobby
             TextButton lobbyButton = new TextButton(lobby.getLobbyHash(), skin);
             // Add a listener to the button to join the lobby
             lobbyButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
+                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
                     // Join the selected lobby
                     joinLobby(lobby);
                 }
             });
-            // Add the lobby button to the table
-            mainTable.add(lobbyButton).pad(BUTTON_PADDING);
-            mainTable.row();
+            // Add the lobby button to the table for lobbies in a row.
+            if (lobbyCount % 4 == 0) {
+                mainTable.add(lobbyButton).pad(BUTTON_PADDING)
+                        .uniform(true)
+                        .row();
+            } else {
+                mainTable.add(lobbyButton).pad(BUTTON_PADDING)
+                        .uniform(true);
+            }
+
         }
 
         // Add existing components to the table
-        mainTable.add(gameLabel).pad(BUTTON_PADDING);
         mainTable.row();
-        mainTable.add(menuLabel).pad(BUTTON_PADDING);
+        mainTable.add(placeholder).size(BUTTON_PADDING);
+        mainTable.add(menuLabel).padBottom(BUTTON_PADDING).colspan(2);
+        mainTable.add(placeholder).size(BUTTON_PADDING);
         mainTable.row();
-        mainTable.add(refreshButton).pad(BUTTON_PADDING);
+        mainTable.add(placeholder).size(BUTTON_PADDING).left();
+        mainTable.add(refreshButton).padBottom(BUTTON_PADDING).colspan(2);
+        mainTable.add(placeholder).size(BUTTON_PADDING).right();
         mainTable.row();
-        mainTable.add(back).pad(BUTTON_PADDING);
-        mainTable.row();
+        mainTable.add(placeholder).size(BUTTON_PADDING).left();
+        mainTable.add(back).padBottom(BUTTON_PADDING).colspan(2);
+        mainTable.add(placeholder).size(BUTTON_PADDING).right();
 
         // Add table to stage
         stage.addActor(mainTable);
@@ -159,8 +178,6 @@ public class JoinLobby implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

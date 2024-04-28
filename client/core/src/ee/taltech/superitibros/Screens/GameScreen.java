@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
@@ -55,8 +56,8 @@ public class GameScreen implements Screen, InputProcessor {
     private boolean canShoot = true;
     private float shootCooldown = 1f;
 
-    // Shooting sound.
-    private final Sound shot = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/shot.MP3"));
+    // Sounds.
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     // Coin
     Coin coin = new Coin(3450, 25);
@@ -391,7 +392,7 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
-            shot.play(1f);
+            audioHelper.playSound("MusicSounds/shot.MP3");
             clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer

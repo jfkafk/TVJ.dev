@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class GameOverScreen implements Screen {
@@ -27,11 +28,14 @@ public class GameOverScreen implements Screen {
     private TextButton restartButton;
     private TextButton mainMenuButton;
 
+    // Sounds.
+    private AudioHelper audioHelper = AudioHelper.getInstance();
+
     public GameOverScreen(GameClient gameClient) {
         int worldWidth = 1600;
         int worldHeight = 1000;
-        atlas = new TextureAtlas("Skins/quantum-horizon/skin/quantum-horizon-ui.atlas");
-        skin = new Skin(Gdx.files.internal("Skins/quantum-horizon/skin/quantum-horizon-ui.json"), atlas);
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(worldWidth, worldHeight, camera);
@@ -44,6 +48,8 @@ public class GameOverScreen implements Screen {
         mainTable.setFillParent(true);
         mainTable.center();
 
+        audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
+
         Label gameOverLabel = new Label("Game Over", skin, "title", Color.RED);
 
         restartButton = new TextButton("Back to lobby", skin);
@@ -53,6 +59,7 @@ public class GameOverScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 LobbyScreen lobbyScreen = new LobbyScreen(gameClient, gameClient.getMyLobby());
+                audioHelper.stopAllMusic();
                 gameClient.setLobbyScreen(lobbyScreen);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(lobbyScreen);
             }
@@ -63,6 +70,7 @@ public class GameOverScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 // Return to the main menu
                 MenuScreen menuScreen = new MenuScreen(gameClient);
+                audioHelper.stopAllMusic();
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });

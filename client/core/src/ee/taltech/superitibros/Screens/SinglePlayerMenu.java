@@ -15,12 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import org.w3c.dom.Text;
 
 
 public class SinglePlayerMenu implements Screen {
 
+    // Sound.
+    private AudioHelper audioHelper = AudioHelper.getInstance();
     private SpriteBatch batch;
     protected Stage stage;
     private Viewport viewport;
@@ -150,6 +153,7 @@ public class SinglePlayerMenu implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 resume();
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
 //                String mapPath = "Maps/level2/level2.tmx";
 //                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
 //                gameClient.startGame(mapPath);
@@ -159,6 +163,8 @@ public class SinglePlayerMenu implements Screen {
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level1/level1.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -167,6 +173,8 @@ public class SinglePlayerMenu implements Screen {
         desertButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level4/gameart2d-desert.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -175,6 +183,8 @@ public class SinglePlayerMenu implements Screen {
         castleButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 String mapPath = "Maps/level3/MagicLand.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
@@ -182,6 +192,8 @@ public class SinglePlayerMenu implements Screen {
         });
         optionsButton.addListener(new ClickListener() {
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                audioHelper.stopAllMusic();
                 Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
             }
@@ -189,6 +201,7 @@ public class SinglePlayerMenu implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 MenuScreen menuScreen = new MenuScreen(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
@@ -213,8 +226,6 @@ public class SinglePlayerMenu implements Screen {
      */
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(.1f, .12f, .16f, 1);
-        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);

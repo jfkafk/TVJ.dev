@@ -9,12 +9,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
-    Sound jump = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/jump.mp3"));
-    Sound dead = Gdx.audio.newSound(Gdx.files.internal("MusicSounds/dead.mp3"));
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String temporarySkin = "Skeleton";
@@ -33,7 +33,6 @@ public class GameCharacter {
 
     protected float width, height;
     protected Rectangle boundingBox;
-    private final Integer possiblyDealingWithSheetSize = 8;
 
     private Integer playerSize = 50;
 
@@ -201,7 +200,7 @@ public class GameCharacter {
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded()) {
-            jump.play(1f);
+            audioHelper.playSound("MusicSounds/jump.mp3");
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             // System.out.println("jumped");
