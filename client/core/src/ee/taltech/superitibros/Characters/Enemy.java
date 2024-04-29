@@ -109,8 +109,6 @@ public class Enemy extends GameCharacter {
         if (b2body != null) {
             b2body.applyForceToCenter(0, -10, true);
             yPosition = b2body.getPosition().y;
-            // Store the new position for later update
-            this.newPosition.set(xPos, b2body.getPosition().y);
         }
     }
 
@@ -203,9 +201,7 @@ public class Enemy extends GameCharacter {
     public void removeBodyFromWorld() {
         if (b2body != null) {
             audioHelper.playSound("MusicSounds/dead.mp3");
-            System.out.println("isnt null");
             clientWorld.getGdxWorld().destroyBody(b2body);
-
             b2body = null; // Set the reference to null to indicate that the body has been destroyed
         }
     }

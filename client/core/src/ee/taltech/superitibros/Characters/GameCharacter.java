@@ -199,7 +199,7 @@ public class GameCharacter {
      */
     public void jump() {
         // Player can't jump if he is already in air
-        if (isGrounded()) {
+        if (isGrounded() && !clientWorld.getGdxWorld().isLocked()) {
             audioHelper.playSound("MusicSounds/jump.mp3");
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
@@ -211,24 +211,30 @@ public class GameCharacter {
      * Method for faster falling.
      */
     public void fallDown() {
-        this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed * 70);
+        if (!clientWorld.getGdxWorld().isLocked()) {
+            this.b2body.setLinearVelocity(this.b2body.getLinearVelocity().x, -movementSpeed * 70);
+        }
     }
 
     /**
      * Method for moving character to right.
      */
     public void moveRight() {
-        this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
-        facingRight = true;
+        if (!clientWorld.getGdxWorld().isLocked()) {
+            this.b2body.applyForceToCenter(new Vector2(movementSpeed * 70, b2body.getLinearVelocity().y), true);
+            facingRight = true;
+        }
     }
 
     /**
      * Method for moving character to left.
      */
     public void moveLeft() {
-        // Apply a force to the left
-        this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
-        facingRight = false;
+        if (!clientWorld.getGdxWorld().isLocked()) {
+            // Apply a force to the left
+            this.b2body.applyForceToCenter(new Vector2(-movementSpeed * 70, b2body.getLinearVelocity().y), true);
+            facingRight = false;
+        }
     }
 
     /**
