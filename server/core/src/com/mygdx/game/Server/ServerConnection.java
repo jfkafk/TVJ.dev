@@ -444,7 +444,7 @@ public class ServerConnection {
 	public void sendUpdatedBullet(String lobbyHash) {
 
 		// To prevent modifying list while iterating
-		List<Bullet> bullets = onGoingLobbies.get(lobbyHash).getServerWorld().getBullets();
+		List<Bullet> bullets = new ArrayList<>(onGoingLobbies.get(lobbyHash).getServerWorld().getBullets());
 
 		for (Bullet bullet : bullets) {
 			PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash, bullet.getBulletId(),
