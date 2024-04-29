@@ -34,7 +34,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "127.0.0.1";
+		String ip = "193.40.255.30";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;

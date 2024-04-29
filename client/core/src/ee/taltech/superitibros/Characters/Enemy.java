@@ -179,7 +179,9 @@ public class Enemy extends GameCharacter {
         float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
 
-        b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
+        if (!clientWorld.getGdxWorld().isLocked()) {
+            b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
+        }
 
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;
