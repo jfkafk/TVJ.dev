@@ -120,6 +120,7 @@ public class MenuScreen implements Screen {
         });
         mainTable.toFront();
         int buttonLocationPadding = 7;
+        int buttonSize = 150;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
         mainTable.row();
         mainTable.add(multiplayerButton).pad(buttonLocationPadding);

@@ -67,12 +67,13 @@ public class GameScreen implements Screen, InputProcessor {
      *
      * @param clientWorld client's world
      */
-    public GameScreen (ClientWorld clientWorld) {
+    public GameScreen(ClientWorld clientWorld) {
 
         this.clientWorld = clientWorld;
 
         // TextureAtlas and background texture
         tiledMap = new TmxMapLoader().load(clientWorld.getPath());
+        System.out.println("tiled map in GameScreen -> " + tiledMap + "\n");
         int tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
         int mapWidthInTiles = tiledMap.getProperties().get("width", Integer.class);
         WORLD_WIDTH = tileWidth * mapWidthInTiles;
@@ -84,15 +85,12 @@ public class GameScreen implements Screen, InputProcessor {
         buttonHasBeenPressed = false;
 
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
-        if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles; // Set the desired width of the camera
-        } else {
-            this.desiredCameraHeight = tileHeight * mapHeightInTiles;
-        }
+        this.desiredCameraHeight = tileHeight * mapHeightInTiles;
         this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
+        System.out.println("screenX, ScreenY" + desiredCameraWidth + " " + desiredCameraHeight + "\n");
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
@@ -149,7 +147,7 @@ public class GameScreen implements Screen, InputProcessor {
         // Check enemy and player collision
         clientWorld.checkPlayerEnemyCollisions();
 
-        // Render Box2D debug
+        // Render Box2D debug)
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
 
         if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
@@ -157,6 +155,7 @@ public class GameScreen implements Screen, InputProcessor {
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+            System.out.println("game over in GameScreen" + "\n");
         }
     }
 

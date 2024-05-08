@@ -175,7 +175,7 @@ public class SinglePlayerMenu implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 audioHelper.stopAllMusic();
-                String mapPath = "Maps/level4/gameart2d-desert.tmx";
+                String mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
             }
