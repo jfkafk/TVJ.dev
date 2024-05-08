@@ -90,10 +90,6 @@ public class GameCharacter {
         this.stateTimer = 0;
         this.mapHeight = clientWorld.getMapHeight();
         this.mapWidth = clientWorld.getMapWidth();
-        if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
-            playerSize = 256;
-            boundingBox.setSize(60, 105);
-        }
         defineCharacter();
         // Initialize health bar properties
         maxHealth = 100f;
