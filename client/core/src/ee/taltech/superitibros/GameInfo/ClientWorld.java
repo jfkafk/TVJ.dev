@@ -53,6 +53,7 @@ public class ClientWorld {
         gdxWorld.step(1/60f, 6, 2);
         initializeMap();
         initializeObjects();
+        b2dr.setDrawBodies(false);
     }
 
     /**

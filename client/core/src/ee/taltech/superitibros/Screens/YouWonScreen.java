@@ -17,7 +17,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
-public class GameOverScreen implements Screen {
+public class YouWonScreen implements Screen {
 
     private SpriteBatch batch;
     private Stage stage;
@@ -31,7 +31,7 @@ public class GameOverScreen implements Screen {
     // Sounds.
     private AudioHelper audioHelper = AudioHelper.getInstance();
 
-    public GameOverScreen(GameClient gameClient) {
+    public YouWonScreen(GameClient gameClient) {
         int worldWidth = 1600;
         int worldHeight = 1000;
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
@@ -50,7 +50,7 @@ public class GameOverScreen implements Screen {
 
         audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
 
-        Label gameOverLabel = new Label("Game Over", skin, "title", Color.RED);
+        Label gameOverLabel = new Label("You Won", skin, "title", Color.RED);
 
         restartButton = new TextButton("Back to lobby", skin);
         mainMenuButton = new TextButton("Main Menu", skin);

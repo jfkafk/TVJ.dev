@@ -1,15 +1,13 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
@@ -131,7 +129,13 @@ public class GameCharacter {
             bodyDef.position.set(boundingBox.getX(), boundingBox.getY());
             bodyDef.type = BodyDef.BodyType.DynamicBody;
 
-            this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+            boolean bodyCreated = false;
+            while (!bodyCreated) {
+                if (!clientWorld.getGdxWorld().isLocked()) {
+                    this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+                    bodyCreated = true;
+                }
+            }
 
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
@@ -149,6 +153,14 @@ public class GameCharacter {
 
             newPosition = new Vector2();
         }
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
+    public float getxPosition() {
+        return xPosition;
     }
 
     /**

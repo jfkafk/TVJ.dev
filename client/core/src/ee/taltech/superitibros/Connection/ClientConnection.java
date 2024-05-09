@@ -9,13 +9,12 @@ import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
-import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.Lobbies.Lobby;
 import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
-import packets.*;
+import ee.taltech.superitibros.Packets.*;
 
 import javax.swing.JOptionPane;
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;
@@ -63,6 +62,7 @@ public class ClientConnection {
 		client.getKryo().register(PacketRemoveLobby.class);
 		client.getKryo().register(PacketBullet.class);
 		client.getKryo().register(PacketAddCoin.class);
+		client.getKryo().register(PacketWon.class);
 
 		// Add a listener to handle receiving objects.
 		client.addListener(new Listener.ThreadedListener(new Listener()) {
@@ -229,6 +229,9 @@ public class ClientConnection {
 						PacketAddCoin packetAddCoin = (PacketAddCoin) object;
 						// Create coin object
 						gameScreen.setCoinCoords(packetAddCoin.getxCoordinate(), packetAddCoin.getyCoordinate());
+
+					} else if (object instanceof PacketWon) {
+						gameClient.setGameWon(true);
 					}
 				}
 			}

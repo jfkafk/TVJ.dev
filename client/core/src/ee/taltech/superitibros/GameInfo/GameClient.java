@@ -17,7 +17,6 @@ public class GameClient extends Game {
     private GameScreen gameScreen;
     private ClientConnection clientConnection;
     private ClientWorld clientWorld;
-    private MenuScreen menuScreen;
     private MultiplayerMenu multiplayerMenu;
     List<Lobby> availableLobbies = new LinkedList<>();
     Lobby myLobby;
@@ -25,6 +24,7 @@ public class GameClient extends Game {
     HostLobby hostLobbyScreen;
     Integer connectionId;
     String mapPath;
+    boolean gameWon;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -52,7 +52,7 @@ public class GameClient extends Game {
         clientConnection = new ClientConnection();
         clientConnection.setGameClient(this);
         // Create and set the menu screen as the initial screen
-        this.menuScreen = new MenuScreen(this);
+        MenuScreen menuScreen = new MenuScreen(this);
         setScreen(menuScreen);
     }
 
@@ -254,6 +254,21 @@ public class GameClient extends Game {
      */
     public String getMapPath() {
         return mapPath;
+    }
+
+    /**
+     * Set status to game won.
+     */
+    public void setGameWon(boolean won) {
+        this.gameWon = won;
+    }
+
+    /**
+     * Return if game won.
+     * @return boolean if game won.
+     */
+    public boolean isGameWon() {
+        return gameWon;
     }
 
     /**

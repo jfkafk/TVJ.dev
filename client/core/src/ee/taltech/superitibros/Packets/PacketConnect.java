@@ -1,6 +1,9 @@
-package packets;
+package ee.taltech.superitibros.Packets;
 
-public class PacketRemoveLobby extends Packet {
+/**
+ * Packet that is used when a client wants to connect to the server.
+ */
+public class PacketConnect extends Packet {
 
     String lobbyHash;
 

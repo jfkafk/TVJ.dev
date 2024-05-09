@@ -1,4 +1,4 @@
-package packets;
+package ee.taltech.superitibros.Packets;
 import ee.taltech.superitibros.Characters.GameCharacter;
 
 /**
