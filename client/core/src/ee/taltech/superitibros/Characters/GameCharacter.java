@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Timer;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
@@ -17,7 +17,7 @@ public class GameCharacter {
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String temporarySkin = "Skeleton";
+    String nameOfSkin;
     float stateTime;
 
     // Character characteristics.
@@ -103,6 +103,21 @@ public class GameCharacter {
         healthBarColor = Color.GREEN;
     }
 
+    /**
+     *
+     * @return the name of the skin
+     */
+    public String getNameOfSkin() {
+        return nameOfSkin;
+    }
+
+    /**
+     * sets parameter as name of skin
+     * @param nameOfSkin
+     */
+    public void setNameOfSkin(String nameOfSkin) {
+        this.nameOfSkin = nameOfSkin;
+    }
 
     /**
      * Making frames for character
