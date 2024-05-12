@@ -34,7 +34,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;
@@ -119,7 +119,7 @@ public class ClientConnection {
 					} else if (object instanceof PacketClientDisconnect && clientWorld != null) {
 						// Packet for removing player from world if disconnected.
 						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
-						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected.");
+						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected." + "\n");
 						clientWorld.getGameCharacter(packetClientDisconnect.getId()).removeBodyFromWorld();
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 
@@ -127,7 +127,7 @@ public class ClientConnection {
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
-						System.out.println("Got packet new enemy");
+						System.out.println("Got packet new enemy" + "\n");
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy && clientWorld != null) {

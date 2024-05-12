@@ -62,12 +62,13 @@ public class GameClient extends Game {
     public void startGame(String path) {
         // Create a new game screen and transition to it
         clientWorld = new ClientWorld(path);
+        System.out.println("path in start game GameClient -> " + path + "\n");
         gameScreen = new GameScreen(clientWorld);
         setScreen(gameScreen);
-
         try {
             createClient(gameScreen);
         } catch (IOException e) {
+            System.out.println("something terrible happened in startGame GameClient" + "\n");
             e.printStackTrace();
         }
         Gdx.input.setInputProcessor(gameScreen);
@@ -96,7 +97,7 @@ public class GameClient extends Game {
         if (!lobbyExists) {
             availableLobbies.add(lobby);
         }
-        System.out.println("added lobby: " + availableLobbies);
+        System.out.println("added lobby: " + availableLobbies + "\n");
     }
 
     /**

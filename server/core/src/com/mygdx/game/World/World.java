@@ -86,6 +86,7 @@ public class World {
      */
     public void addGameCharacter(Integer id, PlayerGameCharacter gameCharacter){
         clients.put(id, gameCharacter);
+        System.out.println("added new GameCharacter in World!\n");
     }
 
     /**

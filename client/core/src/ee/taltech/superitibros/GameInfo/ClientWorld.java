@@ -48,6 +48,7 @@ public class ClientWorld {
     public ClientWorld(String path) {
         // Map and physics
         this.path = path;
+        System.out.println("path in ClientWorld -> " + path + "\n");
         gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -150), true);
         b2dr = new Box2DDebugRenderer();
         gdxWorld.step(1/60f, 6, 2);
@@ -85,7 +86,6 @@ public class ClientWorld {
 
             // Determine the type of object and set category and mask bits accordingly
             String type = obj.getProperties().get("ground", String.class);
-            System.out.println(type);
             if ("player".equals(type)) {
                 fixtureDef.filter.categoryBits = playerCategory;
                 fixtureDef.filter.maskBits = playerMask;
@@ -109,6 +109,8 @@ public class ClientWorld {
     public void initializeMap() {
         this.tiledMap = getMap();
         this.mapLayer = tiledMap.getLayers().get(2);
+        this.mapLayer.setVisible(false);
+        System.out.println("initialize Map in ClientWorld (map Layer) -> " + mapLayer.getName() + "\n");
     }
 
     /**
@@ -177,7 +179,6 @@ public class ClientWorld {
 
     /**
      * Map of clients and their PlayerGameCharacters.
-     *
      * Key: id, value: PlayerGameCharacter
      */
     public HashMap<Integer, GameCharacter> getWorldGameCharactersMap() {
@@ -305,7 +306,6 @@ public class ClientWorld {
      * Method for sending my player character info.
      */
     public void sendMyPlayerCharacterInfo() {
-
         // Arguments
         float xPosition = getMyPlayerGameCharacter().b2body.getPosition().x;
         float yPosition = getMyPlayerGameCharacter().b2body.getPosition().y;
@@ -314,6 +314,10 @@ public class ClientWorld {
         float health = getMyPlayerGameCharacter().getHealth();
 
         clientConnection.sendPlayerInformation(xPosition, yPosition, state, isFacingRight, health);
+        System.out.println("sent MyPlayerCharacterInfo in ClientWorld ->" +
+                " xPosition -> " + xPosition +
+                " yPosition -> " + yPosition +
+                " state -> " + state + "\n");
     }
 
     /**
