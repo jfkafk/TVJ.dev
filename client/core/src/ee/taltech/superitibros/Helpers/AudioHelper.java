@@ -1,4 +1,4 @@
-package ee.taltech;
+package ee.taltech.superitibros.Helpers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;

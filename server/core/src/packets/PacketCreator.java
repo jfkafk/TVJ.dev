@@ -150,4 +150,12 @@ public class PacketCreator {
         packetAddCoin.setyCoordinate(yCoordinate);
         return packetAddCoin;
     }
+
+    /**
+     * Create PacketWon.
+     * @return PacketWon.
+     */
+    public static PacketWon createPacketWon() {
+        return new PacketWon();
+    }
 }

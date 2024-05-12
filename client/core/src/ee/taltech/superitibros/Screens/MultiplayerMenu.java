@@ -4,41 +4,34 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
-import ee.taltech.superitibros.Lobbies.Lobby;
 
 public class MultiplayerMenu implements Screen {
 
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
-    private TextField nameField;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
     protected Skin skin;
-    private TextButton joinLobbyButton;
-    private TextButton hostLobbyButton;
     GameClient gameClient;
 
     // Audio.
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
-    private Sprite background;
+    private final Sprite background;
 
     public MultiplayerMenu(GameClient gameClient) {
         this.gameClient = gameClient;
@@ -66,13 +59,13 @@ public class MultiplayerMenu implements Screen {
 
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
-        nameField = new TextField("", skin);
+        TextField nameField = new TextField("", skin);
         nameField.setMaxLength(10);
 
-        joinLobbyButton = new TextButton("Join Lobby", skin);
+        TextButton joinLobbyButton = new TextButton("Join Lobby", skin);
         joinLobbyButton.setDisabled(true);
 
-        hostLobbyButton = new TextButton("Host Lobby", skin);
+        TextButton hostLobbyButton = new TextButton("Host Lobby", skin);
         hostLobbyButton.setDisabled(true);
 
         TextButton back = new TextButton("Back", skin);

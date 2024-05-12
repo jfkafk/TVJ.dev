@@ -1,7 +1,6 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -11,7 +10,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class Enemy extends GameCharacter {
@@ -49,7 +48,13 @@ public class Enemy extends GameCharacter {
 
             bodyDef.gravityScale = 1.0f;
 
-            this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+            boolean bodyCreated = false;
+            while (!bodyCreated) {
+                if (!clientWorld.getGdxWorld().isLocked()) {
+                    this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+                    bodyCreated = true;
+                }
+            }
 
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();

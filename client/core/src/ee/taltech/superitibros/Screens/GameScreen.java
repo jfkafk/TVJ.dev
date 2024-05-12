@@ -29,6 +29,7 @@ import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -42,10 +43,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Graphics and Texture
     private final SpriteBatch batch;
-    private TiledMap tiledMap;
     private final TiledMapRenderer tiledMapRenderer;
-    private float desiredCameraWidth;
-    private float desiredCameraHeight;
 
     // World parameters
     private final float WORLD_WIDTH;
@@ -59,7 +57,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Shooting cooldown
     private boolean canShoot = true;
-    private float shootCooldown = 1f;
 
     // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
@@ -199,14 +196,9 @@ public class GameScreen implements Screen, InputProcessor {
         // Render Box2D debug)
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
 
-        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
-            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
-            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
-            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
-            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
-            clientWorld.setTimeZero();
-            System.out.println("game over in GameScreen" + "\n");
-        }
+        // Check if game over
+        checkIfGameOver();
+
         if (escPressed) {
             clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
             clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
@@ -228,6 +220,27 @@ public class GameScreen implements Screen, InputProcessor {
             FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
             this.dispose();
             ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
+        }
+    }
+
+    public void checkIfGameOver() {
+        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+            clientWorld.setTimeZero();
+            System.out.println("game over in GameScreen" + "\n");
+        } else if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getyPosition() <= 10) {
+            // TODO: decide what happens when character falls out of the map (dies or respawns?)
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+        } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
+            YouWonScreen youWonScreen = new YouWonScreen(clientConnection.getGameClient());
+            ((Game) Gdx.app.getApplicationListener()).setScreen(youWonScreen);
+            clientConnection.getGameClient().setGameWon(false);
         }
     }
 
@@ -329,7 +342,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for updating player's position
      */
     public void updatePlayersPositions() {
-        Map<Integer, GameCharacter> gameCharactersMap = clientWorld.getWorldGameCharactersMap();
+        Map<Integer, GameCharacter> gameCharactersMap = new HashMap<>(clientWorld.getWorldGameCharactersMap());
         if (!gameCharactersMap.isEmpty()) {
             List<GameCharacter> players = new ArrayList<>(gameCharactersMap.values());
             for (GameCharacter player : players) {
@@ -344,8 +357,8 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for drawing Enemies.
      */
     public void drawEnemies() {
-        Map<String, Enemy> enemyMap = clientWorld.getEnemyMap();
-        if (enemyMap != null && !enemyMap.isEmpty()) {
+        Map<String, Enemy> enemyMap = new HashMap<>(clientWorld.getEnemyMap());
+        if (!enemyMap.isEmpty()) {
             for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
                     enemy.draw(batch, clientWorld.getHealthBarTexture());
@@ -360,9 +373,10 @@ public class GameScreen implements Screen, InputProcessor {
      */
     public void drawBullets() {
 
-        if (!clientWorld.getBulletsToRemove().isEmpty()) {
+        List<Bullet> bulltetsToRemove = new ArrayList<>(clientWorld.getBulletsToRemove());
+        if (!bulltetsToRemove.isEmpty()) {
             //System.out.println(clientWorld.getBulletsToRemove());
-            for (Bullet bullet : clientWorld.getBulletsToRemove()) {
+            for (Bullet bullet : bulltetsToRemove) {
                 clientWorld.removeBullet(bullet);
                 //System.out.println("removed");
             }
@@ -370,8 +384,9 @@ public class GameScreen implements Screen, InputProcessor {
             //System.out.println(clientWorld.getBulletsToRemove());
         }
 
-        if (!clientWorld.getBulletsToAdd().isEmpty()) {
-            for (Bullet bullet : clientWorld.getBulletsToAdd()) {
+        List<Bullet> bulltetsToAdd = new ArrayList<>(clientWorld.getBulletsToAdd());
+        if (!bulltetsToAdd.isEmpty()) {
+            for (Bullet bullet : bulltetsToAdd) {
                 //System.out.println("added");
                 clientWorld.addBullet(bullet);
             }
@@ -379,7 +394,8 @@ public class GameScreen implements Screen, InputProcessor {
         }
 
         // System.out.println("Current bullets: " + clientWorld.getBullets());
-        for (Bullet bullet : clientWorld.getBullets()) {
+        List<Bullet> bullets = new ArrayList<>(clientWorld.getBullets());
+        for (Bullet bullet : bullets) {
 
             // If bullet is beyond map borders, then remove it
             if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
@@ -457,7 +473,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        if (canShoot) {
+        if (canShoot && clientWorld.getMyPlayerGameCharacter() != null) {
             // Convert screen coordinates to world coordinates
             Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY, 0));
 
@@ -471,6 +487,7 @@ public class GameScreen implements Screen, InputProcessor {
 
             // Start cooldown timer
             canShoot = false;
+            float shootCooldown = 1f;
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
