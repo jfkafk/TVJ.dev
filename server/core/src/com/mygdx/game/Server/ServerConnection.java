@@ -72,6 +72,7 @@ public class ServerConnection {
 			// Receive packets from clients.
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
+					System.out.println("packet recieved");
 
 					// Add connection to list
 					connectedPlayers.add(connection.getID());
@@ -80,6 +81,7 @@ public class ServerConnection {
 
 					// Get lobby's server world
 					World serverWorld = onGoingLobbies.get(packetConnect.getLobbyHash()).getServerWorld();
+					System.out.println("serverWorld " + serverWorld);
 
 					// Creates new PlayerGameCharacter instance for the connection.
 					PlayerGameCharacter newPlayerGameCharacter = PlayerGameCharacter
@@ -188,8 +190,10 @@ public class ServerConnection {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						// Set for each new ongoing lobby new server world
 						if (Objects.equals(packetLobbyInfo.getMapPath(), "Maps/level1/level1.tmx")) {
+							System.out.println("startGame Packet in Server Connection level1");
 							lobby.setServerWorld(new Level1());
-						} else if (Objects.equals(packetLobbyInfo.getMapPath(), "Maps/level4/gameart2d-desert.tmx")) {
+						} else if (Objects.equals(packetLobbyInfo.getMapPath(), "Maps/level4/destestsmaller.tmx")) {
+							System.out.println("StartGame packet in ServerConnection destestsmaller");
 							lobby.setServerWorld(new Level2());
 						}
 						// Set for each new ongoing lobby new server update thread
