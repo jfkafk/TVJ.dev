@@ -82,6 +82,8 @@ public class MenuScreen implements Screen {
 
         TextButton optionsButton = new TextButton("Options", skin);
 
+        TextButton howToPlay = new TextButton("How To Play", skin);
+
         TextButton exitButton = new TextButton("Exit Game", skin);
 
         //Add listeners to buttons
@@ -109,6 +111,15 @@ public class MenuScreen implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 Options options = new Options(gameClient);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(options);
+                dispose();
+            }
+        });
+        howToPlay.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                HowToPlay howToPlayScreen = new HowToPlay(gameClient);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(howToPlayScreen);
             }
         });
         exitButton.addListener(new ClickListener() {
@@ -127,6 +138,8 @@ public class MenuScreen implements Screen {
         mainTable.add(singlePlayerButton).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(optionsButton).pad(buttonLocationPadding);
+        mainTable.row();
+        mainTable.add(howToPlay).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(exitButton).pad(buttonLocationPadding);
         //Add table to stage
