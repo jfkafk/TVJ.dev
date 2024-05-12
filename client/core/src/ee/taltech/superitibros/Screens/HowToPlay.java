@@ -61,10 +61,10 @@ public class HowToPlay implements Screen {
         stage = new Stage(viewport, batch);
 
         // Tutorials
-        String howToPlayContent = "Choose map and character. Seek and collect the\ngolden coin. For the best experience use fullscreen.";
-        String enemiesContent = "Enemies deal damage by standing on top of the\ncharacter.Deal with them before they got you!";
+        String howToPlayContent = "Choose map and character. Seek and collect\nthe golden coin. For the best experience\nuse fullscreen.";
+        String enemiesContent = "Enemies deal damage by standing on top of\nthe character.Deal with them before they\ngot you!";
         String buttonsContent = "A, W, S, D and space or LEFT, UP, DOWN,\nRIGHT to move around. Right click to shoot.\nESC-button closes the ongoing game.";
-        String multiplayerContent = "Create or join the lobby to play with your friends.";
+        String multiplayerContent = "Create or join the lobby to play with your\nfriends.";
 
         String whatToDo = "What To Do?";
         String enemies = "Enemy";
@@ -137,17 +137,15 @@ public class HowToPlay implements Screen {
             }
         });
 
-        final int buttonSize = 100;
-        // Main Table.
-        mainTable.add(howToPlayLabel);
+        mainTable.add(howToPlayLabel).colspan(3);
         mainTable.row();
-        mainTable.add(reverse).width(buttonSize).uniform(true).colspan(0).padBottom(20);
-        mainTable.add(labelsLabel).uniform(true);
-        mainTable.add(forward).width(buttonSize).uniform(true).colspan(2).padBottom(20);
+        mainTable.add(reverse).uniform(true).width(100).padBottom(20).left();
+        mainTable.add(labelsLabel);
+        mainTable.add(forward).uniform(true).width(100).padBottom(20).right();
         mainTable.row();
-        mainTable.add(tutorialContents).width(1000).height(150).uniform(true);
+        mainTable.add(tutorialContents).colspan(3).width(1000).height(150);
         mainTable.row();
-        mainTable.add(back).padTop(200).bottom();
+        mainTable.add(back).colspan(3).padTop(50);
         stage.addActor(mainTable);
     }
 
