@@ -29,7 +29,7 @@ public class FinishScreen implements Screen {
     private Skin skin;
     private TextButton restartButton;
     private TextButton mainMenuButton;
-    private String time = "";
+    private String time;
 
     // Sounds.
     private AudioHelper audioHelper = AudioHelper.getInstance();
