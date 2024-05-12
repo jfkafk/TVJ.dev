@@ -23,17 +23,17 @@ import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class MenuScreen implements Screen {
 
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
     private final AudioHelper audioHelper = AudioHelper.getInstance();
     protected Skin skin;
     GameClient gameClient;
 
     // Background picture.
-    private Sprite background;
+    private final Sprite background;
 
     /**
      * Constructor for the Menu class.
@@ -124,6 +124,7 @@ public class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                dispose();
                 Gdx.app.exit();
             }
         });

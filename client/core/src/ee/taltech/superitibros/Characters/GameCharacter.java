@@ -17,7 +17,7 @@ public class GameCharacter {
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String temporarySkin = "Skeleton";
+    String nameOfSkin;
     float stateTime;
 
     // Character characteristics.
@@ -103,6 +103,21 @@ public class GameCharacter {
         healthBarColor = Color.GREEN;
     }
 
+    /**
+     *
+     * @return the name of the skin
+     */
+    public String getNameOfSkin() {
+        return nameOfSkin;
+    }
+
+    /**
+     * sets parameter as name of skin
+     * @param nameOfSkin
+     */
+    public void setNameOfSkin(String nameOfSkin) {
+        this.nameOfSkin = nameOfSkin;
+    }
 
     /**
      * Making frames for character
@@ -131,7 +146,13 @@ public class GameCharacter {
             bodyDef.position.set(boundingBox.getX(), boundingBox.getY());
             bodyDef.type = BodyDef.BodyType.DynamicBody;
 
-            this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+            boolean bodyCreated = false;
+            while (!bodyCreated) {
+                if (!clientWorld.getGdxWorld().isLocked()) {
+                    this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+                    bodyCreated = true;
+                }
+            }
 
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
@@ -149,6 +170,14 @@ public class GameCharacter {
 
             newPosition = new Vector2();
         }
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
+    public float getxPosition() {
+        return xPosition;
     }
 
     /**

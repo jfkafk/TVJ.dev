@@ -1,4 +1,4 @@
-package packets;
+package ee.taltech.superitibros.Packets;
 
 /**
  * Packet for sending disconnected client's id to other connections.

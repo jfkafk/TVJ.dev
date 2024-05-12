@@ -1,4 +1,4 @@
-package packets;
+package ee.taltech.superitibros.Packets;
 
 public class PacketAddCoin extends Packet {
 

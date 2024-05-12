@@ -1,4 +1,4 @@
-package packets;
+package ee.taltech.superitibros.Packets;
 
 /**
  * Packet for sending a list of updated Zombie instances to all connections.

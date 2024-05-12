@@ -107,31 +107,8 @@ public class LobbyScreen implements Screen {
             }
         });
 
-        if (readyToStart) {
-            TextButton startGameButton = new TextButton("Start Game", skin);
-            startGameButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                    audioHelper.stopAllMusic();
-                    // Add logic here to start the game
-                    gameClient.startGame(mapPath);
-                }
-            });
-            mainTable.add(startGameButton).pad(BUTTON_PADDING);
-            mainTable.row();
-        }
-
         if (hostLeft) {
             TextButton startGameButton = new TextButton("Host Left, find new lobby", skin);
-            startGameButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                    // Add logic here to start the game
-                    gameClient.startGame(mapPath);
-                }
-            });
             mainTable.add(startGameButton).pad(BUTTON_PADDING);
             mainTable.row();
         }
@@ -174,6 +151,16 @@ public class LobbyScreen implements Screen {
         this.mapPath = mapPath;
     }
 
+    /**
+     * Check if game has started.
+     */
+    public void ifGameToStart() {
+        if (gameClient.isGameStart()) {
+            gameClient.startGame(mapPath);
+            gameClient.setMapPath(null);
+        }
+    }
+
     @Override
     public void render(float delta) {
         batch.begin();
@@ -182,6 +169,7 @@ public class LobbyScreen implements Screen {
         batch.end();
         stage.act();
         stage.draw();
+        ifGameToStart();
     }
 
     @Override

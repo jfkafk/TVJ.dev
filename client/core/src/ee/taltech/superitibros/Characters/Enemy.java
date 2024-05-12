@@ -48,7 +48,13 @@ public class Enemy extends GameCharacter {
 
             bodyDef.gravityScale = 1.0f;
 
-            this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+            boolean bodyCreated = false;
+            while (!bodyCreated) {
+                if (!clientWorld.getGdxWorld().isLocked()) {
+                    this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+                    bodyCreated = true;
+                }
+            }
 
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
