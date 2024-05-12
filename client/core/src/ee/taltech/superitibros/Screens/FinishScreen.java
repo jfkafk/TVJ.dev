@@ -53,9 +53,9 @@ public class FinishScreen implements Screen {
         mainTable.setFillParent(true);
         mainTable.center();
 
-        audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
+        audioHelper.playSound("MusicSounds/winning.mp3");
 
-        Label gameOverLabel = new Label("You finished in ->" + this.time + " seconds", skin, "title", Color.RED);
+        Label gameOverLabel = new Label("You finished in ->" + this.time + " seconds", skin, "title", Color.GREEN);
 
         restartButton = new TextButton("Back to lobby", skin);
         mainMenuButton = new TextButton("Main Menu", skin);
