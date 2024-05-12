@@ -11,7 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
@@ -37,6 +37,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Screen
     private final OrthographicCamera camera;
+    TiledMap tiledMap;
 
     private final FitViewport fitViewport;
     boolean buttonHasBeenPressed;
@@ -76,6 +77,8 @@ public class GameScreen implements Screen, InputProcessor {
     private Table timerTable = new Table();
     private Label timer;
     private Viewport viewportTimer;
+    float desiredCameraHeight;
+    float desiredCameraWidth;
 
     /**
      * GameScreen constructor
