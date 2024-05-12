@@ -126,7 +126,6 @@ public class GameScreen implements Screen, InputProcessor {
     private void createTableForTimer() {
         timer = new Label("0.00", skin);
         timerTable.add(timer).width(50).padBottom(desiredCameraHeight - 23);
-        timerTable.setDebug(true);
         timerTable.setFillParent(true);
         stage.addActor(timerTable);
     }
