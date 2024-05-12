@@ -15,9 +15,6 @@ public class GameCharacter {
 
     // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
-    // Jumping sound cooldown.
-    private boolean canJump = true;
-    private float jumpCooldown = 0.75f;
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String temporarySkin = "Skeleton";
