@@ -20,7 +20,7 @@ public class Level2 extends World{
         addEnemy(enemy3.getBotHash(), enemy3);
         addEnemy(enemy4.getBotHash(), enemy4);
         addEnemy(enemy5.getBotHash(), enemy5);
-        coin = new Coin(2338, 299);
+        coin = new Coin(2341, 290);
     }
 
 }
