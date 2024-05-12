@@ -1,20 +1,23 @@
 package ee.taltech.superitibros.Characters;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Timer;
 import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
+    // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
+    // Jumping sound cooldown.
+    private boolean canJump = true;
+    private float jumpCooldown = 0.75f;
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String temporarySkin = "Skeleton";
@@ -196,7 +199,16 @@ public class GameCharacter {
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded() && !clientWorld.getGdxWorld().isLocked()) {
-            audioHelper.playSound("MusicSounds/jump.mp3");
+            if (canJump) {
+                canJump = false;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        canJump = true;
+                    }
+                }, jumpCooldown);
+                audioHelper.playSound("MusicSounds/jump.mp3");
+            }
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             // System.out.println("jumped");
