@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -20,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.AudioHelper;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.Lobbies.Lobby;
 
@@ -108,31 +107,8 @@ public class LobbyScreen implements Screen {
             }
         });
 
-        if (readyToStart) {
-            TextButton startGameButton = new TextButton("Start Game", skin);
-            startGameButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                    audioHelper.stopAllMusic();
-                    // Add logic here to start the game
-                    gameClient.startGame(mapPath);
-                }
-            });
-            mainTable.add(startGameButton).pad(BUTTON_PADDING);
-            mainTable.row();
-        }
-
         if (hostLeft) {
             TextButton startGameButton = new TextButton("Host Left, find new lobby", skin);
-            startGameButton.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                    // Add logic here to start the game
-                    gameClient.startGame(mapPath);
-                }
-            });
             mainTable.add(startGameButton).pad(BUTTON_PADDING);
             mainTable.row();
         }
@@ -175,6 +151,16 @@ public class LobbyScreen implements Screen {
         this.mapPath = mapPath;
     }
 
+    /**
+     * Check if game has started.
+     */
+    public void ifGameToStart() {
+        if (gameClient.isGameStart()) {
+            gameClient.startGame(mapPath);
+            gameClient.setMapPath(null);
+        }
+    }
+
     @Override
     public void render(float delta) {
         batch.begin();
@@ -183,6 +169,7 @@ public class LobbyScreen implements Screen {
         batch.end();
         stage.act();
         stage.draw();
+        ifGameToStart();
     }
 
     @Override

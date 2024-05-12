@@ -4,7 +4,6 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
@@ -15,12 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.AudioHelper;
-import ee.taltech.superitibros.Connection.ClientConnection;
+import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
-import ee.taltech.superitibros.Lobbies.Lobby;
-
-import java.util.ArrayList;
 
 public class HostLobby implements Screen {
     private final SpriteBatch batch;
@@ -161,7 +156,6 @@ public class HostLobby implements Screen {
 
 
         //Add listeners to buttons
-
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

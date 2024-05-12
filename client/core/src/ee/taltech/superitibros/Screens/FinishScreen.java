@@ -14,10 +14,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.superitibros.Helpers.AudioHelper;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
-public class GameOverScreen implements Screen {
+import java.text.DecimalFormat;
+
+public class FinishScreen implements Screen {
 
     private SpriteBatch batch;
     private Stage stage;
@@ -27,11 +29,14 @@ public class GameOverScreen implements Screen {
     private Skin skin;
     private TextButton restartButton;
     private TextButton mainMenuButton;
+    private String time = "";
 
     // Sounds.
     private AudioHelper audioHelper = AudioHelper.getInstance();
 
-    public GameOverScreen(GameClient gameClient) {
+    public FinishScreen(GameClient gameClient, double time) {
+        DecimalFormat df = new DecimalFormat("#.##");
+        this.time = df.format(time);
         int worldWidth = 1600;
         int worldHeight = 1000;
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
@@ -50,7 +55,7 @@ public class GameOverScreen implements Screen {
 
         audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
 
-        Label gameOverLabel = new Label("Game Over", skin, "title", Color.RED);
+        Label gameOverLabel = new Label("You finished in ->" + this.time + " seconds", skin, "title", Color.RED);
 
         restartButton = new TextButton("Back to lobby", skin);
         mainMenuButton = new TextButton("Main Menu", skin);

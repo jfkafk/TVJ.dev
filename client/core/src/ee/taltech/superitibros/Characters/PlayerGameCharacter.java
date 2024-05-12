@@ -44,10 +44,6 @@ public class PlayerGameCharacter extends GameCharacter{
         // Player sprite
     }
 
-    public void setCurrentState(GameCharacter.State currentState) {
-        this.currentState = currentState;
-    }
-
     public void setFacingRight(boolean facingRight) {
         this.facingRight = facingRight;
     }

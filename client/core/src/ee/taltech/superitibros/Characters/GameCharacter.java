@@ -15,9 +15,6 @@ public class GameCharacter {
 
     // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
-    // Jumping sound cooldown.
-    private boolean canJump = true;
-    private float jumpCooldown = 0.75f;
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
     String nameOfSkin;
@@ -69,6 +66,10 @@ public class GameCharacter {
     public State currentState = State.IDLE;
     // Animation
     boolean animationCreated = false;
+
+    // Jumping sound cooldown.
+    private boolean canJump = true;
+    private float jumpCooldown = 0.75f;
 
     /**
      * GameCharacter constructor.
@@ -145,7 +146,13 @@ public class GameCharacter {
             bodyDef.position.set(boundingBox.getX(), boundingBox.getY());
             bodyDef.type = BodyDef.BodyType.DynamicBody;
 
-            this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+            boolean bodyCreated = false;
+            while (!bodyCreated) {
+                if (!clientWorld.getGdxWorld().isLocked()) {
+                    this.b2body = clientWorld.getGdxWorld().createBody(bodyDef);
+                    bodyCreated = true;
+                }
+            }
 
             FixtureDef fixtureDef = new FixtureDef();
             PolygonShape shape = new PolygonShape();
@@ -163,6 +170,14 @@ public class GameCharacter {
 
             newPosition = new Vector2();
         }
+    }
+
+    public float getyPosition() {
+        return yPosition;
+    }
+
+    public float getxPosition() {
+        return xPosition;
     }
 
     /**
