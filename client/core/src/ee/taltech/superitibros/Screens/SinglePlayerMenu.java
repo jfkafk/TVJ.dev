@@ -215,7 +215,6 @@ public class SinglePlayerMenu implements Screen {
         mapTable.row();
         mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
         mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-
         parentTable.add(backButton).size(40, 40).padRight(1500);
         parentTable.row();
         parentTable.add(mapTable).padTop(200).padRight(800);
