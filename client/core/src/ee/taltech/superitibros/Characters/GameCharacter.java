@@ -20,7 +20,7 @@ public class GameCharacter {
     private float jumpCooldown = 0.75f;
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String temporarySkin = "Skeleton";
+    String nameOfSkin;
     float stateTime;
 
     // Character characteristics.
@@ -102,6 +102,21 @@ public class GameCharacter {
         healthBarColor = Color.GREEN;
     }
 
+    /**
+     *
+     * @return the name of the skin
+     */
+    public String getNameOfSkin() {
+        return nameOfSkin;
+    }
+
+    /**
+     * sets parameter as name of skin
+     * @param nameOfSkin
+     */
+    public void setNameOfSkin(String nameOfSkin) {
+        this.nameOfSkin = nameOfSkin;
+    }
 
     /**
      * Making frames for character
