@@ -34,4 +34,12 @@ public class Coin {
     public void setyCoordinate(float yCoordinate) {
         this.yCoordinate = yCoordinate;
     }
+
+    public float getyCoordinate() {
+        return yCoordinate;
+    }
+
+    public float getxCoordinate() {
+        return xCoordinate;
+    }
 }

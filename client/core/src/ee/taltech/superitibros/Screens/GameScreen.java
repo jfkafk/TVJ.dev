@@ -1,12 +1,16 @@
 package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
@@ -23,6 +27,7 @@ import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +70,15 @@ public class GameScreen implements Screen, InputProcessor {
     // Esc pressed for quitting the game.
     private boolean escPressed = false;
 
+    // Timer related.
+    private double time = 0;
+    private boolean notFinished = true;
+    private TextureAtlas atlas;
+    private Skin skin;
+    private Stage stage;
+    private Table timerTable = new Table();
+    private Label timer;
+    private Viewport viewportTimer;
 
     /**
      * GameScreen constructor
@@ -72,7 +86,6 @@ public class GameScreen implements Screen, InputProcessor {
      * @param clientWorld client's world
      */
     public GameScreen(ClientWorld clientWorld) {
-
         this.clientWorld = clientWorld;
 
         // TextureAtlas and background texture
@@ -94,10 +107,28 @@ public class GameScreen implements Screen, InputProcessor {
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
+        this.viewportTimer = new FitViewport(desiredCameraWidth, desiredCameraHeight);
+        viewportTimer.apply();
         System.out.println("screenX, ScreenY" + desiredCameraWidth + " " + desiredCameraHeight + "\n");
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
+        stage = new Stage(viewportTimer, batch);
+        createTableForTimer();
+    }
+
+    /**
+     * Create timer table.
+     */
+    private void createTableForTimer() {
+        timer = new Label("0.00", skin);
+        timerTable.add(timer).width(50).padBottom(desiredCameraHeight - 23);
+        timerTable.setDebug(true);
+        timerTable.setFillParent(true);
+        stage.addActor(timerTable);
     }
 
     /**
@@ -109,11 +140,21 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     /**
+     * Updates the time.
+     */
+    public void updateTableForTime() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        timer.setText(df.format(clientWorld.getTime()));
+    }
+
+    /**
      * Method for drawing textures, heads-up display and handling camera positioning
      * @param delta time
      */
     @Override
     public void render(float delta) {
+        clientWorld.updateTimer();
+        updateTableForTime();
         // Clear the game screen with black
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -134,6 +175,8 @@ public class GameScreen implements Screen, InputProcessor {
         // Render tiled map
         tiledMapRenderer.render();
 
+        DecimalFormat df = new DecimalFormat("#.##");
+
         // Render game objects
         batch.begin();
         updatePlayersPositions();
@@ -143,6 +186,9 @@ public class GameScreen implements Screen, InputProcessor {
         drawBullets();
         drawCoin();
         batch.end();
+
+        stage.act();
+        stage.draw();
 
         // Check bullet collision
         clientWorld.checkBulletCollisions();
@@ -159,6 +205,7 @@ public class GameScreen implements Screen, InputProcessor {
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+            clientWorld.setTimeZero();
             System.out.println("game over in GameScreen" + "\n");
         }
         if (escPressed) {
@@ -166,7 +213,22 @@ public class GameScreen implements Screen, InputProcessor {
             clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
             MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
             this.dispose();
+            clientWorld.setTimeZero();
             ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+        }
+        float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
+        float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
+
+        // Registers the finishing time.
+        if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
+            clientWorld.setFinish(true);
+            time = clientWorld.getTime();
+            System.out.println("Finished in -> " + df.format(time));
+            clientWorld.setTimeZero();
+            this.notFinished = false;
+            FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
+            this.dispose();
+            ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
         }
     }
 
