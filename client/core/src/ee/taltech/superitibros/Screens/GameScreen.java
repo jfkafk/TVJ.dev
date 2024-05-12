@@ -124,7 +124,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Create timer table.
      */
     private void createTableForTimer() {
-        timer = new Label("0.00", skin);
+        timer = new Label("0.0", skin);
         timerTable.add(timer).width(50).padBottom(desiredCameraHeight - 23);
         timerTable.setFillParent(true);
         stage.addActor(timerTable);
@@ -142,7 +142,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Updates the time.
      */
     public void updateTableForTime() {
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("#.#");
         timer.setText(df.format(clientWorld.getTime()));
     }
 
