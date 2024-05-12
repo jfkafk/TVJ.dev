@@ -156,7 +156,6 @@ public class HostLobby implements Screen {
 
 
         //Add listeners to buttons
-
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -171,7 +170,7 @@ public class HostLobby implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                mapPath = "Maps/level4/gameart2d-desert.tmx";
+                mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
             }

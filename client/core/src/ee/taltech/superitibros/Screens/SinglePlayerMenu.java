@@ -174,7 +174,7 @@ public class SinglePlayerMenu implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 audioHelper.stopAllMusic();
-                String mapPath = "Maps/level4/gameart2d-desert.tmx";
+                String mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
             }
@@ -214,7 +214,6 @@ public class SinglePlayerMenu implements Screen {
         mapTable.row();
         mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
         mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-
         parentTable.add(backButton).size(40, 40).padRight(1500);
         parentTable.row();
         parentTable.add(mapTable).padTop(200).padRight(800);

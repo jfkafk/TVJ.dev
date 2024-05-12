@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Timer;
 import ee.taltech.superitibros.Characters.CollisionBits;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
@@ -17,7 +18,6 @@ import ee.taltech.superitibros.Characters.MyPlayerGameCharacter;
 import ee.taltech.superitibros.Characters.PlayerGameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
-import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.Weapons.Bullet;
 
 import java.util.*;
@@ -45,9 +45,16 @@ public class ClientWorld {
     // Health bar
     private final Texture healthBarTexture = new Texture("HealthBar/white-texture.jpg");
 
+    // Time related.
+    private double time = 0.00;
+    private boolean isTimePassed = true;
+    private float precision = 0.05f;
+    private boolean finish = false;
+
     public ClientWorld(String path) {
         // Map and physics
         this.path = path;
+        System.out.println("path in ClientWorld -> " + path + "\n");
         gdxWorld = new com.badlogic.gdx.physics.box2d.World(new Vector2(0, -150), true);
         b2dr = new Box2DDebugRenderer();
         gdxWorld.step(1/60f, 6, 2);
@@ -64,8 +71,6 @@ public class ClientWorld {
         PolygonShape polygonShape = new PolygonShape();
         FixtureDef fixtureDef = new FixtureDef();
         Body body;
-
-        System.out.println(path);
 
         Array<RectangleMapObject> objects = mapLayer.getObjects().getByType(RectangleMapObject.class);
         for (RectangleMapObject obj : objects) {
@@ -86,7 +91,6 @@ public class ClientWorld {
 
             // Determine the type of object and set category and mask bits accordingly
             String type = obj.getProperties().get("ground", String.class);
-            System.out.println(type);
             if ("player".equals(type)) {
                 fixtureDef.filter.categoryBits = playerCategory;
                 fixtureDef.filter.maskBits = playerMask;
@@ -110,6 +114,8 @@ public class ClientWorld {
     public void initializeMap() {
         this.tiledMap = getMap();
         this.mapLayer = tiledMap.getLayers().get(2);
+        this.mapLayer.setVisible(false);
+        System.out.println("initialize Map in ClientWorld (map Layer) -> " + mapLayer.getName() + "\n");
     }
 
     /**
@@ -178,7 +184,6 @@ public class ClientWorld {
 
     /**
      * Map of clients and their PlayerGameCharacters.
-     *
      * Key: id, value: PlayerGameCharacter
      */
     public HashMap<Integer, GameCharacter> getWorldGameCharactersMap() {
@@ -280,9 +285,6 @@ public class ClientWorld {
             // Remove enemies b2body
             enemy.removeBodyFromWorld();
         }
-
-        // System.out.println("Enemy health: " + enemy.getHealth());
-
     }
 
     public void checkPlayerEnemyCollisions() {
@@ -306,7 +308,6 @@ public class ClientWorld {
      * Method for sending my player character info.
      */
     public void sendMyPlayerCharacterInfo() {
-
         // Arguments
         float xPosition = getMyPlayerGameCharacter().b2body.getPosition().x;
         float yPosition = getMyPlayerGameCharacter().b2body.getPosition().y;
@@ -315,6 +316,10 @@ public class ClientWorld {
         float health = getMyPlayerGameCharacter().getHealth();
 
         clientConnection.sendPlayerInformation(xPosition, yPosition, state, isFacingRight, health);
+        System.out.println("sent MyPlayerCharacterInfo in ClientWorld ->" +
+                " xPosition -> " + xPosition +
+                " yPosition -> " + yPosition +
+                " state -> " + state + "\n");
     }
 
     /**
@@ -423,7 +428,6 @@ public class ClientWorld {
             setMyPlayerGameCharacter((MyPlayerGameCharacter) newCharacter);
             myPlayerId = id;
         }
-        // System.out.println("characters: " + worldGameCharactersMap.keySet());
         worldGameCharactersMap.put(id, newCharacter);
     }
 
@@ -508,4 +512,40 @@ public class ClientWorld {
     public void removeClient(int id) {
         worldGameCharactersMap.remove(id);
     }
+
+
+    public double getTime() {
+        return this.time;
+    }
+
+    /**
+     * Restores 0.
+     */
+    public void setTimeZero() {
+        this.time = 0;
+    }
+    /**
+     * Timer with precision of 0.1 sec.
+     */
+    public void updateTimer() {
+        if (isTimePassed && !finish) {
+            time += 0.05;
+            // Start cooldown timer
+            isTimePassed = false;
+            Timer.schedule(new Timer.Task() {
+                @Override
+                public void run() {
+                    isTimePassed = true;
+                }
+            }, precision);
+        }
+    }
+
+    /**
+     * @param isFinish to change to.
+     */
+    public void setFinish(boolean isFinish) {
+        finish = isFinish;
+    }
+
 }

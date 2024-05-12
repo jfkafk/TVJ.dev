@@ -5,12 +5,13 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import ee.taltech.superitibros.Helpers.AudioHelper;
+import ee.taltech.AudioHelper;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
 import ee.taltech.superitibros.Connection.ClientConnection;
@@ -26,7 +27,7 @@ import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
 
-import java.awt.*;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -81,12 +82,12 @@ public class GameScreen implements Screen, InputProcessor {
      *
      * @param clientWorld client's world
      */
-    public GameScreen (ClientWorld clientWorld) {
-
+    public GameScreen(ClientWorld clientWorld) {
         this.clientWorld = clientWorld;
 
         // TextureAtlas and background texture
-        TiledMap tiledMap = new TmxMapLoader().load(clientWorld.getPath());
+        tiledMap = new TmxMapLoader().load(clientWorld.getPath());
+        System.out.println("tiled map in GameScreen -> " + tiledMap + "\n");
         int tileWidth = tiledMap.getProperties().get("tilewidth", Integer.class);
         int mapWidthInTiles = tiledMap.getProperties().get("width", Integer.class);
         WORLD_WIDTH = tileWidth * mapWidthInTiles;
@@ -98,19 +99,32 @@ public class GameScreen implements Screen, InputProcessor {
         buttonHasBeenPressed = false;
 
         float aspectRatio = (float) Gdx.graphics.getWidth() / (float) Gdx.graphics.getHeight();
-        float desiredCameraHeight;
-        if (!clientWorld.getPath().equalsIgnoreCase("Maps/level4/gameart2d-desert.tmx")) {
-            desiredCameraHeight = tileHeight * mapHeightInTiles; // Set the desired width of the camera
-        } else {
-            desiredCameraHeight = tileHeight * mapHeightInTiles;
-        }
-        float desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
+        this.desiredCameraHeight = tileHeight * mapHeightInTiles;
+        this.desiredCameraWidth = desiredCameraHeight * aspectRatio; // Calculate the corresponding height
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
+        this.viewportTimer = new FitViewport(desiredCameraWidth, desiredCameraHeight);
+        viewportTimer.apply();
+        System.out.println("screenX, ScreenY" + desiredCameraWidth + " " + desiredCameraHeight + "\n");
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
+
+        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
+        stage = new Stage(viewportTimer, batch);
+        createTableForTimer();
+    }
+
+    /**
+     * Create timer table.
+     */
+    private void createTableForTimer() {
+        timer = new Label("0.00", skin);
+        timerTable.add(timer).width(50).padBottom(desiredCameraHeight - 23);
+        timerTable.setFillParent(true);
+        stage.addActor(timerTable);
     }
 
     /**
@@ -122,11 +136,21 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     /**
+     * Updates the time.
+     */
+    public void updateTableForTime() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        timer.setText(df.format(clientWorld.getTime()));
+    }
+
+    /**
      * Method for drawing textures, heads-up display and handling camera positioning
      * @param delta time
      */
     @Override
     public void render(float delta) {
+        clientWorld.updateTimer();
+        updateTableForTime();
         // Clear the game screen with black
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
@@ -147,6 +171,8 @@ public class GameScreen implements Screen, InputProcessor {
         // Render tiled map
         tiledMapRenderer.render();
 
+        DecimalFormat df = new DecimalFormat("#.##");
+
         // Render game objects
         batch.begin();
         updatePlayersPositions();
@@ -157,6 +183,9 @@ public class GameScreen implements Screen, InputProcessor {
         drawCoin();
         batch.end();
 
+        stage.act();
+        stage.draw();
+
         // Check bullet collision
         clientWorld.checkBulletCollisions();
         clientWorld.checkBulletEnemyCollisions();
@@ -164,7 +193,7 @@ public class GameScreen implements Screen, InputProcessor {
         // Check enemy and player collision
         clientWorld.checkPlayerEnemyCollisions();
 
-        // Render Box2D debug
+        // Render Box2D debug)
         clientWorld.b2dr.render(clientWorld.getGdxWorld(), camera.combined);
 
         // Check if game over
@@ -219,7 +248,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Method for updating camera position.
      */
     private void updateCameraPosition() {
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
+        if (clientWorld.getMyPlayerGameCharacter() != null || escPressed) {
             // Set the target position to the center of the player character's bounding box
             float targetX = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getWidth() / 2;
             float targetY = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getHeight() / 2;
@@ -244,7 +273,7 @@ public class GameScreen implements Screen, InputProcessor {
      */
     private void detectInput(){
 
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
+        if (clientWorld.getMyPlayerGameCharacter() != null || escPressed) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
                 buttonHasBeenPressed = true;
@@ -261,6 +290,9 @@ public class GameScreen implements Screen, InputProcessor {
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 clientWorld.getMyPlayerGameCharacter().moveRight();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+                escPressed = true;
             }
 
             // If player moves (has non-zero velocity in x or y direction), send player position to server
