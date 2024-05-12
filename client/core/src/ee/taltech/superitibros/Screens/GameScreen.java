@@ -2,9 +2,14 @@ package ee.taltech.superitibros.Screens;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Timer;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.Characters.Enemy;
 import ee.taltech.superitibros.Characters.GameCharacter;
@@ -21,6 +26,7 @@ import ee.taltech.superitibros.Finish.Coin;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +62,19 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Coin
     Coin coin = new Coin(3450, 25);
+
+    // Esc pressed for quitting the game.
+    private boolean escPressed = false;
+
+    // Timer related.
+    private double time = 0;
+    private boolean notFinished = true;
+    private TextureAtlas atlas;
+    private Skin skin;
+    private Stage stage;
+    private Table timerTable = new Table();
+    private Label timer;
+    private Viewport viewportTimer;
 
     /**
      * GameScreen constructor
@@ -150,6 +169,29 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Check if game over
         checkIfGameOver();
+
+        if (escPressed) {
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
+            MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
+            this.dispose();
+            clientWorld.setTimeZero();
+            ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+        }
+        float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
+        float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
+
+        // Registers the finishing time.
+        if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
+            clientWorld.setFinish(true);
+            time = clientWorld.getTime();
+            System.out.println("Finished in -> " + df.format(time));
+            clientWorld.setTimeZero();
+            this.notFinished = false;
+            FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
+            this.dispose();
+            ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
+        }
     }
 
     public void checkIfGameOver() {
@@ -158,6 +200,8 @@ public class GameScreen implements Screen, InputProcessor {
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+            clientWorld.setTimeZero();
+            System.out.println("game over in GameScreen" + "\n");
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getyPosition() <= 10) {
             // TODO: decide what happens when character falls out of the map (dies or respawns?)
             clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
