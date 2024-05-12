@@ -62,6 +62,10 @@ public class GameScreen implements Screen, InputProcessor {
     // Coin
     Coin coin = new Coin(3450, 25);
 
+    // Esc pressed for quitting the game.
+    private boolean escPressed = false;
+
+
     /**
      * GameScreen constructor
      *
@@ -157,13 +161,20 @@ public class GameScreen implements Screen, InputProcessor {
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
             System.out.println("game over in GameScreen" + "\n");
         }
+        if (escPressed) {
+            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
+            MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
+            this.dispose();
+            ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+        }
     }
 
     /**
      * Method for updating camera position.
      */
     private void updateCameraPosition() {
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
+        if (clientWorld.getMyPlayerGameCharacter() != null || escPressed) {
             // Set the target position to the center of the player character's bounding box
             float targetX = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getWidth() / 2;
             float targetY = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getHeight() / 2;
@@ -188,7 +199,7 @@ public class GameScreen implements Screen, InputProcessor {
      */
     private void detectInput(){
 
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
+        if (clientWorld.getMyPlayerGameCharacter() != null || escPressed) {
 
             if (Gdx.input.isKeyPressed(Input.Keys.ANY_KEY)) {
                 buttonHasBeenPressed = true;
@@ -205,6 +216,9 @@ public class GameScreen implements Screen, InputProcessor {
             }
             if (Gdx.input.isKeyPressed(Input.Keys.D) || Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 clientWorld.getMyPlayerGameCharacter().moveRight();
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
+                escPressed = true;
             }
 
             // If player moves (has non-zero velocity in x or y direction), send player position to server
