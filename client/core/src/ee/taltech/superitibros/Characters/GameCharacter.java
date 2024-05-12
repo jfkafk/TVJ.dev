@@ -70,6 +70,10 @@ public class GameCharacter {
     // Animation
     boolean animationCreated = false;
 
+    // Jumping sound cooldown.
+    private boolean canJump = true;
+    private float jumpCooldown = 0.75f;
+
     /**
      * GameCharacter constructor.
      *

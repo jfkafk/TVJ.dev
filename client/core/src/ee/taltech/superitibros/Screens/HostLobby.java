@@ -161,7 +161,6 @@ public class HostLobby implements Screen {
 
 
         //Add listeners to buttons
-
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
