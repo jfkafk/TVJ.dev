@@ -20,21 +20,18 @@ import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class MultiplayerMenu implements Screen {
 
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
-    private TextField nameField;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
     protected Skin skin;
-    private TextButton joinLobbyButton;
-    private TextButton hostLobbyButton;
     GameClient gameClient;
 
     // Audio.
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
-    private Sprite background;
+    private final Sprite background;
 
     public MultiplayerMenu(GameClient gameClient) {
         this.gameClient = gameClient;
@@ -62,13 +59,13 @@ public class MultiplayerMenu implements Screen {
 
         Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
-        nameField = new TextField("", skin);
+        TextField nameField = new TextField("", skin);
         nameField.setMaxLength(10);
 
-        joinLobbyButton = new TextButton("Join Lobby", skin);
+        TextButton joinLobbyButton = new TextButton("Join Lobby", skin);
         joinLobbyButton.setDisabled(true);
 
-        hostLobbyButton = new TextButton("Host Lobby", skin);
+        TextButton hostLobbyButton = new TextButton("Host Lobby", skin);
         hostLobbyButton.setDisabled(true);
 
         TextButton back = new TextButton("Back", skin);

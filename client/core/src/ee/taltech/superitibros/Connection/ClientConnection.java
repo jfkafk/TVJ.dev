@@ -151,7 +151,9 @@ public class ClientConnection {
 
 						if (lobby.isPresent()) {
 							if (packetLobbyInfo.isStartGame()) {
-								gameClient.readyToStart(packetLobbyInfo.getMapPath());
+								gameClient.setGameStart(true);
+								gameClient.setMapPath(packetLobbyInfo.getMapPath());
+								// gameClient.readyToStart(packetLobbyInfo.getMapPath());
 
 							} else if (packetLobbyInfo.isToDelete()) {
 								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
@@ -185,6 +187,7 @@ public class ClientConnection {
 						gameClient.addAvailableLobby(lobby);
 						if (packetSendNewLobby.getCreatorId() == connection.getID()) {
 							gameClient.setMyLobby(lobby);
+							gameClient.refreshHostLobbyScreen();
 						}
 
 					} else if (object instanceof PacketRemoveLobby) {

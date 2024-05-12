@@ -18,13 +18,14 @@ public class GameClient extends Game {
     private ClientConnection clientConnection;
     private ClientWorld clientWorld;
     private MultiplayerMenu multiplayerMenu;
-    List<Lobby> availableLobbies = new LinkedList<>();
-    Lobby myLobby;
-    LobbyScreen lobbyScreen;
-    HostLobby hostLobbyScreen;
-    Integer connectionId;
-    String mapPath;
-    boolean gameWon;
+    private final List<Lobby> availableLobbies = new LinkedList<>();
+    private Lobby myLobby;
+    private LobbyScreen lobbyScreen;
+    private HostLobby hostLobbyScreen;
+    private Integer connectionId;
+    private String mapPath;
+    private boolean gameStart;
+    private boolean gameWon;
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -64,12 +65,12 @@ public class GameClient extends Game {
         clientWorld = new ClientWorld(path);
         gameScreen = new GameScreen(clientWorld);
         setScreen(gameScreen);
-
         try {
             createClient(gameScreen);
         } catch (IOException e) {
             e.printStackTrace();
         }
+        gameStart = false;
         Gdx.input.setInputProcessor(gameScreen);
     }
 
@@ -130,12 +131,10 @@ public class GameClient extends Game {
     }
 
     /**
-     * Method for setting lobby to ready to start.
+     * Set map path.
      * @param mapPath map's path.
      */
-    public void readyToStart(String mapPath) {
-        lobbyScreen.setReadyToStart(true);
-        lobbyScreen.refreshScreen();
+    public void setMapPath(String mapPath) {
         lobbyScreen.setMapPath(mapPath);
     }
 
@@ -269,6 +268,22 @@ public class GameClient extends Game {
      */
     public boolean isGameWon() {
         return gameWon;
+    }
+
+    /**
+     * Set game to start.
+     * @param gameStart is game start.
+     */
+    public void setGameStart(boolean gameStart) {
+        this.gameStart = gameStart;
+    }
+
+    /**
+     * Return if game start.
+     * @return true if game to start.
+     */
+    public boolean isGameStart() {
+        return gameStart;
     }
 
     /**

@@ -50,7 +50,7 @@ public class YouWonScreen implements Screen {
 
         audioHelper.playMusicLoop("MusicSounds/gameOverMusic.mp3");
 
-        Label gameOverLabel = new Label("You Won", skin, "title", Color.RED);
+        Label gameOverLabel = new Label("You Won", skin, "title", Color.GREEN);
 
         restartButton = new TextButton("Back to lobby", skin);
         mainMenuButton = new TextButton("Main Menu", skin);
