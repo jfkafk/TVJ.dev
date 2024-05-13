@@ -33,7 +33,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "127.0.0.1";
+		String ip = "193.40.255.30";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;
@@ -84,6 +84,7 @@ public class ClientConnection {
 									// Add new PlayerGameCharacter to client's game.
 									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 								} else {
+									System.out.println("packet ->< " + ((Packet) object).getMessage());
 									// Create a new PlayerGameCharacter instance from received info.
 									PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
 									// Add new PlayerGameCharacter to client's game.
@@ -196,7 +197,7 @@ public class ClientConnection {
 							gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
 						}
 
-					} else if (object instanceof PacketBullet && clientWorld != null) {
+					} else if (object instanceof PacketBullet && clientWorld != null && clientWorld.getMyPlayerGameCharacter() != null) {
 						PacketBullet packetBullet = (PacketBullet) object;
 
 						// If bullet collided with enemy, then remove enemy from game
@@ -209,7 +210,7 @@ public class ClientConnection {
 						} else {
 
 							// Check if bullet is already in client world
-							if (clientWorld.isBulletInWorld(packetBullet.getBulletId())) {
+							if (clientWorld.isBulletInWorld(packetBullet.getBulletId()) && clientWorld.getMyPlayerGameCharacter() != null) {
 								// System.out.println("got existing bullet");
 								// If is then update coordinates
 								Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
@@ -251,13 +252,14 @@ public class ClientConnection {
 
 	/**
 	 * Send PacketConnect to the server.
-	 *
 	 * This is sent when a client wants to connect to the server.
 	 */
 	public void sendPacketConnect() {
+		System.out.println("sent packet connect!");
 		PacketConnect packetConnect = PacketCreator.createPacketConnect();
 		packetConnect.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
 		client.sendTCP(packetConnect);
+		System.out.println("packetConnect message -> " + packetConnect.getLobbyHash());
 	}
 
 	/**
@@ -332,6 +334,7 @@ public class ClientConnection {
 	 */
 	public void sendLobbyStartGame(String lobbyHash, String mapPath) {
 		PacketLobbyInfo packetLobbyInfo = PacketCreator.createPacketLobbyInfo(lobbyHash);
+		System.out.println("sendLobbyStartGame in ClientConnection -> " + packetLobbyInfo.getLobbyHash());
 		packetLobbyInfo.setStartGame(true);
 		packetLobbyInfo.setMapPath(mapPath);
 		client.sendTCP(packetLobbyInfo);

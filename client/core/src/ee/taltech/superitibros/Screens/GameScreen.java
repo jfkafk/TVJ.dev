@@ -124,7 +124,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Create timer table.
      */
     private void createTableForTimer() {
-        timer = new Label("0.00", skin);
+        timer = new Label("0.0", skin);
         timerTable.add(timer).width(50).padBottom(desiredCameraHeight - 23);
         timerTable.setFillParent(true);
         stage.addActor(timerTable);
@@ -142,7 +142,7 @@ public class GameScreen implements Screen, InputProcessor {
      * Updates the time.
      */
     public void updateTableForTime() {
-        DecimalFormat df = new DecimalFormat("#.##");
+        DecimalFormat df = new DecimalFormat("#.#");
         timer.setText(df.format(clientWorld.getTime()));
     }
 
@@ -210,19 +210,21 @@ public class GameScreen implements Screen, InputProcessor {
             clientWorld.setTimeZero();
             ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
         }
-        float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
-        float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
+        if (clientWorld.getMyPlayerGameCharacter() != null) {
+            float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
+            float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
 
         // Registers the finishing time.
-        if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
-            clientWorld.setFinish(true);
-            time = clientWorld.getTime();
-            System.out.println("Finished in -> " + df.format(time));
-            clientWorld.setTimeZero();
-            this.notFinished = false;
-            FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
-            this.dispose();
-            ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
+            if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
+                clientWorld.setFinish(true);
+                time = clientWorld.getTime();
+                System.out.println("Finished in -> " + df.format(time));
+                clientWorld.setTimeZero();
+                this.notFinished = false;
+                FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
+                this.dispose();
+                ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
+            }
         }
     }
 
