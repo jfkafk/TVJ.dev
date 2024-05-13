@@ -230,18 +230,18 @@ public class ServerConnection {
 					} else if (packetLobbyInfo.getPlayerToAdd() != null && availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null) {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						lobby.addPlayer(packetLobbyInfo.getPlayerToAdd());
-						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
+						server.sendToTCP(connection.getID(), packetLobbyInfo);
 
 					} else if (availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null && packetLobbyInfo.getPlayerToRemove() != null) {
 						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
 						lobby.removePlayer(packetLobbyInfo.getPlayerToRemove());
-						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
+						server.sendToTCP(connection.getID(), packetLobbyInfo);
 
 					} else if (packetLobbyInfo.isToDelete()) {
 						// Remove lobby from available lobbies
 						removeAvailableLobby(packetLobbyInfo.getLobbyHash());
 						// Send to all that lobby is to be deleted
-						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
+						server.sendToTCP(connection.getID(), packetLobbyInfo);
 
 					}
 				} else if (object instanceof PacketBullet) {
