@@ -153,7 +153,7 @@ public class JoinLobby implements Screen {
     private void joinLobby(Lobby lobby) {
         // Add your logic here to join the selected lobby
         gameClient.setMyLobby(lobby);
-        lobby.addPLayer(gameClient.getConnectionId());
+        lobby.addPlayer(gameClient.getConnectionId());
         gameClient.getClientConnection().sendAddPlayerToLobby(lobby.getLobbyHash());
         LobbyScreen lobbyScreen = new LobbyScreen(gameClient, lobby);
         gameClient.setLobbyScreen(lobbyScreen);

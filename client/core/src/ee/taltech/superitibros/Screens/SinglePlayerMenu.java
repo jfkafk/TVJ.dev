@@ -22,47 +22,20 @@ import ee.taltech.superitibros.GameInfo.GameClient;
 public class SinglePlayerMenu implements Screen {
 
     // Sound.
-    private AudioHelper audioHelper = AudioHelper.getInstance();
-    private SpriteBatch batch;
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
-
     private final Sprite background;
-
-    // ImageButton.
-    // Desert.
-    private Texture desertTexture;
-    private TextureRegion desertRegion;
-    private TextureRegionDrawable desertDrawable;
-    private ImageButton desertButton;
-
-    // Moon
-    private Texture moonTexture;
-    private TextureRegion moonRegion;
-    private TextureRegionDrawable moonDrawable;
-    private ImageButton moonButton;
-
-    // Castle
-    private Texture castleTexture;
-    private TextureRegion castleRegion;
-    private TextureRegionDrawable castleDrawable;
-    private ImageButton castleButton;
-
-    // SuperMario Map.
-    private Texture superMTexture;
-    private TextureRegion superMRegion;
-    private TextureRegionDrawable superMDrawable;
-    private ImageButton superMButton;
-
-    // Back Button.
-    private Texture backTexture;
-    private TextureRegion backRegion;
-    private TextureRegionDrawable backDrawable;
-    private ImageButton backButton;
+    private final ImageButton desertButton;
+    private final ImageButton moonButton;
+    private final ImageButton castleButton;
+    private final ImageButton superMButton;
+    private final ImageButton backButton;
 
 
     /**
@@ -90,34 +63,36 @@ public class SinglePlayerMenu implements Screen {
         // Map representation pictures.
 
         // Desert.
-        desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
-        desertRegion = new TextureRegion(desertTexture);
-        desertDrawable = new TextureRegionDrawable(desertRegion);
+        // ImageButton.
+        // Desert.
+        Texture desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
+        TextureRegion desertRegion = new TextureRegion(desertTexture);
+        TextureRegionDrawable desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
         desertButton.setSize(100, 100);
 
-        // Moon.
-        moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
-        moonRegion = new TextureRegion(moonTexture);
-        moonDrawable = new TextureRegionDrawable(moonRegion);
+        // Moon
+        Texture moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
+        TextureRegion moonRegion = new TextureRegion(moonTexture);
+        TextureRegionDrawable moonDrawable = new TextureRegionDrawable(moonRegion);
         moonButton = new ImageButton(moonDrawable);
 
-        // Castle.
-        castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
-        castleRegion = new TextureRegion(castleTexture);
-        castleDrawable = new TextureRegionDrawable(castleRegion);
+        // Castle
+        Texture castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
+        TextureRegion castleRegion = new TextureRegion(castleTexture);
+        TextureRegionDrawable castleDrawable = new TextureRegionDrawable(castleRegion);
         castleButton = new ImageButton(castleDrawable);
 
         // SuperMario Map.
-        superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
-        superMRegion = new TextureRegion(superMTexture);
-        superMDrawable = new TextureRegionDrawable(superMRegion);
+        Texture superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
+        TextureRegion superMRegion = new TextureRegion(superMTexture);
+        TextureRegionDrawable superMDrawable = new TextureRegionDrawable(superMRegion);
         superMButton = new ImageButton(superMDrawable);
 
         // Back Button.
-        backTexture = new Texture(Gdx.files.internal("Images/back.jpeg"));
-        backRegion = new TextureRegion(backTexture);
-        backDrawable = new TextureRegionDrawable(backRegion);
+        Texture backTexture = new Texture(Gdx.files.internal("Images/back.jpeg"));
+        TextureRegion backRegion = new TextureRegion(backTexture);
+        TextureRegionDrawable backDrawable = new TextureRegionDrawable(backRegion);
         backButton = new ImageButton(backDrawable);
     }
 

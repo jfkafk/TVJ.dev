@@ -33,7 +33,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;
@@ -75,6 +75,7 @@ public class ClientConnection {
 				if (object instanceof Packet) {
 
 					if (object instanceof PacketAddCharacter) {
+						System.out.println("Got packet add character");
 						if (gameScreen != null && clientWorld != null) {
 							// Packet for adding player to game.
 							PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
@@ -84,7 +85,7 @@ public class ClientConnection {
 									// Add new PlayerGameCharacter to client's game.
 									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 								} else {
-									System.out.println("packet ->< " + ((Packet) object).getMessage());
+									// System.out.println("packet ->< " + ((Packet) object).getMessage());
 									// Create a new PlayerGameCharacter instance from received info.
 									PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
 									// Add new PlayerGameCharacter to client's game.
@@ -94,6 +95,7 @@ public class ClientConnection {
 						}
 
 					} else if (object instanceof PacketUpdateCharacterInformation && clientWorld != null) {
+						System.out.println("Got packet update character info");
 						// Packet for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 
@@ -118,6 +120,7 @@ public class ClientConnection {
 						}
 
 					} else if (object instanceof PacketClientDisconnect && clientWorld != null) {
+						System.out.println("Got packet client disconnected");
 						// Packet for removing player from world if disconnected.
 						PacketClientDisconnect packetClientDisconnect = (PacketClientDisconnect) object;
 						System.out.println("Client " + packetClientDisconnect.getId() + " disconnected." + "\n");
@@ -125,13 +128,15 @@ public class ClientConnection {
 						clientWorld.getWorldGameCharactersMap().remove(packetClientDisconnect.getId());
 
 					} else if (object instanceof PacketNewEnemy && clientWorld != null) {
+						System.out.println("Got packet new enemy");
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
 						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
-						System.out.println("Got packet new enemy" + "\n");
+						// System.out.println("Got packet new enemy" + "\n");
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy && clientWorld != null) {
+						System.out.println("Got packet update enemy");
 						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
@@ -146,6 +151,7 @@ public class ClientConnection {
 							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
 						}
 					} else if (object instanceof PacketLobbyInfo) {
+						System.out.println("Got packet lobby info");
 						// Packet for updating available lobby info
 						PacketLobbyInfo packetLobbyInfo = (PacketLobbyInfo) object;
 						Optional<Lobby> lobby = gameClient.getLobby(packetLobbyInfo.getLobbyHash());
@@ -161,12 +167,16 @@ public class ClientConnection {
 								gameClient.hostLeft();
 
 							} else if (packetLobbyInfo.isUpdateInfo()) {
+								System.out.println("Got " + packetLobbyInfo.getPlayers().size() + " players.");
 								lobby.get().setPlayers(packetLobbyInfo.getPlayers());
 								gameClient.refreshLobbyScreen();
 								gameClient.refreshHostLobbyScreen();
 
 							} else if (packetLobbyInfo.getPlayerToAdd() != null) {
-								lobby.get().addPLayer(packetLobbyInfo.getPlayerToAdd());
+								System.out.println("Got player to add.");
+								lobby.get().addPlayer(packetLobbyInfo.getPlayerToAdd());
+								System.out.println("Added player");
+								System.out.println(lobby.get().getPlayers());
 								gameClient.refreshLobbyScreen();
 								gameClient.refreshHostLobbyScreen();
 
@@ -182,9 +192,10 @@ public class ClientConnection {
 							}
 
 					} else if (object instanceof PacketSendNewLobby) {
+						System.out.println("Got packet send new lobby");
 						PacketSendNewLobby packetSendNewLobby = (PacketSendNewLobby) object;
 						Lobby lobby = new Lobby(packetSendNewLobby.getLobbyHash());
-						lobby.addPLayer(packetSendNewLobby.getCreatorId());
+						lobby.addPlayer(packetSendNewLobby.getCreatorId());
 						gameClient.addAvailableLobby(lobby);
 						if (packetSendNewLobby.getCreatorId() == connection.getID()) {
 							gameClient.setMyLobby(lobby);
@@ -192,12 +203,14 @@ public class ClientConnection {
 						}
 
 					} else if (object instanceof PacketRemoveLobby) {
+						System.out.println("Got packet remove lobby");
 						PacketRemoveLobby packetRemoveLobby = (PacketRemoveLobby) object;
 						if (gameClient.getLobby(packetRemoveLobby.getLobbyHash()).isPresent()) {
 							gameClient.removeAvailableLobby(gameClient.getLobby(packetRemoveLobby.getLobbyHash()).get());
 						}
 
 					} else if (object instanceof PacketBullet && clientWorld != null && clientWorld.getMyPlayerGameCharacter() != null) {
+						System.out.println("Got packet bullet");
 						PacketBullet packetBullet = (PacketBullet) object;
 
 						// If bullet collided with enemy, then remove enemy from game
@@ -230,11 +243,13 @@ public class ClientConnection {
 							}
 						}
 					} else if (object instanceof PacketAddCoin) {
+						System.out.println("Got packet add coin");
 						PacketAddCoin packetAddCoin = (PacketAddCoin) object;
 						// Create coin object
 						gameScreen.setCoinCoords(packetAddCoin.getxCoordinate(), packetAddCoin.getyCoordinate());
 
 					} else if (object instanceof PacketWon) {
+						System.out.println("Got packet won");
 						gameClient.setGameWon(true);
 					}
 				}
@@ -259,7 +274,7 @@ public class ClientConnection {
 		PacketConnect packetConnect = PacketCreator.createPacketConnect();
 		packetConnect.setLobbyHash(gameClient.getMyLobby().getLobbyHash());
 		client.sendTCP(packetConnect);
-		System.out.println("packetConnect message -> " + packetConnect.getLobbyHash());
+		// System.out.println("packetConnect message -> " + packetConnect.getLobbyHash());
 	}
 
 	/**

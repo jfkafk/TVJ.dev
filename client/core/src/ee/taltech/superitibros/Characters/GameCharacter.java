@@ -288,16 +288,19 @@ public class GameCharacter {
      * @return state.
      */
     public State getState() {
-        if((b2body.getLinearVelocity().y > 0)) {
-            return State.JUMPING;
+        if (b2body != null) {
+            if((b2body.getLinearVelocity().y > 0)) {
+                return State.JUMPING;
+            }
+            //if negative in Y-Axis mario is falling
+            else if(b2body.getLinearVelocity().y < 0)
+                return State.FALL;
+                //if mario is positive or negative in the X axis he is running
+            else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
+                return State.WALKING;
+            }
         }
-        //if negative in Y-Axis mario is falling
-        else if(b2body.getLinearVelocity().y < 0)
-            return State.FALL;
-            //if mario is positive or negative in the X axis he is running
-        else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
-            return State.WALKING;
-        }
+
         //if none of these return then he must be standing
         return State.IDLE;
     }

@@ -20,14 +20,10 @@ public class ServerUpdateThread implements Runnable {
     private World serverWorld;
     String lobbyHash;
 
-    // TODO create constructor
-
-    public void setServerConnection(ServerConnection serverConnection) {
-        this.serverConnection = serverConnection;
-    }
-
-    public void setServerWorld(World serverWorld) {
+    public ServerUpdateThread(World serverWorld, String lobbyHash, ServerConnection serverConnection) {
         this.serverWorld = serverWorld;
+        this.lobbyHash = lobbyHash;
+        this.serverConnection = serverConnection;
     }
 
     public void setLobbyHash(String lobbyHash) {
@@ -42,7 +38,8 @@ public class ServerUpdateThread implements Runnable {
     public void run() {
         while (true) {
             try {
-                if (serverWorld != null) {
+                if (serverWorld != null && serverConnection.getOnGoingLobbies().get(lobbyHash) != null
+                        && serverConnection.getOnGoingLobbies().get(lobbyHash).getServerWorld() != null) {
                     // Update and send Enemies.
                     if (!serverWorld.getEnemyMap().isEmpty()) {
                         for (Enemy enemy : serverWorld.getEnemyMap().values()) {

@@ -24,7 +24,7 @@ public class Lobby {
         return lobbyHash;
     }
 
-    public void addPLayer(Integer playerId) {
+    public void addPlayer(Integer playerId) {
         players.add(playerId);
     }
 

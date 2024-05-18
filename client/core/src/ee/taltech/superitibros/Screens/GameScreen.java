@@ -68,17 +68,14 @@ public class GameScreen implements Screen, InputProcessor {
     // Esc pressed for quitting the game.
     private boolean escPressed = false;
 
-    // Timer related.
-    private double time = 0;
     private boolean notFinished = true;
-    private TextureAtlas atlas;
-    private Skin skin;
-    private Stage stage;
-    private Table timerTable = new Table();
+    private final Skin skin;
+    private final Stage stage;
+    private final Table timerTable = new Table();
     private Label timer;
-    private Viewport viewportTimer;
     float desiredCameraHeight;
     float desiredCameraWidth;
+    DecimalFormat df = new DecimalFormat("#.##");
 
     /**
      * GameScreen constructor
@@ -107,14 +104,14 @@ public class GameScreen implements Screen, InputProcessor {
         camera = new OrthographicCamera(desiredCameraWidth, desiredCameraHeight);
 
         this.fitViewport = new FitViewport(desiredCameraWidth, desiredCameraHeight, camera);
-        this.viewportTimer = new FitViewport(desiredCameraWidth, desiredCameraHeight);
+        Viewport viewportTimer = new FitViewport(desiredCameraWidth, desiredCameraHeight);
         viewportTimer.apply();
         System.out.println("screenX, ScreenY" + desiredCameraWidth + " " + desiredCameraHeight + "\n");
 
         batch = new SpriteBatch();
         batch.setProjectionMatrix(camera.combined);
 
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         stage = new Stage(viewportTimer, batch);
         createTableForTimer();
@@ -174,8 +171,6 @@ public class GameScreen implements Screen, InputProcessor {
         // Render tiled map
         tiledMapRenderer.render();
 
-        DecimalFormat df = new DecimalFormat("#.##");
-
         // Render game objects
         batch.begin();
         updatePlayersPositions();
@@ -201,23 +196,19 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Check if game over
         checkIfGameOver();
+        checkIfGameWon();
+    }
 
-        if (escPressed) {
-            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
-            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
-            MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
-            this.dispose();
-            clientWorld.setTimeZero();
-            ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
-        }
+    public void checkIfGameWon() {
         if (clientWorld.getMyPlayerGameCharacter() != null) {
             float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
             float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
 
-        // Registers the finishing time.
+            // Registers the finishing time.
             if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
                 clientWorld.setFinish(true);
-                time = clientWorld.getTime();
+                // Timer related.
+                double time = clientWorld.getTime();
                 System.out.println("Finished in -> " + df.format(time));
                 clientWorld.setTimeZero();
                 this.notFinished = false;
@@ -299,20 +290,35 @@ public class GameScreen implements Screen, InputProcessor {
             if (Gdx.input.isKeyPressed(Input.Keys.ESCAPE)) {
                 escPressed = true;
             }
-
-            // If player moves (has non-zero velocity in x or y direction), send player position to server
-            if (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0 || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0) {
-                clientWorld.sendMyPlayerCharacterInfo();
-                lastPacketCount = 0;
-
-            } else if (lastPacketCount < 3) {
-                // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
-                clientWorld.sendMyPlayerCharacterInfo();
-                lastPacketCount++;
+            if (escPressed) {
+                clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+                clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+                clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
+                MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
+                clientWorld.setTimeZero();
+                dispose();
+                Gdx.gl.glClearColor(0, 0, 0, 1);
+                Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+                ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
+                camera.update();
             }
 
-            // Reset the velocity before applying new forces
-            // clientWorld.getMyPlayerGameCharacter().b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
+            sendPlayerMovementInfo();
+        }
+    }
+
+    public void sendPlayerMovementInfo() {
+        // If player moves (has non-zero velocity in x or y direction), send player position to server
+        if (clientWorld.getMyPlayerGameCharacter().b2body != null
+                && (clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().x != 0
+                || clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y != 0)) {
+            clientWorld.sendMyPlayerCharacterInfo();
+            lastPacketCount = 0;
+
+        } else if (lastPacketCount < 3) {
+            // Send more 3 packets after last input. So if other client jumps, this client can see how player lands.
+            clientWorld.sendMyPlayerCharacterInfo();
+            lastPacketCount++;
         }
     }
 
@@ -338,8 +344,9 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawPlayerGameCharacters() {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
-            character.draw(batch, clientWorld.getHealthBarTexture());
-            // System.out.println(character.b2body.getLinearVelocity().x);
+            if (character.b2body != null) {
+                character.draw(batch, clientWorld.getHealthBarTexture());
+            }
         }
     }
 
@@ -447,6 +454,7 @@ public class GameScreen implements Screen, InputProcessor {
     @Override
     public void dispose() {
         batch.dispose();
+        stage.clear();
     }
 
     @Override

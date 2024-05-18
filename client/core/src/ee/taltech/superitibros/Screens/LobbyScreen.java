@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -100,9 +101,11 @@ public class LobbyScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                gameClient.getMyLobby().getPlayers().remove(gameClient.getConnectionId());
-                gameClient.getClientConnection().sendRemovePlayerFromLobby(gameClient.getMyLobby().getLobbyHash());
-                gameClient.setMyLobby(null);
+                if (gameClient.getMyLobby() != null) {
+                    gameClient.getMyLobby().getPlayers().remove(gameClient.getConnectionId());
+                    gameClient.getClientConnection().sendRemovePlayerFromLobby(gameClient.getMyLobby().getLobbyHash());
+                    gameClient.setMyLobby(null);
+                }
                 ((Game) Gdx.app.getApplicationListener()).setScreen(gameClient.getMultiplayerMenu());
             }
         });
@@ -134,10 +137,6 @@ public class LobbyScreen implements Screen {
         stage.addActor(mainTable);
     }
 
-    public void setReadyToStart(boolean readyToStart) {
-        this.readyToStart = readyToStart;
-    }
-
     public void setHostLeft(boolean hostLeft) {
         this.hostLeft = hostLeft;
     }
@@ -163,6 +162,9 @@ public class LobbyScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        // Clear the game screen with black
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);
