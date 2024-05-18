@@ -21,22 +21,19 @@ import java.text.DecimalFormat;
 
 public class FinishScreen implements Screen {
 
-    private SpriteBatch batch;
-    private Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
-    private Skin skin;
-    private TextButton restartButton;
-    private TextButton mainMenuButton;
-    private String time;
+    private final SpriteBatch batch;
+    private final Stage stage;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
+    private final Skin skin;
 
     // Sounds.
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public FinishScreen(GameClient gameClient, double time) {
         DecimalFormat df = new DecimalFormat("#.##");
-        this.time = df.format(time);
+        String time1 = df.format(time);
         int worldWidth = 1600;
         int worldHeight = 1000;
         atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
@@ -55,10 +52,10 @@ public class FinishScreen implements Screen {
 
         audioHelper.playSound("MusicSounds/winning.mp3");
 
-        Label gameOverLabel = new Label("You finished in ->" + this.time + " seconds", skin, "title", Color.GREEN);
+        Label gameOverLabel = new Label("You finished in ->" + time1 + " seconds", skin, "title", Color.GREEN);
 
-        restartButton = new TextButton("Back to lobby", skin);
-        mainMenuButton = new TextButton("Main Menu", skin);
+        TextButton restartButton = new TextButton("Back to lobby", skin);
+        TextButton mainMenuButton = new TextButton("Main Menu", skin);
 
         restartButton.addListener(new ClickListener() {
             @Override

@@ -20,7 +20,11 @@ import ee.taltech.superitibros.Connection.ClientConnection;
 import com.badlogic.gdx.math.Rectangle;
 import ee.taltech.superitibros.Weapons.Bullet;
 
-import java.util.*;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class ClientWorld {
 
@@ -48,8 +52,6 @@ public class ClientWorld {
     // Time related.
     private double time = 0.00;
     private boolean isTimePassed = true;
-    private float precision = 0.05f;
-    private boolean finish = false;
 
     public ClientWorld(String path) {
         // Map and physics
@@ -250,9 +252,7 @@ public class ClientWorld {
         Collection<Bullet> bulletList = new ArrayList<>(bullets.values()); // Make a copy of the bullets collection
         Collection<Enemy> enemiesList = new ArrayList<>(enemyMap.values()); // Make a copy of the enemies collection
 
-        Iterator<Bullet> bulletIterator = bulletList.iterator();
-        while (bulletIterator.hasNext()) {
-            Bullet bullet = bulletIterator.next();
+        for (Bullet bullet : bulletList) {
             for (Enemy enemy : enemiesList) {
                 if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
                     // Collision detected, handle accordingly
@@ -441,7 +441,6 @@ public class ClientWorld {
 
     /**
      * This moves the PlayerGameCharacter by changing  x and y coordinates of set character.
-     *
      * Also updates PlayerGameCharacter's weapons coordinates.
      * @param id of the moving character - id is key in worldGameCharactersMap.
      */
@@ -456,8 +455,10 @@ public class ClientWorld {
      */
     public void moveEnemies() {
         for (Enemy enemy : this.getEnemyMap().values()) {
-            enemy.moveToNewPos(enemy.xPosition);
-            enemy.updatePosition();
+            if (enemy.getB2body() != null) {
+                enemy.moveToNewPos(enemy.xPosition);
+                enemy.updatePosition();
+            }
         }
     }
 
@@ -475,17 +476,6 @@ public class ClientWorld {
      */
     public void addEnemy(Enemy enemy) {
         enemyMap.put(enemy.getBotHash(), enemy);
-    }
-
-    /**
-     * Remove enemy from game.
-     * @param botHash bot's hash.
-     */
-    public void removeEnemy(String botHash) {
-        if (getEnemy(botHash) != null) {
-            getEnemy(botHash).removeBodyFromWorld();
-            enemyMap.remove(botHash);
-        }
     }
 
     /**
@@ -528,10 +518,11 @@ public class ClientWorld {
      * Timer with precision of 0.1 sec.
      */
     public void updateTimer() {
-        if (isTimePassed && !finish) {
+        if (isTimePassed && !clientConnection.getGameClient().isGameWon()) {
             time += 0.05;
             // Start cooldown timer
             isTimePassed = false;
+            float precision = 0.05f;
             Timer.schedule(new Timer.Task() {
                 @Override
                 public void run() {
@@ -540,12 +531,4 @@ public class ClientWorld {
             }, precision);
         }
     }
-
-    /**
-     * @param isFinish to change to.
-     */
-    public void setFinish(boolean isFinish) {
-        finish = isFinish;
-    }
-
 }

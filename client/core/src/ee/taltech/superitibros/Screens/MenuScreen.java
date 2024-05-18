@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -72,7 +73,7 @@ public class MenuScreen implements Screen {
         Table mainTable = new Table();
 
         //Create game title
-        Label gameLabel = new Label("SuperITIBros", skin, "title", new Color(0f, 66f, 64f, 100f));
+        Label gameLabel = new Label("SuperIAIBros", skin, "title", new Color(0f, 66f, 64f, 100f));
 
         //Create buttons
         TextButton multiplayerButton = new TextButton("Multiplayer", skin);
@@ -124,13 +125,14 @@ public class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                dispose();
                 Gdx.app.exit();
+                dispose();
+                System.exit(-1);
             }
         });
+
         mainTable.toFront();
         int buttonLocationPadding = 7;
-        int buttonSize = 150;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
         mainTable.row();
         mainTable.add(multiplayerButton).pad(buttonLocationPadding);
@@ -155,7 +157,9 @@ public class MenuScreen implements Screen {
      */
     @Override
     public void render(float delta) {
-        // Background.
+        // Clear the game screen with black
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         batch.begin();
         background.setSize(camera.viewportWidth, camera.viewportHeight);
         background.draw(batch);
@@ -189,6 +193,9 @@ public class MenuScreen implements Screen {
     public void dispose() {
         skin.dispose();
         atlas.dispose();
+        stage.dispose();
+        batch.dispose();
+        background.getTexture().dispose();
     }
 
 

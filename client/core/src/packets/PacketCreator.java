@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Class that is used to create new Packets to keep the code readable in ClientConnection and ServerConnection.

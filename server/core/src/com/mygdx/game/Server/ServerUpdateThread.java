@@ -16,18 +16,15 @@ import static java.lang.Thread.sleep;
  */
 public class ServerUpdateThread implements Runnable {
 
-    private ServerConnection serverConnection;
-    private World serverWorld;
+    private final ServerConnection serverConnection;
+    private final World serverWorld;
     String lobbyHash;
+    boolean gameOn;
 
-    // TODO create constructor
-
-    public void setServerConnection(ServerConnection serverConnection) {
-        this.serverConnection = serverConnection;
-    }
-
-    public void setServerWorld(World serverWorld) {
+    public ServerUpdateThread(World serverWorld, String lobbyHash, ServerConnection serverConnection) {
         this.serverWorld = serverWorld;
+        this.lobbyHash = lobbyHash;
+        this.serverConnection = serverConnection;
     }
 
     public void setLobbyHash(String lobbyHash) {
@@ -38,11 +35,20 @@ public class ServerUpdateThread implements Runnable {
         return lobbyHash;
     }
 
+    public void setGameOn(boolean gameOn) {
+        this.gameOn = gameOn;
+    }
+
+    public boolean isGameOn() {
+        return gameOn;
+    }
+
     @Override
     public void run() {
-        while (true) {
+        while (gameOn) {
             try {
-                if (serverWorld != null) {
+                if (serverWorld != null && serverConnection.getOnGoingLobbies().get(lobbyHash) != null
+                        && serverConnection.getOnGoingLobbies().get(lobbyHash).getServerWorld() != null) {
                     // Update and send Enemies.
                     if (!serverWorld.getEnemyMap().isEmpty()) {
                         for (Enemy enemy : serverWorld.getEnemyMap().values()) {

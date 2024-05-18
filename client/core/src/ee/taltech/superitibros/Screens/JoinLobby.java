@@ -27,17 +27,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class JoinLobby implements Screen {
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private ArrayList<String> joinedPlayers;
+    private final SpriteBatch batch;
+    private final BitmapFont font;
 
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
     protected Skin skin;
     GameClient gameClient;
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     // Fetch available lobbies
     List<Lobby> availableLobbies = new ArrayList<>();
@@ -50,7 +48,7 @@ public class JoinLobby implements Screen {
         int worldWidth = 1600;
         int worldHeight = 1000;
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
@@ -59,9 +57,6 @@ public class JoinLobby implements Screen {
         camera.update();
         stage = new Stage(viewport, batch);
         font = new BitmapFont();
-        joinedPlayers = new ArrayList<String>();
-        // Assuming you have a method to retrieve joined players
-        // You can populate joinedPlayers list here
     }
 
     @Override
@@ -153,7 +148,7 @@ public class JoinLobby implements Screen {
     private void joinLobby(Lobby lobby) {
         // Add your logic here to join the selected lobby
         gameClient.setMyLobby(lobby);
-        lobby.addPLayer(gameClient.getConnectionId());
+        lobby.addPlayer(gameClient.getConnectionId());
         gameClient.getClientConnection().sendAddPlayerToLobby(lobby.getLobbyHash());
         LobbyScreen lobbyScreen = new LobbyScreen(gameClient, lobby);
         gameClient.setLobbyScreen(lobbyScreen);
