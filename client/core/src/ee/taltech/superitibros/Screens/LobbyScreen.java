@@ -28,26 +28,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LobbyScreen implements Screen {
-    private SpriteBatch batch;
-    private BitmapFont font;
-    private ArrayList<String> joinedPlayers;
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final SpriteBatch batch;
+    private final BitmapFont font;
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
     protected Skin skin;
     GameClient gameClient;
     Lobby currentLobby;
-    boolean readyToStart;
     boolean hostLeft;
     String mapPath;
-
-    private Sprite background;
-
-    // Fetch available lobbies
-    List<LobbyScreen> availableLobbies = new ArrayList<>();
+    private final Sprite background;
 
     private static final int BUTTON_PADDING = 10;
 
@@ -56,7 +49,7 @@ public class LobbyScreen implements Screen {
         int worldWidth = 1600;
         int worldHeight = 1000;
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);;
         batch = new SpriteBatch();
         camera = new OrthographicCamera();

@@ -73,7 +73,7 @@ public class MenuScreen implements Screen {
         Table mainTable = new Table();
 
         //Create game title
-        Label gameLabel = new Label("SuperITIBros", skin, "title", new Color(0f, 66f, 64f, 100f));
+        Label gameLabel = new Label("SuperIAIBros", skin, "title", new Color(0f, 66f, 64f, 100f));
 
         //Create buttons
         TextButton multiplayerButton = new TextButton("Multiplayer", skin);
@@ -125,10 +125,13 @@ public class MenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                dispose();
                 Gdx.app.exit();
+                gameClient.dispose();
+                dispose();
+                System.exit(-1);
             }
         });
+
         mainTable.toFront();
         int buttonLocationPadding = 7;
         mainTable.add(gameLabel).pad(buttonLocationPadding).padBottom(buttonLocationPadding);
@@ -191,6 +194,9 @@ public class MenuScreen implements Screen {
     public void dispose() {
         skin.dispose();
         atlas.dispose();
+        stage.dispose();
+        batch.dispose();
+        background.getTexture().dispose();
     }
 
 

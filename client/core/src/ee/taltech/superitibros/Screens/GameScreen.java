@@ -67,8 +67,6 @@ public class GameScreen implements Screen, InputProcessor {
 
     // Esc pressed for quitting the game.
     private boolean escPressed = false;
-
-    private boolean notFinished = true;
     private final Skin skin;
     private final Stage stage;
     private final Table timerTable = new Table();
@@ -196,27 +194,6 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Check if game over
         checkIfGameOver();
-        checkIfGameWon();
-    }
-
-    public void checkIfGameWon() {
-        if (clientWorld.getMyPlayerGameCharacter() != null) {
-            float xCoordinate = clientWorld.getMyPlayerGameCharacter().xPosition;
-            float yCoordinate = clientWorld.getMyPlayerGameCharacter().yPosition;
-
-            // Registers the finishing time.
-            if (xCoordinate < coin.getxCoordinate() + 20 && xCoordinate > coin.getxCoordinate() && yCoordinate < coin.getyCoordinate() + 20 && yCoordinate + 20 > coin.getyCoordinate() && notFinished) {
-                clientWorld.setFinish(true);
-                // Timer related.
-                double time = clientWorld.getTime();
-                System.out.println("Finished in -> " + df.format(time));
-                clientWorld.setTimeZero();
-                this.notFinished = false;
-                FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
-                this.dispose();
-                ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
-            }
-        }
     }
 
     public void checkIfGameOver() {
@@ -234,8 +211,12 @@ public class GameScreen implements Screen, InputProcessor {
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
-            YouWonScreen youWonScreen = new YouWonScreen(clientConnection.getGameClient());
-            ((Game) Gdx.app.getApplicationListener()).setScreen(youWonScreen);
+            clientWorld.setFinish(true);
+            double time = clientWorld.getTime();
+            clientWorld.setTimeZero();
+            FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
+            this.dispose();
+            ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
             clientConnection.getGameClient().setGameWon(false);
         }
     }

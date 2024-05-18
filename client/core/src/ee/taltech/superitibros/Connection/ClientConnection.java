@@ -158,9 +158,9 @@ public class ClientConnection {
 
 						if (lobby.isPresent()) {
 							if (packetLobbyInfo.isStartGame()) {
+								gameClient.setGameWon(false);
 								gameClient.setGameStart(true);
 								gameClient.setMapPath(packetLobbyInfo.getMapPath());
-								// gameClient.readyToStart(packetLobbyInfo.getMapPath());
 
 							} else if (packetLobbyInfo.isToDelete()) {
 								gameClient.removeAvailableLobby(packetLobbyInfo.getLobbyHash());
@@ -227,8 +227,7 @@ public class ClientConnection {
 								// System.out.println("got existing bullet");
 								// If is then update coordinates
 								Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());
-								bullet.setBulletX(packetBullet.getBulletX());
-								bullet.setBulletY(packetBullet.getBulletY());
+								bullet.setBulletCoordinates(packetBullet.getBulletX(), packetBullet.getBulletY());
 
 							} else {
 								// System.out.println("got new bullet");
@@ -236,8 +235,7 @@ public class ClientConnection {
 								// Check is bullet has collided already with solid object
 								if (!clientWorld.getCollidedBullets().contains(packetBullet.getBulletId())) {
 									Bullet bullet = new Bullet(packetBullet.getBulletId());
-									bullet.setBulletX(packetBullet.getBulletX());
-									bullet.setBulletY(packetBullet.getBulletY());
+									bullet.setBulletCoordinates(packetBullet.getBulletX(), packetBullet.getBulletY());
 									clientWorld.addBulletToAdd(bullet);
 								}
 							}

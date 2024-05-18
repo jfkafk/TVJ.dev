@@ -19,17 +19,15 @@ import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class GameOverScreen implements Screen {
 
-    private SpriteBatch batch;
-    private Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
-    private Skin skin;
-    private TextButton restartButton;
-    private TextButton mainMenuButton;
+    private final SpriteBatch batch;
+    private final Stage stage;
+    private final Viewport viewport;
+    private final OrthographicCamera camera;
+    private final TextureAtlas atlas;
+    private final Skin skin;
 
     // Sounds.
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public GameOverScreen(GameClient gameClient) {
         int worldWidth = 1600;
@@ -52,8 +50,8 @@ public class GameOverScreen implements Screen {
 
         Label gameOverLabel = new Label("Game Over", skin, "title", Color.RED);
 
-        restartButton = new TextButton("Back to lobby", skin);
-        mainMenuButton = new TextButton("Main Menu", skin);
+        TextButton restartButton = new TextButton("Back to lobby", skin);
+        TextButton mainMenuButton = new TextButton("Main Menu", skin);
 
         restartButton.addListener(new ClickListener() {
             @Override

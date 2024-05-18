@@ -21,27 +21,23 @@ import ee.taltech.superitibros.GameInfo.GameClient;
 import java.util.ArrayList;
 
 public class HowToPlay implements Screen {
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final OrthographicCamera camera;
     protected Skin skin;
     GameClient gameClient;
 
-    private Sprite background;
+    private final Sprite background;
 
     // Helper for audio
-    private AudioHelper audioHelper = AudioHelper.getInstance();
-
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
     // List for tutorial.
-    private static ArrayList<String> contents = new ArrayList<>();
-    private static ArrayList<String> labels = new ArrayList<>();
-
+    private static final ArrayList<String> contents = new ArrayList<>();
+    private static final ArrayList<String> labels = new ArrayList<>();
     private int contentID = 0;
     // Tutorial contents.
-    private Label tutorialContents;
-    private Label labelsLabel;
+    private final Label tutorialContents;
+    private final Label labelsLabel;
 
 
     public HowToPlay(GameClient gameClient) {
@@ -49,12 +45,12 @@ public class HowToPlay implements Screen {
         int worldWidth = 1600;
         int worldHeight = 1000;
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
 
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
-        viewport = new FitViewport(worldWidth, worldHeight, camera);
+        Viewport viewport = new FitViewport(worldWidth, worldHeight, camera);
         viewport.apply();
         camera.update();
 

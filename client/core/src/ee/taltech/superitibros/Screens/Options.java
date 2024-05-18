@@ -19,27 +19,25 @@ import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
 public class Options implements Screen {
-    private SpriteBatch batch;
+    private final SpriteBatch batch;
     protected Stage stage;
-    private Viewport viewport;
-    private OrthographicCamera camera;
-    private TextureAtlas atlas;
+    private final OrthographicCamera camera;
     protected Skin skin;
     GameClient gameClient;
 
-    private Sprite background;
+    private final Sprite background;
     // Helper for audio
-    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
     // Labels to display current volume.
-    private Label musicVolumeLevel;
-    private Label sfxVolumeLevel;
+    private final Label musicVolumeLevel;
+    private final Label sfxVolumeLevel;
 
     public Options(GameClient gameClient) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
 
         // Labels to display music and sound levels on scale 0-10.
@@ -48,7 +46,7 @@ public class Options implements Screen {
 
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
-        viewport = new FitViewport(worldWidth, worldHeight, camera);
+        Viewport viewport = new FitViewport(worldWidth, worldHeight, camera);
         viewport.apply();
         camera.update();
 
