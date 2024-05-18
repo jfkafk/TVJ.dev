@@ -39,13 +39,6 @@ public class GameClient extends Game {
     }
 
     /**
-     * Sets the screen to game over screen.
-     */
-    public void setScreenToGameOver() {
-        // Implement your game over screen logic here
-    }
-
-    /**
      * Creates the menu screen.
      */
     @Override
@@ -65,6 +58,7 @@ public class GameClient extends Game {
         clientWorld = new ClientWorld(path);
         System.out.println("path in start game GameClient -> " + path + "\n");
         gameScreen = new GameScreen(clientWorld);
+        gameWon = false;
         setScreen(gameScreen);
         try {
             createClient(gameScreen);

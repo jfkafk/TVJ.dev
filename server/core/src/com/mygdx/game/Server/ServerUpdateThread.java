@@ -16,9 +16,10 @@ import static java.lang.Thread.sleep;
  */
 public class ServerUpdateThread implements Runnable {
 
-    private ServerConnection serverConnection;
-    private World serverWorld;
+    private final ServerConnection serverConnection;
+    private final World serverWorld;
     String lobbyHash;
+    boolean gameOn;
 
     public ServerUpdateThread(World serverWorld, String lobbyHash, ServerConnection serverConnection) {
         this.serverWorld = serverWorld;
@@ -34,9 +35,17 @@ public class ServerUpdateThread implements Runnable {
         return lobbyHash;
     }
 
+    public void setGameOn(boolean gameOn) {
+        this.gameOn = gameOn;
+    }
+
+    public boolean isGameOn() {
+        return gameOn;
+    }
+
     @Override
     public void run() {
-        while (true) {
+        while (gameOn) {
             try {
                 if (serverWorld != null && serverConnection.getOnGoingLobbies().get(lobbyHash) != null
                         && serverConnection.getOnGoingLobbies().get(lobbyHash).getServerWorld() != null) {

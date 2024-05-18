@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Packet for sending bullet information between client and server.

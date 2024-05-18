@@ -74,6 +74,7 @@ public class GameScreen implements Screen, InputProcessor {
     float desiredCameraHeight;
     float desiredCameraWidth;
     DecimalFormat df = new DecimalFormat("#.##");
+    boolean clickedEsc;
 
     /**
      * GameScreen constructor
@@ -165,6 +166,10 @@ public class GameScreen implements Screen, InputProcessor {
 
         // Detect input
         detectInput();
+        if (clickedEsc) {
+            clickedEsc = false;
+            return;
+        }
 
         // Render tiled map
         tiledMapRenderer.render();
@@ -211,7 +216,6 @@ public class GameScreen implements Screen, InputProcessor {
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
-            clientWorld.setFinish(true);
             double time = clientWorld.getTime();
             clientWorld.setTimeZero();
             FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
@@ -282,9 +286,10 @@ public class GameScreen implements Screen, InputProcessor {
                 Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
                 camera.update();
+                clickedEsc = true;
+            } else {
+                sendPlayerMovementInfo();
             }
-
-            sendPlayerMovementInfo();
         }
     }
 
@@ -325,7 +330,7 @@ public class GameScreen implements Screen, InputProcessor {
     public void drawPlayerGameCharacters() {
         List<GameCharacter> characterValues = new ArrayList<>(clientWorld.getWorldGameCharactersMap().values());
         for (GameCharacter character : characterValues) {
-            if (character.b2body != null) {
+            if (character.getB2body() != null) {
                 character.draw(batch, clientWorld.getHealthBarTexture());
             }
         }
@@ -366,10 +371,10 @@ public class GameScreen implements Screen, InputProcessor {
      */
     public void drawBullets() {
 
-        List<Bullet> bulltetsToRemove = new ArrayList<>(clientWorld.getBulletsToRemove());
-        if (!bulltetsToRemove.isEmpty()) {
+        List<Bullet> bulletsToRemove = new ArrayList<>(clientWorld.getBulletsToRemove());
+        if (!bulletsToRemove.isEmpty()) {
             //System.out.println(clientWorld.getBulletsToRemove());
-            for (Bullet bullet : bulltetsToRemove) {
+            for (Bullet bullet : bulletsToRemove) {
                 clientWorld.removeBullet(bullet);
                 //System.out.println("removed");
             }
@@ -377,9 +382,9 @@ public class GameScreen implements Screen, InputProcessor {
             //System.out.println(clientWorld.getBulletsToRemove());
         }
 
-        List<Bullet> bulltetsToAdd = new ArrayList<>(clientWorld.getBulletsToAdd());
-        if (!bulltetsToAdd.isEmpty()) {
-            for (Bullet bullet : bulltetsToAdd) {
+        List<Bullet> bulletsToAdd = new ArrayList<>(clientWorld.getBulletsToAdd());
+        if (!bulletsToAdd.isEmpty()) {
+            for (Bullet bullet : bulletsToAdd) {
                 //System.out.println("added");
                 clientWorld.addBullet(bullet);
             }

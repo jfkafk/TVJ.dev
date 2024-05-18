@@ -52,7 +52,6 @@ public class ClientWorld {
     // Time related.
     private double time = 0.00;
     private boolean isTimePassed = true;
-    private boolean finish = false;
 
     public ClientWorld(String path) {
         // Map and physics
@@ -456,8 +455,10 @@ public class ClientWorld {
      */
     public void moveEnemies() {
         for (Enemy enemy : this.getEnemyMap().values()) {
-            enemy.moveToNewPos(enemy.xPosition);
-            enemy.updatePosition();
+            if (enemy.getB2body() != null) {
+                enemy.moveToNewPos(enemy.xPosition);
+                enemy.updatePosition();
+            }
         }
     }
 
@@ -517,7 +518,7 @@ public class ClientWorld {
      * Timer with precision of 0.1 sec.
      */
     public void updateTimer() {
-        if (isTimePassed && !finish) {
+        if (isTimePassed && !clientConnection.getGameClient().isGameWon()) {
             time += 0.05;
             // Start cooldown timer
             isTimePassed = false;
@@ -530,12 +531,4 @@ public class ClientWorld {
             }, precision);
         }
     }
-
-    /**
-     * @param isFinish to change to.
-     */
-    public void setFinish(boolean isFinish) {
-        finish = isFinish;
-    }
-
 }

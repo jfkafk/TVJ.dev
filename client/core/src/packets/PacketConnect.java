@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Packet used when a client wants to connect to the server.

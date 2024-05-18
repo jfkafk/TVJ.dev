@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 import java.util.LinkedHashSet;
 import java.util.Set;

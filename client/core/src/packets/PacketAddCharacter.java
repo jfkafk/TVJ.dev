@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Packet used to add existing PlayerGameCharacters to a new player's world and to add the new PlayerGameCharacter to existing players' worlds.

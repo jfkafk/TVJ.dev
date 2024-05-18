@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Packet for adding a coin to the game world.

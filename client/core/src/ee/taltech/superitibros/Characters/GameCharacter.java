@@ -7,17 +7,15 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Timer;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
-    // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String nameOfSkin;
+    String temporarySkin = "Skeleton";
     float stateTime;
 
     // Character characteristics.
@@ -25,7 +23,6 @@ public class GameCharacter {
 
     public enum State {IDLE, WALKING, JUMPING, FALL}
     boolean facingRight;
-    private float stateTimer;
 
     // Position & dimension.
     public float xPosition;
@@ -37,21 +34,17 @@ public class GameCharacter {
     private Integer playerSize = 50;
 
     // Health bar properties
-    private float maxHealth;
+    private final float maxHealth;
     private float health;
-    private float healthBarWidth;
-    private float healthBarHeight;
+    private final float healthBarWidth;
+    private final float healthBarHeight;
     private Color healthBarColor;
-    private float healthBarX;
-    private float healthBarY;
 
     // World where physics are applied
     ClientWorld clientWorld;
     public Body b2body;
-    private boolean bodyDefined = false;
+    boolean bodyDefined = false;
     Vector2 newPosition;
-    private Integer mapHeight;
-    private Integer mapWidth;
 
     // Textures
     Animation<TextureRegion> walkAnimationRight; // Must declare frame type (TextureRegion)
@@ -66,10 +59,6 @@ public class GameCharacter {
     public State currentState = State.IDLE;
     // Animation
     boolean animationCreated = false;
-
-    // Jumping sound cooldown.
-    private boolean canJump = true;
-    private float jumpCooldown = 0.75f;
 
     /**
      * GameCharacter constructor.
@@ -91,9 +80,13 @@ public class GameCharacter {
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
         this.facingRight = true;
-        this.stateTimer = 0;
-        this.mapHeight = clientWorld.getMapHeight();
-        this.mapWidth = clientWorld.getMapWidth();
+        float stateTimer = 0;
+        Integer mapHeight = clientWorld.getMapHeight();
+        Integer mapWidth = clientWorld.getMapWidth();
+        if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
+            playerSize = 256;
+            boundingBox.setSize(60, 105);
+        }
         defineCharacter();
         // Initialize health bar properties
         maxHealth = 100f;
@@ -103,21 +96,6 @@ public class GameCharacter {
         healthBarColor = Color.GREEN;
     }
 
-    /**
-     *
-     * @return the name of the skin
-     */
-    public String getNameOfSkin() {
-        return nameOfSkin;
-    }
-
-    /**
-     * sets parameter as name of skin
-     * @param nameOfSkin
-     */
-    public void setNameOfSkin(String nameOfSkin) {
-        this.nameOfSkin = nameOfSkin;
-    }
 
     /**
      * Making frames for character
@@ -229,16 +207,7 @@ public class GameCharacter {
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded() && !clientWorld.getGdxWorld().isLocked()) {
-            if (canJump) {
-                canJump = false;
-                Timer.schedule(new Timer.Task() {
-                    @Override
-                    public void run() {
-                        canJump = true;
-                    }
-                }, jumpCooldown);
-                audioHelper.playSound("MusicSounds/jump.mp3");
-            }
+            audioHelper.playSound("MusicSounds/jump.mp3");
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             // System.out.println("jumped");
@@ -288,19 +257,16 @@ public class GameCharacter {
      * @return state.
      */
     public State getState() {
-        if (b2body != null) {
-            if((b2body.getLinearVelocity().y > 0)) {
-                return State.JUMPING;
-            }
-            //if negative in Y-Axis mario is falling
-            else if(b2body.getLinearVelocity().y < 0)
-                return State.FALL;
-                //if mario is positive or negative in the X axis he is running
-            else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
-                return State.WALKING;
-            }
+        if((b2body.getLinearVelocity().y > 0)) {
+            return State.JUMPING;
         }
-
+        //if negative in Y-Axis mario is falling
+        else if(b2body.getLinearVelocity().y < 0)
+            return State.FALL;
+            //if mario is positive or negative in the X axis he is running
+        else if(b2body.getLinearVelocity().x != 0 && isGrounded()) {
+            return State.WALKING;
+        }
         //if none of these return then he must be standing
         return State.IDLE;
     }
@@ -327,14 +293,19 @@ public class GameCharacter {
         stateTime += Gdx.graphics.getDeltaTime();
 
         // Get which state is player currently in
-        State currentState = getState(); // Muuda olekut vastavalt vajadusele
+        State currentState = getState();
+
+        // Reset x-axis velocity
+        b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
+
+        drawCurrentFrame(batch, whiteTexture, currentState);
+    }
+
+    public void drawCurrentFrame(Batch batch, Texture whiteTexture, State currentState) {
 
         if (currentState == null) {
             currentState = State.IDLE;
         }
-
-        // Reset x-axis velocity
-        b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
 
         switch (currentState) {
             case IDLE:
@@ -367,26 +338,17 @@ public class GameCharacter {
                 break;
         }
 
-        // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() - 0.1 * playerSize); // Somehow needed -4 to match the sprite.
-        float frameY = (b2body.getPosition().y - boundingBox.getHeight());
-        //System.out.println("Bounding box height: " + boundingBox.getHeight());
-        //System.out.println("Bounding box width: " + boundingBox.getWidth());
-        //System.out.println("Position y: " + b2body.getPosition().y);
-        //System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
-
-        // Calculate health bar position
-        healthBarX = frameX + boundingBox.width / 2;
-        healthBarY = frameY + boundingBox.height;
-
-        // Bounding box
-        boundingBox.x = b2body.getPosition().x ;
-        boundingBox.y = b2body.getPosition().y;
-
         // Update coordinates
         xPosition = b2body.getPosition().x;
         yPosition = b2body.getPosition().y;
 
+        // Set the position of the current frame to match the position of the Box2D body
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5);
+        float frameY = (b2body.getPosition().y - boundingBox.getHeight());
+
+        // Bounding box
+        boundingBox.x = b2body.getPosition().x ;
+        boundingBox.y = b2body.getPosition().y;
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
@@ -457,6 +419,10 @@ public class GameCharacter {
      */
     public void setHealth(float health) {
         this.health = health;
+    }
+
+    public Body getB2body() {
+        return b2body;
     }
 
     /**

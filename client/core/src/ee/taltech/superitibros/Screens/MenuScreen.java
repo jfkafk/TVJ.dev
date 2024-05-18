@@ -126,7 +126,6 @@ public class MenuScreen implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 Gdx.app.exit();
-                gameClient.dispose();
                 dispose();
                 System.exit(-1);
             }

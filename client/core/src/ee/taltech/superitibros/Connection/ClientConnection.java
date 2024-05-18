@@ -14,11 +14,15 @@ import ee.taltech.superitibros.Screens.GameScreen;
 import ee.taltech.superitibros.GameInfo.GameClient;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 import ee.taltech.superitibros.Weapons.Bullet;
-import ee.taltech.superitibros.Packets.*;
+import packets.*;
 
 import javax.swing.JOptionPane;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 
 
 public class ClientConnection {
@@ -101,14 +105,13 @@ public class ClientConnection {
 
 						if (gameScreen != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
 
-							if (packetUpdateCharacterInformation.isDead()) {
-								PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
-								clientWorld.removeClient(packetUpdateCharacterInformation.getId());
+                            PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
+                            if (packetUpdateCharacterInformation.isDead()) {
+                                clientWorld.removeClient(packetUpdateCharacterInformation.getId());
 								gameCharacter.removeBodyFromWorld();
 							} else {
 								// Update PlayerGameCharacter's coordinates.
-								PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
-								gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
+                                gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
 								// System.out.println(packetUpdateCharacterInformation.getCurrentState());
 								//System.out.println("Got y: " + packetUpdateCharacterInformation.getY());
 								gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
@@ -383,7 +386,7 @@ public class ClientConnection {
 	/**
 	 * Send packet that informs that enemy is killed.
 	 * @param lobbyHash lobby's hash.
-	 * @param botHash bot's hash.
+	 * @param botHash bot hash.
 	 */
 	public void sendEnemyHit(String lobbyHash, String botHash, int bulletId) {
 		PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash);
@@ -425,14 +428,6 @@ public class ClientConnection {
 	 */
 	public void setGameScreen(GameScreen gameScreen) {
 		this.gameScreen = gameScreen;
-	}
-
-	/**
-	 * Get game screen.
-	 * @return game screen.
-	 */
-	public GameScreen getGameScreen() {
-		return gameScreen;
 	}
 
 	/**

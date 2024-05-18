@@ -46,7 +46,7 @@ public class Enemy extends GameCharacter {
             bodyDef.position.set(boundingBox.getX(), boundingBox.getY());
             bodyDef.type = BodyDef.BodyType.DynamicBody;
 
-            bodyDef.gravityScale = 1.0f;
+            bodyDef.gravityScale = 30.0f;
 
             boolean bodyCreated = false;
             while (!bodyCreated) {
@@ -110,10 +110,9 @@ public class Enemy extends GameCharacter {
      * @param xPos of the GameCharacter's new coordinates
      */
     public void moveToNewPos(float xPos) {
-        this.boundingBox.set(xPos, b2body.getPosition().y, boundingBox.getWidth(), boundingBox.getHeight());
-        if (b2body != null) {
-            b2body.applyForceToCenter(0, -10, true);
-            yPosition = b2body.getPosition().y;
+        if (b2body != null && b2body.isActive()) {
+            this.boundingBox.set(xPos, b2body.getPosition().y, boundingBox.getWidth(), boundingBox.getHeight());
+            b2body.setTransform(xPos, yPosition, b2body.getAngle());
         }
     }
 
@@ -132,6 +131,12 @@ public class Enemy extends GameCharacter {
      * @param batch batch.
      */
     public void draw(SpriteBatch batch, Texture whiteTexture) {
+
+        b2body.applyForceToCenter(0, -10, true);
+        yPosition = b2body.getPosition().y;
+        if (!clientWorld.getGdxWorld().isLocked()) {
+            b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
+        }
 
         if (!animationCreated) {
             createFrames();
@@ -181,10 +186,6 @@ public class Enemy extends GameCharacter {
         // Set the position of the current frame to match the position of the Box2D body
         float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
-
-        if (!clientWorld.getGdxWorld().isLocked()) {
-            b2body.setTransform(new Vector2(xPosition, b2body.getPosition().y), b2body.getAngle());
-        }
 
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;
