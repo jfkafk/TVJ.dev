@@ -56,6 +56,11 @@ public class PacketBullet extends Packet {
     String hitEnemy;
 
     /**
+     * Is bullet shot by player or not.
+     */
+    boolean isPlayerBullet;
+
+    /**
      * Sets the ID of the bullet.
      * @param bulletId The ID of the bullet.
      */
@@ -213,5 +218,21 @@ public class PacketBullet extends Packet {
      */
     public void setHitEnemy(String hitEnemy) {
         this.hitEnemy = hitEnemy;
+    }
+
+    /**
+     * Set if bullet is shot by player.
+     * @param playerBullet boolean whether bullet is shot by player.
+     */
+    public void setPlayerBullet(boolean playerBullet) {
+        isPlayerBullet = playerBullet;
+    }
+
+    /**
+     * Get if bullet is shot by player.
+     * @return boolean whether bullet is shot by player.
+     */
+    public boolean isPlayerBullet() {
+        return isPlayerBullet;
     }
 }

@@ -13,9 +13,7 @@ import ee.taltech.superitibros.GameInfo.ClientWorld;
 public class GameCharacter {
 
     private final AudioHelper audioHelper = AudioHelper.getInstance();
-
     public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String temporarySkin = "Skeleton";
     float stateTime;
 
     // Character characteristics.
@@ -30,7 +28,6 @@ public class GameCharacter {
 
     protected float width, height;
     protected Rectangle boundingBox;
-
     private Integer playerSize = 50;
 
     // Health bar properties
@@ -80,9 +77,6 @@ public class GameCharacter {
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
         this.facingRight = true;
-        float stateTimer = 0;
-        Integer mapHeight = clientWorld.getMapHeight();
-        Integer mapWidth = clientWorld.getMapWidth();
         if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
             playerSize = 256;
             boundingBox.setSize(60, 105);
@@ -150,10 +144,18 @@ public class GameCharacter {
         }
     }
 
+    /**
+     * Get character y coordinate.
+     * @return y coordinate.
+     */
     public float getyPosition() {
         return yPosition;
     }
 
+    /**
+     * Get character x coordinate.
+     * @return x coordinate.
+     */
     public float getxPosition() {
         return xPosition;
     }
@@ -191,15 +193,21 @@ public class GameCharacter {
         }
     }
 
-
+    /**
+     * Set character's current state.
+     * @param currentState current state.
+     */
     public void setCurrentState(GameCharacter.State currentState) {
         this.currentState = currentState;
     }
 
+    /**
+     * Set facing right boolean.
+     * @param facingRight boolean whether character facing right.
+     */
     public void setFacingRight(boolean facingRight) {
         this.facingRight = facingRight;
     }
-
 
     /**
      * Method for jumping.
@@ -301,6 +309,12 @@ public class GameCharacter {
         drawCurrentFrame(batch, whiteTexture, currentState);
     }
 
+    /**
+     * Get and draw current frame of character animation.
+     * @param batch batch.
+     * @param whiteTexture white texture.
+     * @param currentState current state.
+     */
     public void drawCurrentFrame(Batch batch, Texture whiteTexture, State currentState) {
 
         if (currentState == null) {
@@ -360,7 +374,11 @@ public class GameCharacter {
         drawHealthBar(batch, whiteTexture);
     }
 
-    // Draw health bar method
+    /**
+     * Method for drawing health bar.
+     * @param batch batch.
+     * @param whiteTexture white texture.
+     */
     public void drawHealthBar(Batch batch, Texture whiteTexture) {
         // Calculate health bar fill percentage
         float healthPercentage = health / maxHealth;
@@ -390,7 +408,10 @@ public class GameCharacter {
         batch.draw(whiteTexture, healthBarX, healthBarY, filledWidth, healthBarHeight);
     }
 
-    // Update health method (call this when player takes damage or heals)
+    /**
+     * Update player health.
+     * @param amount amount to add/subtract
+     */
     public void updateHealth(float amount) {
         health += amount;
 

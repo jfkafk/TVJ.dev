@@ -212,7 +212,8 @@ public class ClientWorld {
      * Check for bullet collisions with obstacles.
      */
     public void checkBulletCollisions() {
-        for (Bullet bullet : bullets.values()) {
+        List<Bullet> bulletsList = new ArrayList<>(bullets.values());
+        for (Bullet bullet : bulletsList) {
             for (MapObject object : mapLayer.getObjects()) {
                 if (object instanceof RectangleMapObject) {
                     RectangleMapObject rectangleObject = (RectangleMapObject) object;
@@ -234,7 +235,6 @@ public class ClientWorld {
         // Remove the bullet from the world
         bulletsToRemove.add(bullet);
         collidedBullets.add(bullet.getBulletId());
-        // Optionally, you can play a sound effect, spawn particles, etc.
     }
 
     /**
@@ -251,12 +251,27 @@ public class ClientWorld {
     public void checkBulletEnemyCollisions() {
         Collection<Bullet> bulletList = new ArrayList<>(bullets.values()); // Make a copy of the bullets collection
         Collection<Enemy> enemiesList = new ArrayList<>(enemyMap.values()); // Make a copy of the enemies collection
+        Collection<GameCharacter> playersList = new ArrayList<>(worldGameCharactersMap.values());
 
         for (Bullet bullet : bulletList) {
+
+            // Check if bullet hits enemy
             for (Enemy enemy : enemiesList) {
-                if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
+                if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox()) && bullet.isPlayerBullet()) {
                     // Collision detected, handle accordingly
-                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash(), bullet.getBulletId());
+                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(),
+                            enemy.getBotHash(), bullet.getBulletId());
+                }
+            }
+
+            // Check if bullet hits player
+            for (GameCharacter player : playersList) {
+                if (bullet.getBoundingBox().overlaps(player.getBoundingBox()) && !bullet.isPlayerBullet()) {
+                    collidedBullets.add(bullet.getBulletId());
+                    bulletsToRemove.add(bullet);
+                    player.setHealth(player.getHealth() - 10);
+                    clientConnection.sendPlayerInformation(player.getxPosition(), player.getyPosition(),
+                            player.getState(), player.getFacingRight(), player.getHealth());
                 }
             }
         }
@@ -278,10 +293,8 @@ public class ClientWorld {
         enemy.updateHealth(-20);
 
         if (enemy.getHealth() <= 0) {
-
             // Remove enemy
             enemyMap.remove(enemy.getBotHash());
-
             // Remove enemies b2body
             enemy.removeBodyFromWorld();
         }
@@ -289,7 +302,8 @@ public class ClientWorld {
 
     public void checkPlayerEnemyCollisions() {
         MyPlayerGameCharacter playerCharacter = myPlayerGameCharacter;
-        for (Enemy enemy : enemyMap.values()) {
+        List<Enemy> enemies = new ArrayList<>(enemyMap.values());
+        for (Enemy enemy : enemies) {
             if (playerCharacter.getBoundingBox().overlaps(enemy.getBoundingBox())) {
                 // Collision detected between player character and enemy
                 handlePlayerEnemyCollision(playerCharacter);

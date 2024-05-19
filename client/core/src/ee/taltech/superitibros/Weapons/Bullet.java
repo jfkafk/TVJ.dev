@@ -11,13 +11,16 @@ public class Bullet {
     private float bulletX;
     private float bulletY;
     private final Rectangle boundingBox = new Rectangle(bulletX, bulletY, 20, 20);
+    private final boolean isPlayerBullet;
 
     /**
      * Bullet constructor.
      * @param bulletId bullet's id.
+     * @param isPlayerBullet boolean whether bullet is shot by bullet.
      */
-    public Bullet(Integer bulletId) {
+    public Bullet(Integer bulletId, boolean isPlayerBullet) {
         this.bulletId = bulletId;
+        this.isPlayerBullet = isPlayerBullet;
     }
 
     /**
@@ -79,5 +82,13 @@ public class Bullet {
 
         // Draw
         sprite.draw(batch);
+    }
+
+    /**
+     * Get whether bullet is shot by player.
+     * @return boolean whether bullet is shot by player.
+     */
+    public boolean isPlayerBullet() {
+        return isPlayerBullet;
     }
 }

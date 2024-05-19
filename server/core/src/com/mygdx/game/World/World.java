@@ -3,6 +3,7 @@ package com.mygdx.game.World;
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Characters.PlayerGameCharacter;
 import com.mygdx.game.Finish.Coin;
+import com.mygdx.game.Server.ServerConnection;
 import com.mygdx.game.Weapons.Bullet;
 
 import java.util.*;
@@ -10,11 +11,22 @@ import java.util.stream.Collectors;
 
 public class World {
 
+    ServerConnection serverConnection;
+    String lobbyHash;
     private final Map<Integer, PlayerGameCharacter> clients = new HashMap<>();
     private final Map<String, Enemy> enemyMap = new HashMap<>();
     private final List<Bullet> bullets = new ArrayList<>();
     private final List<Bullet> bulletsToRemove = new ArrayList<>();
-    Coin coin;
+    protected Coin coin;
+
+    /**
+     * Constructor for World class.
+     * @param lobbyHash lobby hash.
+     */
+    public World(String lobbyHash, ServerConnection serverConnection) {
+        this.lobbyHash = lobbyHash;
+        this.serverConnection = serverConnection;
+    }
 
     /**
      * Get coin object.
@@ -59,6 +71,9 @@ public class World {
      * @param bullet to add.
      */
     public void addBullet(Bullet bullet) {
+        if (serverConnection != null) {
+            serverConnection.sendNewBullet(lobbyHash, bullet);
+        }
         bullets.add(bullet);
     }
 
@@ -129,6 +144,14 @@ public class World {
         for (Enemy enemy : getEnemyMap().values()) {
             enemy.spin();
         }
+    }
+
+    /**
+     * Get lobby hash.
+     * @return lobby hash.
+     */
+    public String getLobbyHash() {
+        return lobbyHash;
     }
 
     /**
