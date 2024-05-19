@@ -4,6 +4,7 @@ import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.World;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.List;
@@ -51,7 +52,8 @@ public class ServerUpdateThread implements Runnable {
                         && serverConnection.getOnGoingLobbies().get(lobbyHash).getServerWorld() != null) {
                     // Update and send Enemies.
                     if (!serverWorld.getEnemyMap().isEmpty()) {
-                        for (Enemy enemy : serverWorld.getEnemyMap().values()) {
+                        List<Enemy> enemies = new ArrayList<>(serverWorld.getEnemyMap().values());
+                        for (Enemy enemy : enemies) {
                             enemy.spin();
                         }
                         serverConnection.sendUpdatedEnemies(lobbyHash);
@@ -66,7 +68,8 @@ public class ServerUpdateThread implements Runnable {
                         }
 
                         // Update bullets
-                        for (Bullet bullet : serverWorld.getBullets()) {
+                        List<Bullet> bullets = new ArrayList<>(serverWorld.getBullets());
+                        for (Bullet bullet : bullets) {
                             bullet.updateBullet();
 
                             if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
