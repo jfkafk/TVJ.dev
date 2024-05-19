@@ -267,8 +267,8 @@ public class SinglePlayerMenu implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Goblin");
                 currentChosenCharacter = "Goblin";
-                wizardButton = new ImageButton(wizardDrawable, wizardClick, wizardPressedDrawable);
-                ramboButton = new ImageButton(ramboDrawable, ramboClick, ramboPressedDrawable);
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
             }
         });
 
@@ -278,8 +278,8 @@ public class SinglePlayerMenu implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Wizard");
                 currentChosenCharacter = "Wizard";
-                ramboButton = new ImageButton(ramboDrawable, ramboClick, ramboPressedDrawable);
-                goblinButton = new ImageButton(goblinDrawable, goblinClick, goblinPressedDrawable);
+                if (goblinButton.isChecked()) goblinButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
             }
         });
 
@@ -289,10 +289,8 @@ public class SinglePlayerMenu implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Rambo");
                 currentChosenCharacter = "Rambo";
-                goblinButton.setDisabled(true);
-                wizardButton.setDisabled(true);
-                goblinButton = new ImageButton(goblinDrawable, goblinClick, goblinPressedDrawable);
-                wizardButton = new ImageButton(wizardDrawable, wizardClick, wizardPressedDrawable);
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (goblinButton.isChecked()) goblinButton.toggle();
             }
         });
     }

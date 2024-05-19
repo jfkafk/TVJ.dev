@@ -26,7 +26,6 @@ public class CreateCharacterFrames {
     Animation<TextureRegion> fallAnimationLeft;
     private Integer playerSize;
     private String characterName = "Goblin";
-    private GameClient gameClient;
 
     public CreateCharacterFrames(ClientWorld clientWorld) {
         characterName =  clientWorld.getClientConnection().getGameClient().getCharacterName();
