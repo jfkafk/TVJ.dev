@@ -481,7 +481,9 @@ public class ServerConnection {
 						bullet.getBulletX(), bullet.getBulletY(), false);
 			}
 
-			for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
+			List<Integer> players = new ArrayList<>(onGoingLobbies.get(lobbyHash).getPlayers());
+
+			for (Integer id : players) {
 				server.sendToTCP(id, packetBullet);
 			}
 		}
