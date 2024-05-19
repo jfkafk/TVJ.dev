@@ -548,4 +548,8 @@ public class ClientWorld {
         finish = isFinish;
     }
 
+    public ClientConnection getClientConnection() {
+        return this.clientConnection;
+    }
+
 }

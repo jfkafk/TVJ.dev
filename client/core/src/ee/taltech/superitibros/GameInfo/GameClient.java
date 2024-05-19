@@ -26,6 +26,7 @@ public class GameClient extends Game {
     private String mapPath;
     private boolean gameStart;
     private boolean gameWon;
+    private String characterName = "Goblin";
 
     /**
      * Method creates a new Client who connects to the Server with its ClientWorld and GameScreen.
@@ -307,5 +308,13 @@ public class GameClient extends Game {
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+    }
+
+    public String getCharacterName() {
+        return characterName;
+    }
+
+    public void setCharacterName(String characterName) {
+        this.characterName = characterName;
     }
 }

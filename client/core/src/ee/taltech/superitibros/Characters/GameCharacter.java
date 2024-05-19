@@ -16,10 +16,6 @@ public class GameCharacter {
     // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
-    public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    String nameOfSkin;
-    float stateTime;
-
     // Character characteristics.
     protected float movementSpeed; // world units per second
 
@@ -71,6 +67,10 @@ public class GameCharacter {
     private boolean canJump = true;
     private float jumpCooldown = 0.75f;
 
+    public static CreateCharacterFrames skinCreator;
+    String nameOfSkin;
+    float stateTime;
+
     /**
      * GameCharacter constructor.
      *
@@ -83,6 +83,7 @@ public class GameCharacter {
      */
     public GameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width,
                          float height, ClientWorld clientWorld) {
+        skinCreator = new CreateCharacterFrames(clientWorld);
         this.movementSpeed = movementSpeed;
         this.xPosition = xPosition;
         this.yPosition = yPosition;

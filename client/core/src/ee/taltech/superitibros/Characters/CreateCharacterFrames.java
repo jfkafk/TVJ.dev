@@ -4,6 +4,8 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import ee.taltech.superitibros.Characters.GameCharacter;
+import ee.taltech.superitibros.GameInfo.ClientWorld;
+import ee.taltech.superitibros.GameInfo.GameClient;
 
 import java.util.Objects;
 import java.util.Random;
@@ -23,6 +25,12 @@ public class CreateCharacterFrames {
     Animation<TextureRegion> fallAnimationRight;
     Animation<TextureRegion> fallAnimationLeft;
     private Integer playerSize;
+    private String characterName = "Goblin";
+    private GameClient gameClient;
+
+    public CreateCharacterFrames(ClientWorld clientWorld) {
+        characterName =  clientWorld.getClientConnection().getGameClient().getCharacterName();
+    }
 
     public void makeFrames(GameCharacter character) {
         determineWhatPathToUse(character);
@@ -36,29 +44,33 @@ public class CreateCharacterFrames {
      * determine what path to take; right now a skeleton path is default later it is changed
      */
     public void determineWhatPathToUse(GameCharacter character) {
-        Random random = new Random();
-        // Generate a random number between 1 and 3 (inclusive)
-        int randomNumber = random.nextInt(3) + 1;
         if (character instanceof Enemy) {
+            System.out.println("Creating frames for -> " + character.nameOfSkin);
             walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
             idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
             jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
             fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
             playerSize = 54;
-        } else {
-            if (randomNumber == 1) {
+        }
+        else {
+            if (Objects.equals(characterName, "Rambo")) {
+                System.out.println("Creating frames for -> " + characterName);
                 walkAnimationPath = "Characters/Enemy sprites/WALK.png";
                 idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
                 jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
                 fallAnimationPath = "Characters/Enemy sprites/FALL.png";
                 playerSize = 50;
-            } if (randomNumber == 2) {
+            }
+            if (Objects.equals(characterName, "Wizard")) {
+                System.out.println("Creating frames for -> " + characterName);
                 walkAnimationPath = "Characters/Wizard sprites/Wizard WALK.png";
                 idleAnimationPath = "Characters/Wizard sprites/Wizard IDLE.png";
                 jumpAnimationPath = "Characters/Wizard sprites/Wizard JUMP.png";
                 fallAnimationPath = "Characters/Wizard sprites/Wizard FALL.png";
                 playerSize = 50;
-            } else {
+            }
+            if (Objects.equals(characterName, "Goblin")) {
+                System.out.println("Creating frames for -> " + characterName);
                 walkAnimationPath = "Characters/Goblin Sprites/Goblin WALK.png";
                 idleAnimationPath = "Characters/Goblin Sprites/Goblin IDLE.png";
                 jumpAnimationPath = "Characters/Goblin Sprites/Goblin JUMP.png";
@@ -66,33 +78,6 @@ public class CreateCharacterFrames {
                 playerSize = 50;
             }
         }
-
-
-        //Päris kood hetkel üleval on temporary
-//        if (character instanceof Enemy) {
-//            walkAnimationPath = "Characters/Skeleton sprites/WALK 64 frames.png";
-//            idleAnimationPath = "Characters/Skeleton sprites/IDLE 64 frames.png";
-//            jumpAnimationPath = "Characters/Skeleton sprites/JUMP 64 frames.png";
-//            fallAnimationPath = "Characters/Skeleton sprites/FALL 64 frames.png";
-//            playerSize = 54;
-//        } if (Objects.equals(character.getNameOfSkin(), "Rambo")) {
-//            walkAnimationPath = "Characters/Enemy sprites/WALK.png";
-//            idleAnimationPath = "Characters/Enemy sprites/IDLE.png";
-//            jumpAnimationPath = "Characters/Enemy sprites/JUMP.png";
-//            fallAnimationPath = "Characters/Enemy sprites/FALL.png";
-//            playerSize = 50;
-//        } if (Objects.equals(character.getNameOfSkin(), "Wizard")) {
-//            walkAnimationPath = "Characters/Wizard sprites/Wizard WALK.png";
-//            idleAnimationPath = "Characters/Wizard sprites/Wizard IDLE.png";
-//            jumpAnimationPath = "Characters/Wizard sprites/Wizard JUMP.png";
-//            fallAnimationPath = "Characters/Wizard sprites/Wizard FALL.png";
-//            playerSize = 50;
-//        } if (Objects.equals(character.getNameOfSkin(), "Goblin")) {
-//            walkAnimationPath = "Characters/Goblin Sprites/Goblin WALK.png";
-//            idleAnimationPath = "Characters/Goblin Sprites/Goblin IDLE.png";
-//            jumpAnimationPath = "Characters/Goblin Sprites/Goblin JUMP.png";
-//            fallAnimationPath = "Characters/Goblin Sprites/Goblin FALL.png";
-//        }
     }
 
     private void createFrames(String animationPath) {
@@ -189,5 +174,13 @@ public class CreateCharacterFrames {
 
     public Integer getPlayerSize() {
         return playerSize;
+    }
+
+    public String getCharacterName() {
+        return characterName;
+    }
+
+    public void setCharacterName(String characterName) {
+        this.characterName = characterName;
     }
 }
