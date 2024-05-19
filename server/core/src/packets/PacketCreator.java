@@ -129,12 +129,13 @@ public class PacketCreator {
      * @param bulletY bullet y coordinate.
      * @return new PacketBullet.
      */
-    public static PacketBullet createPacketBullet(String lobbyHash, int bulletId, float bulletX, float bulletY) {
+    public static PacketBullet createPacketBullet(String lobbyHash, int bulletId, float bulletX, float bulletY, boolean isPlayerBullet) {
         PacketBullet packetBullet = new PacketBullet();
         packetBullet.setLobbyHash(lobbyHash);
         packetBullet.setBulletId(bulletId);
         packetBullet.setBulletX(bulletX);
         packetBullet.setBulletY(bulletY);
+        packetBullet.setPlayerBullet(isPlayerBullet);
         return packetBullet;
     }
 
@@ -157,5 +158,22 @@ public class PacketCreator {
      */
     public static PacketWon createPacketWon() {
         return new PacketWon();
+    }
+
+    /**
+     * Create PacketNewBullet.
+     * @param lobbyHash lobby hash.
+     * @param bulletX bullet x.
+     * @param bulletY bullet y.
+     * @return new PacketNewBullet.
+     */
+    public static PacketNewBullet createPacketNewBullet(String lobbyHash, int bulletId, float bulletX, float bulletY, boolean isPlayerBullet) {
+        PacketNewBullet packetNewBullet = new PacketNewBullet();
+        packetNewBullet.setLobbyHash(lobbyHash);
+        packetNewBullet.setBulletId(bulletId);
+        packetNewBullet.setPlayerX(bulletX);
+        packetNewBullet.setPlayerY(bulletY);
+        packetNewBullet.setPlayerBullet(isPlayerBullet);
+        return packetNewBullet;
     }
 }

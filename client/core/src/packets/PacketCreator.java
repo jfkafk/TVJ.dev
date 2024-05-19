@@ -1,4 +1,4 @@
-package ee.taltech.superitibros.Packets;
+package packets;
 
 /**
  * Class that is used to create new Packets to keep the code readable in ClientConnection and ServerConnection.
@@ -102,9 +102,48 @@ public class PacketCreator {
         return packetLobbyInfo;
     }
 
+    /**
+     * Create PacketBullet.
+     * @param lobbyHash lobby hash.
+     * @return new PacketBullet.
+     */
     public static PacketBullet createPacketBullet(String lobbyHash) {
         PacketBullet packetBullet = new PacketBullet();
         packetBullet.setLobbyHash(lobbyHash);
         return packetBullet;
+    }
+
+    /**
+     * Create PacketRemovePlayer.
+     * @param lobbyHash lobby hash.
+     * @param playerToRemove player to remove.
+     * @return new PacketRemovePlayer.
+     */
+    public static PacketRemovePlayer createPacketRemovePlayer(String lobbyHash, int playerToRemove) {
+        PacketRemovePlayer packetRemovePlayer = new PacketRemovePlayer();
+        packetRemovePlayer.setLobbyHash(lobbyHash);
+        packetRemovePlayer.setPlayerToRemove(playerToRemove);
+        return  packetRemovePlayer;
+    }
+
+    /**
+     * Create PacketNewBullet.
+     * @param lobbyHash lobby hash.
+     * @param mouseX mouse x.
+     * @param mouseY mouse y.
+     * @param playerX player x.
+     * @param playerY player y.
+     * @return new PacketNewBullet.
+     */
+    public static PacketNewBullet createPacketNewBullet(String lobbyHash, float mouseX, float mouseY,
+                                                        float playerX, float playerY) {
+        PacketNewBullet packetNewBullet = new PacketNewBullet();
+        packetNewBullet.setLobbyHash(lobbyHash);
+        packetNewBullet.setMouseX(mouseX);
+        packetNewBullet.setMouseY(mouseY);
+        packetNewBullet.setPlayerX(playerX);
+        packetNewBullet.setPlayerY(playerY);
+        packetNewBullet.setPlayerBullet(true);
+        return packetNewBullet;
     }
 }

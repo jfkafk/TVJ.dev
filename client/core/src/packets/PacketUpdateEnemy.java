@@ -1,6 +1,6 @@
 package packets;
 
-import com.mygdx.game.Characters.GameCharacter;
+import ee.taltech.superitibros.Characters.GameCharacter;
 
 /**
  * Packet for sending a list of updated Enemy instances to all connections.

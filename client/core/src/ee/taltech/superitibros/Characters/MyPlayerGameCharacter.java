@@ -7,23 +7,24 @@ import ee.taltech.superitibros.GameInfo.ClientWorld;
 public class MyPlayerGameCharacter extends GameCharacter {
 
     public float width;
-
     public float height;
-    private final float movementSpeed;
     int id;
-
-    // Player sprite
-    private TextureRegion characterTexture;
-
-    // Box2D
     public ClientWorld world;
 
-    private int myPlayerGameCharacterId;
-
+    /**
+     * Constructor for my player.
+     * @param movementSpeed movement speed.
+     * @param boundingBox bounding box.
+     * @param xPosition x coordinate.
+     * @param yPosition y coordinate.
+     * @param width width.
+     * @param height height.
+     * @param id id.
+     * @param world world.
+     */
     public MyPlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition,
                                  float yPosition, float width, float height, int id, ClientWorld world) {
         super(movementSpeed, boundingBox, xPosition, yPosition, width, height, world);
-        this.movementSpeed = movementSpeed;
         this.boundingBox = boundingBox;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -32,18 +33,6 @@ public class MyPlayerGameCharacter extends GameCharacter {
         this.id = id;
         this.world = world;
         defineCharacter();
-    }
-
-    public void setMyPlayerGameCharacterId(int playerGameCharacterId) {
-        this.myPlayerGameCharacterId = playerGameCharacterId;
-    }
-
-    public int getMyPlayerGameCharacterId() {
-        return myPlayerGameCharacterId;
-    }
-
-    public void setCharacterTexture(TextureRegion texture) {
-        this.characterTexture = texture;
     }
 
     /**
@@ -56,9 +45,5 @@ public class MyPlayerGameCharacter extends GameCharacter {
     public static MyPlayerGameCharacter createMyPlayerGameCharacter(float x, float y, int id, ClientWorld world) {
         Rectangle myPlayerGameCharacterRectangle = new Rectangle(x, y, 10, 20);
         return new MyPlayerGameCharacter(100f, myPlayerGameCharacterRectangle, x, y, myPlayerGameCharacterRectangle.width, myPlayerGameCharacterRectangle.height, id, world);
-    }
-
-    // Dispose
-    public void dispose() {
     }
 }

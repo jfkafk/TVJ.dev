@@ -1,46 +1,75 @@
 package ee.taltech.superitibros.Weapons;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Rectangle;
 
 public class Bullet {
 
-    Integer bulletId;
-    float bulletX;
-    float bulletY;
+    // Bullet data
+    private final Integer bulletId;
+    private float bulletX;
+    private float bulletY;
+    private final Rectangle boundingBox = new Rectangle(bulletX, bulletY, 20, 20);
+    private final boolean isPlayerBullet;
 
-    Rectangle boundingBox = new Rectangle(bulletX, bulletY, 20, 20);
-
-    public Bullet(Integer bulletId) {
+    /**
+     * Bullet constructor.
+     * @param bulletId bullet's id.
+     * @param isPlayerBullet boolean whether bullet is shot by bullet.
+     */
+    public Bullet(Integer bulletId, boolean isPlayerBullet) {
         this.bulletId = bulletId;
+        this.isPlayerBullet = isPlayerBullet;
     }
 
-    public void setBulletX(float bulletX) {
-        this.bulletX = bulletX;
+    /**
+     * Set bullet x and y coordinate.
+     * @param x coordinate.
+     * @param y coordinate.
+     */
+    public void setBulletCoordinates(float x, float y) {
+        this.bulletX = x;
+        this.bulletY = y;
     }
 
-    public void setBulletY(float bulletY) {
-        this.bulletY = bulletY;
-    }
-
+    /**
+     * Get bullet id.
+     * @return id.
+     */
     public Integer getBulletId() {
         return bulletId;
     }
 
+    /**
+     * Return bullet x coordinate.
+     * @return x coordinate.
+     */
     public float getBulletX() {
         return bulletX;
     }
 
+    /**
+     * Return bullet y coordinate.
+     * @return y coordinate.
+     */
     public float getBulletY() {
         return bulletY;
     }
 
+    /**
+     * Get bullet bounding box.
+     * @return bounding box.
+     */
     public Rectangle getBoundingBox() {
         return boundingBox;
     }
 
+    /**
+     * Method for drawing bullet.
+     * @param batch batch.
+     * @param sprite bullet sprite.
+     */
     public void draw(SpriteBatch batch, Sprite sprite) {
 
         sprite.setSize(20, 20);
@@ -53,5 +82,13 @@ public class Bullet {
 
         // Draw
         sprite.draw(batch);
+    }
+
+    /**
+     * Get whether bullet is shot by player.
+     * @return boolean whether bullet is shot by player.
+     */
+    public boolean isPlayerBullet() {
+        return isPlayerBullet;
     }
 }

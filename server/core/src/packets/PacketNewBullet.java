@@ -1,9 +1,6 @@
 package packets;
 
-/**
- * Packet for sending bullet information between client and server.
- */
-public class PacketBullet extends Packet {
+public class PacketNewBullet extends Packet {
 
     /**
      * The ID of the bullet.
@@ -14,16 +11,6 @@ public class PacketBullet extends Packet {
      * The lobby hash associated with the bullet.
      */
     String lobbyHash;
-
-    /**
-     * The X-coordinate of the bullet.
-     */
-    float bulletX;
-
-    /**
-     * The Y-coordinate of the bullet.
-     */
-    float bulletY;
 
     /**
      * The X-coordinate of the player shooting the bullet.
@@ -44,16 +31,6 @@ public class PacketBullet extends Packet {
      * The Y-coordinate of the mouse position when the bullet was shot.
      */
     float mouseY;
-
-    /**
-     * Flag indicating whether the bullet has hit something.
-     */
-    boolean isHit;
-
-    /**
-     * The enemy hit by the bullet.
-     */
-    String hitEnemy;
 
     /**
      * Is bullet shot by player or not.
@@ -82,22 +59,6 @@ public class PacketBullet extends Packet {
      */
     public void setLobbyHash(String lobbyHash) {
         this.lobbyHash = lobbyHash;
-    }
-
-    /**
-     * Sets the X-coordinate of the bullet.
-     * @param bulletX The X-coordinate of the bullet.
-     */
-    public void setBulletX(float bulletX) {
-        this.bulletX = bulletX;
-    }
-
-    /**
-     * Sets the Y-coordinate of the bullet.
-     * @param bulletY The Y-coordinate of the bullet.
-     */
-    public void setBulletY(float bulletY) {
-        this.bulletY = bulletY;
     }
 
     /**
@@ -130,22 +91,6 @@ public class PacketBullet extends Packet {
      */
     public void setMouseY(float mouseY) {
         this.mouseY = mouseY;
-    }
-
-    /**
-     * Retrieves the X-coordinate of the bullet.
-     * @return The X-coordinate of the bullet.
-     */
-    public float getBulletX() {
-        return bulletX;
-    }
-
-    /**
-     * Retrieves the Y-coordinate of the bullet.
-     * @return The Y-coordinate of the bullet.
-     */
-    public float getBulletY() {
-        return bulletY;
     }
 
     /**
@@ -186,38 +131,6 @@ public class PacketBullet extends Packet {
      */
     public float getMouseY() {
         return mouseY;
-    }
-
-    /**
-     * Checks if the bullet has hit something.
-     * @return True if the bullet has hit something, false otherwise.
-     */
-    public boolean isHit() {
-        return isHit;
-    }
-
-    /**
-     * Sets the flag indicating whether the bullet has hit something.
-     * @param hit True if the bullet has hit something, false otherwise.
-     */
-    public void setIsHit(boolean hit) {
-        isHit = hit;
-    }
-
-    /**
-     * Retrieves the enemy hit by the bullet.
-     * @return The enemy hit by the bullet.
-     */
-    public String getHitEnemy() {
-        return hitEnemy;
-    }
-
-    /**
-     * Sets the enemy hit by the bullet.
-     * @param hitEnemy The enemy hit by the bullet.
-     */
-    public void setHitEnemy(String hitEnemy) {
-        this.hitEnemy = hitEnemy;
     }
 
     /**

@@ -1,6 +1,8 @@
 package com.mygdx.game.Characters;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.World;
 
 public class Enemy extends GameCharacter {
@@ -15,6 +17,7 @@ public class Enemy extends GameCharacter {
 
     private static final float MOVEMENT_SPEED = 0.15f; // At this speed enemy can climb
     private static final float DETECTION_RANGE = 300f;
+    private static final float SHOOT_COOLDOWN = 1.0f; // 1 second cooldown
 
     // Health
     private final float maxHealth;
@@ -27,15 +30,18 @@ public class Enemy extends GameCharacter {
     float minX;
     float maxX;
 
+    // Last shot time
+    private long lastShotTime;
+
     /**
-     * GameCharacter constructor.
+     * Constructs a new Enemy instance.
      *
-     * @param boundingBox   encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
-     * @param xPosition     of the PlayerGameCharacter (float)
-     * @param yPosition     of the PlayerGameCharacter (float)
-     * @param width         of the PlayerGameCharacter (float)
-     * @param height        of the PlayerGameCharacter (float)
-     * @param world         game world (World)
+     * @param boundingBox the bounding box that encapsulates the Enemy (Rectangle)
+     * @param xPosition the initial x position of the Enemy (float)
+     * @param yPosition the initial y position of the Enemy (float)
+     * @param width the width of the Enemy (float)
+     * @param height the height of the Enemy (float)
+     * @param world the game world where the Enemy exists (World)
      */
     public Enemy(Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
         super(MOVEMENT_SPEED, boundingBox, xPosition, yPosition, width, height, world);
@@ -46,11 +52,14 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Enemy static method for creating a new Enemy instance.
+     * Creates a new Enemy instance.
      *
-     * @param x coordinate of the PlayerGameCharacter (float)
-     * @param y coordinate of the PlayerGameCharacter (float)
-     * @return new Enemy instance
+     * @param x the initial x coordinate of the Enemy (float)
+     * @param y the initial y coordinate of the Enemy (float)
+     * @param minX the minimum x coordinate the Enemy can move to (float)
+     * @param maxX the maximum x coordinate the Enemy can move to (float)
+     * @param world the game world where the Enemy exists (World)
+     * @return a new Enemy instance
      */
     public static Enemy createEnemy(float x, float y, float minX, float maxX, World world) {
         Rectangle enemyRectangle = new Rectangle(x, y, 10f, 20f);
@@ -60,9 +69,10 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Set min and max coordinate of enemy.
-     * @param minX minimum x coordinate.
-     * @param maxX maximum x coordinate.
+     * Sets the minimum and maximum x coordinates the Enemy can move to.
+     *
+     * @param minX the minimum x coordinate (float)
+     * @param maxX the maximum x coordinate (float)
      */
     public void setMinMax(float minX, float maxX) {
         this.minX = minX;
@@ -70,16 +80,18 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Get bot hash.
-     * @return bot hash.
+     * Gets the bot hash of the Enemy.
+     *
+     * @return the bot hash (String)
      */
     public String getBotHash() {
         return botHash;
     }
 
     /**
-     * Update enemy health.
-     * @param amount health.
+     * Updates the health of the Enemy.
+     *
+     * @param amount the amount to change the health by (float)
      */
     public void updateHealth(float amount) {
         health += amount;
@@ -96,15 +108,16 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Get enemy health.
-     * @return health.
+     * Gets the health of the Enemy.
+     *
+     * @return the current health (float)
      */
     public float getHealth() {
         return health;
     }
 
     /**
-     * Main method for looping.
+     * The main method for looping the Enemy's actions.
      */
     public void spin() {
         sense();
@@ -113,7 +126,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Sense method for npc sensing.
+     * The sensing method for the Enemy to detect players.
      */
     private void sense() {
         float minDistance = DETECTION_RANGE;
@@ -123,6 +136,19 @@ public class Enemy extends GameCharacter {
             if (distance < minDistance) {
                 minDistance = distance;
                 foundPlayer = true;
+
+                // Check if enough time has passed since the last shot
+                if (TimeUtils.timeSinceNanos(lastShotTime) > SHOOT_COOLDOWN * 1_000_000_000L) {
+                    // Create bullet for shooting
+                    Bullet bullet = Bullet.createBullet(xPosition - width, yPosition,
+                            player.getxPosition(), player.getyPosition(), false);
+                    // Add to server world
+                    getWorld().addBullet(bullet);
+
+                    // Update the last shot time
+                    lastShotTime = TimeUtils.nanoTime();
+                }
+
                 if ((xPosition <= minX && player.getxPosition() < minX) || (xPosition >= maxX && player.getxPosition() > maxX)) {
                     currentState = State.IDLE;
                 } else {
@@ -142,7 +168,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Act method for acting.
+     * The act method for the Enemy to perform actions based on its state.
      */
     private void act() {
         switch (currentState) {

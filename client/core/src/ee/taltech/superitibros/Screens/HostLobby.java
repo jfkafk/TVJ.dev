@@ -24,40 +24,22 @@ public class HostLobby implements Screen {
     protected Stage stage;
     private final Viewport viewport;
     private final OrthographicCamera camera;
-    private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
     String mapPath;
-    private AudioHelper audioHelper = AudioHelper.getInstance();
-
+    private final AudioHelper audioHelper = AudioHelper.getInstance();
     private final Sprite background;
-
-    // ImageButton.
-    // Desert.
-    private Texture desertTexture;
-    private TextureRegion desertRegion;
-    private TextureRegionDrawable desertDrawable;
     private final ImageButton desertButton;
-
-    // SuperMario Map.
-    private Texture superMTexture;
-    private TextureRegion superMRegion;
-    private TextureRegionDrawable superMDrawable;
+    private final ImageButton moonButton;
+    private final ImageButton castleButton;
     private final ImageButton superMButton;
-
-    // Back Button.
-    private Texture backTexture;
-    private TextureRegion backRegion;
-    private TextureRegionDrawable backDrawable;
-    private final ImageButton backButton;
-
 
     public HostLobby(GameClient gameClient) {
         this.gameClient = gameClient;
         int worldWidth = 1600;
         int worldHeight = 1000;
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
-        atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
+        TextureAtlas atlas = new TextureAtlas("Skins/pixthulhu/skin/pixthulhu-ui.atlas");
         skin = new Skin(Gdx.files.internal("Skins/pixthulhu/skin/pixthulhu-ui.json"), atlas);
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
@@ -70,22 +52,29 @@ public class HostLobby implements Screen {
         // Map representation pictures.
 
         // Desert.
-        desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
-        desertRegion = new TextureRegion(desertTexture);
-        desertDrawable = new TextureRegionDrawable(desertRegion);
+        // ImageButton.
+        Texture desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
+        TextureRegion desertRegion = new TextureRegion(desertTexture);
+        TextureRegionDrawable desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
 
-        // SuperMario Map.
-        superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
-        superMRegion = new TextureRegion(superMTexture);
-        superMDrawable = new TextureRegionDrawable(superMRegion);
-        superMButton = new ImageButton(superMDrawable);
+        // Moon
+        Texture moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
+        TextureRegion moonRegion = new TextureRegion(moonTexture);
+        TextureRegionDrawable moonDrawable = new TextureRegionDrawable(moonRegion);
+        moonButton = new ImageButton(moonDrawable);
 
-        // Back Button.
-        backTexture = new Texture(Gdx.files.internal("Images/back.jpeg"));
-        backRegion = new TextureRegion(backTexture);
-        backDrawable = new TextureRegionDrawable(backRegion);
-        backButton = new ImageButton(backDrawable);
+        // Castle
+        Texture castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
+        TextureRegion castleRegion = new TextureRegion(castleTexture);
+        TextureRegionDrawable castleDrawable = new TextureRegionDrawable(castleRegion);
+        castleButton = new ImageButton(castleDrawable);
+
+        // SuperMario Map.
+        Texture superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
+        TextureRegion superMRegion = new TextureRegion(superMTexture);
+        TextureRegionDrawable superMDrawable = new TextureRegionDrawable(superMRegion);
+        superMButton = new ImageButton(superMDrawable);
     }
 
     @Override
@@ -106,9 +95,6 @@ public class HostLobby implements Screen {
         Table parentTable = new Table();
         parentTable.setFillParent(true);
 
-        // Create Table for maps.
-        Table mapTable = new Table();
-        Label mapLabel = new Label("Choose Map!", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
         //Set alignment of contents in the table.
 
         // Buttons Table.
@@ -126,9 +112,11 @@ public class HostLobby implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                System.out.println(gameClient.getMyLobby().getPlayers());
                 refreshPlayers();
             }
         });
+
 
         //Add listeners to buttons
         superMButton.addListener(new ClickListener() {
@@ -147,6 +135,25 @@ public class HostLobby implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.updateMapPath(mapPath);
+                refreshPlayers();
+            }
+        });
+        moonButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                mapPath = "Maps/level2/level2.tmx";
+                gameClient.updateMapPath(mapPath);
+                refreshPlayers();
+            }
+        });
+        castleButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                mapPath = "Maps/level3/MagicLand.tmx";
+                gameClient.updateMapPath(mapPath);
+                System.out.println(gameClient.getMapPath());
                 refreshPlayers();
             }
         });
@@ -194,24 +201,25 @@ public class HostLobby implements Screen {
         int mapButtonSize = 150;
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(menuLabel).pad(buttonLocationPadding);
+        mainTable.add(menuLabel).pad(buttonLocationPadding).colspan(2);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
-        mainTable.add(superMButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding);
-        mainTable.add(desertButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding);
+        mainTable.add(superMButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
+        mainTable.add(desertButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
+        mainTable.add(castleButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
+        mainTable.add(moonButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(startGameButton).pad(buttonLocationPadding);
-        mainTable.add(placeholder).size(buttonLocationPadding).right();
-        mainTable.row();
-        mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(refreshButton).pad(buttonLocationPadding);
+        mainTable.add(startGameButton).pad(buttonLocationPadding).colspan(2);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(back).pad(buttonLocationPadding);
+        mainTable.add(refreshButton).pad(buttonLocationPadding).colspan(2);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
-        mainTable.setDebug(true);
+        mainTable.row();
+        mainTable.add(placeholder).size(buttonLocationPadding).left();
+        mainTable.add(back).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(placeholder).size(buttonLocationPadding).right();
         //Add table to stage
         stage.addActor(mainTable);
     }
