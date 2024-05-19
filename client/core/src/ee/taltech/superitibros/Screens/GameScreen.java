@@ -490,7 +490,6 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
-            makeShootingSound();
             clientConnection.sendNewBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer

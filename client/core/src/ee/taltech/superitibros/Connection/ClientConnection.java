@@ -252,6 +252,7 @@ public class ClientConnection {
 							Bullet bullet = new Bullet(packetNewBullet.getBulletId(), packetNewBullet.isPlayerBullet());
 							bullet.setBulletCoordinates(packetNewBullet.getPlayerX(), packetNewBullet.getPlayerY());
 							clientWorld.addBulletToAdd(bullet);
+							gameScreen.makeShootingSound();
 						}
 
 					} else if (object instanceof PacketAddCoin) {
