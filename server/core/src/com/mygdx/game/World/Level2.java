@@ -2,13 +2,15 @@ package com.mygdx.game.World;
 
 import com.mygdx.game.Characters.Enemy;
 import com.mygdx.game.Finish.Coin;
+import com.mygdx.game.Server.ServerConnection;
 
 public class Level2 extends World{
 
     /**
      * Initialize necessary objects.
      */
-    public Level2() {
+    public Level2(String lobbyHash, ServerConnection serverConnection) {
+        super(lobbyHash, serverConnection);
         // Enemys and their ranges.
         Enemy enemy1 = Enemy.createEnemy(100, 60, 0, 1080, this);
         Enemy enemy2 = Enemy.createEnemy(700, 50, 500, 1090, this);

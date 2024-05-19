@@ -203,6 +203,7 @@ public class GameScreen implements Screen, InputProcessor {
 
     public void checkIfGameOver() {
         if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
+            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
             clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
@@ -210,12 +211,13 @@ public class GameScreen implements Screen, InputProcessor {
             clientWorld.setTimeZero();
             System.out.println("game over in GameScreen" + "\n");
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getyPosition() <= 10) {
-            // TODO: decide what happens when character falls out of the map (dies or respawns?)
+            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
             clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
             clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
+            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
             double time = clientWorld.getTime();
             clientWorld.setTimeZero();
             FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
@@ -425,6 +427,13 @@ public class GameScreen implements Screen, InputProcessor {
     }
 
     /**
+     * Method for making shooting sound.
+     */
+    public void makeShootingSound() {
+        audioHelper.playSound("MusicSounds/shot.MP3");
+    }
+
+    /**
      * Resizing the camera.
      */
     @Override
@@ -481,8 +490,8 @@ public class GameScreen implements Screen, InputProcessor {
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
-            audioHelper.playSound("MusicSounds/shot.MP3");
-            clientConnection.sendBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
+            makeShootingSound();
+            clientConnection.sendNewBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer
             canShoot = false;

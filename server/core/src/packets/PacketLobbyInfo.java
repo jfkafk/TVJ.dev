@@ -11,7 +11,6 @@ public class PacketLobbyInfo extends Packet {
     String lobbyHash;
     Set<Integer> players = new LinkedHashSet<>();
     Integer playerToAdd;
-    Integer playerToRemove;
     boolean updateInfo;
     boolean startGame;
     boolean toDelete;
@@ -69,24 +68,6 @@ public class PacketLobbyInfo extends Packet {
      */
     public Integer getPlayerToAdd() {
         return playerToAdd;
-    }
-
-    /**
-     * Sets the player ID to be removed from the lobby.
-     *
-     * @param playerToRemove the player ID to be removed from the lobby
-     */
-    public void setPlayerToRemove(Integer playerToRemove) {
-        this.playerToRemove = playerToRemove;
-    }
-
-    /**
-     * Gets the player ID to be removed from the lobby.
-     *
-     * @return the player ID to be removed from the lobby
-     */
-    public Integer getPlayerToRemove() {
-        return playerToRemove;
     }
 
     /**

@@ -12,20 +12,15 @@ public class GameCharacter {
 
     // Character characteristics.
     protected float movementSpeed; // World units per second.
-    float health;
+    protected float health;
 
     // Position & dimension.
-    public float xPosition;
-    public float yPosition; // Lower-left corner
+    protected float xPosition;
+    protected float yPosition; // Lower-left corner
     protected float width, height;
     protected Rectangle boundingBox;
-
-    private String characterDirection;
-
     private World world;
-
     private State currentState;
-
     private boolean facingRight = true;
 
     /**

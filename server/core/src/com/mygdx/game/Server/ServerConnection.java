@@ -66,6 +66,8 @@ public class ServerConnection {
 		server.getKryo().register(PacketBullet.class);
 		server.getKryo().register(PacketAddCoin.class);
 		server.getKryo().register(PacketWon.class);
+		server.getKryo().register(PacketRemovePlayer.class);
+		server.getKryo().register(PacketNewBullet.class);
 
 		// Add listener to handle receiving objects.
 		server.addListener(new Listener() {
@@ -73,7 +75,7 @@ public class ServerConnection {
 			// Receive packets from clients.
 			public void received(Connection connection, Object object){
 				if (object instanceof PacketConnect) {
-					System.out.println("packet recieved");
+					// System.out.println("packet recieved");
 
 					// Add connection to list
 					connectedPlayers.add(connection.getID());
@@ -159,7 +161,7 @@ public class ServerConnection {
 					if (world.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
 						Enemy enemy = world.getEnemyMap().get(packetUpdateEnemy.getBotHash());
 						enemy.setyPosition(packetUpdateEnemy.getyPosition());
-						System.out.println("Got enemy y: " + packetUpdateEnemy.getyPosition());
+						// System.out.println("Got enemy y: " + packetUpdateEnemy.getyPosition());
 					}
 
 				} else if (object instanceof PacketSendNewLobby) {
@@ -232,11 +234,6 @@ public class ServerConnection {
 						lobby.addPlayer(packetLobbyInfo.getPlayerToAdd());
 						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
 
-					} else if (availableLobbies.get(packetLobbyInfo.getLobbyHash()) != null && packetLobbyInfo.getPlayerToRemove() != null) {
-						Lobby lobby = availableLobbies.get(packetLobbyInfo.getLobbyHash());
-						lobby.removePlayer(packetLobbyInfo.getPlayerToRemove());
-						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
-
 					} else if (packetLobbyInfo.isToDelete()) {
 						// Remove lobby from available lobbies
 						removeAvailableLobby(packetLobbyInfo.getLobbyHash());
@@ -244,6 +241,22 @@ public class ServerConnection {
 						server.sendToAllExceptTCP(connection.getID(), packetLobbyInfo);
 
 					}
+
+				} else if (object instanceof PacketRemovePlayer) {
+					// Remove player from lobby and world
+					PacketRemovePlayer packetRemovePlayer = (PacketRemovePlayer) object;
+					Lobby lobby = availableLobbies.get(packetRemovePlayer.getLobbyHash());
+					if (lobby == null) {
+						lobby = onGoingLobbies.get(packetRemovePlayer.getLobbyHash());
+					}
+
+					if (lobby != null) {
+						lobby.removePlayer(packetRemovePlayer.getPlayerToRemove());
+						lobby.getServerWorld().removeClient(packetRemovePlayer.getPlayerToRemove());
+					}
+
+					server.sendToAllExceptTCP(connection.getID(), packetRemovePlayer);
+
 				} else if (object instanceof PacketBullet) {
 					PacketBullet packetBullet = (PacketBullet) object;
 
@@ -264,12 +277,15 @@ public class ServerConnection {
 							sendHitEnemy(packetBullet.getLobbyHash(), packetBullet);
 						}
 
-					} else {
-						// Create bullet
-						Bullet bullet = Bullet.createBullet(packetBullet.getLobbyHash(), packetBullet.getPlayerX(), packetBullet.getPlayerY(), packetBullet.getMouseX(), packetBullet.getMouseY());
-						// Add to server world
-						onGoingLobbies.get(packetBullet.getLobbyHash()).getServerWorld().addBullet(bullet);
 					}
+
+				} else if (object instanceof PacketNewBullet) {
+					PacketNewBullet packetNewBullet = (PacketNewBullet) object;
+					// Create bullet
+					Bullet bullet = Bullet.createBullet(packetNewBullet.getPlayerX(), packetNewBullet.getPlayerY(),
+							packetNewBullet.getMouseX(), packetNewBullet.getMouseY(), true);
+					// Add to server world
+					onGoingLobbies.get(packetNewBullet.getLobbyHash()).getServerWorld().addBullet(bullet);
 				}
 			}
 
@@ -454,12 +470,36 @@ public class ServerConnection {
 		List<Bullet> bullets = new ArrayList<>(onGoingLobbies.get(lobbyHash).getServerWorld().getBullets());
 
 		for (Bullet bullet : bullets) {
-			PacketBullet packetBullet = PacketCreator.createPacketBullet(lobbyHash, bullet.getBulletId(),
-					bullet.getBulletX(), bullet.getBulletY());
+
+			PacketBullet packetBullet;
+
+			if (bullet.isPlayerBullet()) {
+				packetBullet = PacketCreator.createPacketBullet(lobbyHash, bullet.getBulletId(),
+						bullet.getBulletX(), bullet.getBulletY(), true);
+			} else {
+				packetBullet = PacketCreator.createPacketBullet(lobbyHash, bullet.getBulletId(),
+						bullet.getBulletX(), bullet.getBulletY(), false);
+			}
 
 			for (Integer id : onGoingLobbies.get(lobbyHash).getPlayers()) {
 				server.sendToTCP(id, packetBullet);
 			}
+		}
+	}
+
+	/**
+	 * Add new bullet to client game.
+	 * @param lobbyHash lobby hash.
+	 * @param bullet new bullet.
+	 */
+	public void sendNewBullet(String lobbyHash, Bullet bullet) {
+		System.out.println("Sent new bullet");
+		PacketNewBullet packetNewBullet = PacketCreator.createPacketNewBullet(lobbyHash, bullet.getBulletId(),
+				bullet.getBulletX(), bullet.getBulletY(), bullet.isPlayerBullet());
+		System.out.println("Sent bullet with id: " + packetNewBullet.getBulletId());
+		Set<Integer> players = new HashSet<>(onGoingLobbies.get(lobbyHash).getPlayers());
+		for (Integer id : players) {
+			server.sendToTCP(id, packetNewBullet);
 		}
 	}
 
@@ -546,10 +586,10 @@ public class ServerConnection {
 	public World createAndSetServerWorld(String mapPath, Lobby lobby) {
 		if (Objects.equals(mapPath, "Maps/level1/level1.tmx")) {
 			System.out.println("startGame Packet in Server Connection level1");
-			lobby.setServerWorld(new Level1());
+			lobby.setServerWorld(new Level1(lobby.getLobbyHash(), this));
 		} else if (Objects.equals(mapPath, "Maps/level4/destestsmaller.tmx")) {
 			System.out.println("StartGame packet in ServerConnection destestsmaller");
-			lobby.setServerWorld(new Level2());
+			lobby.setServerWorld(new Level2(lobby.getLobbyHash(), this));
 		}
 		return lobby.getServerWorld();
 	}

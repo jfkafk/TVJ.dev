@@ -1,5 +1,6 @@
 package ee.taltech.superitibros.GameInfo;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.MapLayer;
@@ -251,12 +252,25 @@ public class ClientWorld {
     public void checkBulletEnemyCollisions() {
         Collection<Bullet> bulletList = new ArrayList<>(bullets.values()); // Make a copy of the bullets collection
         Collection<Enemy> enemiesList = new ArrayList<>(enemyMap.values()); // Make a copy of the enemies collection
+        Collection<GameCharacter> playersList = new ArrayList<>(worldGameCharactersMap.values());
 
         for (Bullet bullet : bulletList) {
+
+            // Check if bullet hits enemy
             for (Enemy enemy : enemiesList) {
-                if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox())) {
+                if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox()) && bullet.isPlayerBullet()) {
                     // Collision detected, handle accordingly
                     clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash(), bullet.getBulletId());
+                }
+            }
+
+            // Check if bullet hits player
+            for (GameCharacter player : playersList) {
+                if (bullet.getBoundingBox().overlaps(player.getBoundingBox()) && !bullet.isPlayerBullet()) {
+                    collidedBullets.add(bullet.getBulletId());
+                    bulletsToRemove.add(bullet);
+                    player.setHealth(player.getHealth() - 10);
+                    clientConnection.sendPlayerInformation(player.getxPosition(), player.getyPosition(), player.getState(), player.getFacingRight(), player.getHealth());
                 }
             }
         }

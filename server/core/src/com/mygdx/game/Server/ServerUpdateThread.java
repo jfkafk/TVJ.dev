@@ -57,17 +57,15 @@ public class ServerUpdateThread implements Runnable {
                         serverConnection.sendUpdatedEnemies(lobbyHash);
                     }
 
+                    // Bullets
                     if(!serverWorld.getBullets().isEmpty()) {
 
+                        // Remove unnecessary bullets
                         if (!serverWorld.getBulletsToRemove().isEmpty()) {
-
-                            for (Bullet bullet : serverWorld.getBulletsToRemove()) {
-                                serverWorld.getBullets().remove(bullet);
-                            }
                             serverWorld.getBulletsToRemove().clear();
-
                         }
 
+                        // Update bullets
                         for (Bullet bullet : serverWorld.getBullets()) {
                             bullet.updateBullet();
 

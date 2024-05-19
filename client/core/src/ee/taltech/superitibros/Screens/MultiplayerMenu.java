@@ -88,7 +88,6 @@ public class MultiplayerMenu implements Screen {
                 HostLobby hostLobby = new HostLobby(gameClient);
                 gameClient.setHostLobbyScreen(hostLobby);
                 gameClient.getClientConnection().sendCreateNewLobby();
-                System.out.println("Im host");
                 ((Game) Gdx.app.getApplicationListener()).setScreen(hostLobby);
             }
         });

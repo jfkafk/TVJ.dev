@@ -1,6 +1,8 @@
 package com.mygdx.game.Characters;
 
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.Weapons.Bullet;
 import com.mygdx.game.World.World;
 
 public class Enemy extends GameCharacter {
@@ -15,6 +17,7 @@ public class Enemy extends GameCharacter {
 
     private static final float MOVEMENT_SPEED = 0.15f; // At this speed enemy can climb
     private static final float DETECTION_RANGE = 300f;
+    private static final float SHOOT_COOLDOWN = 1.0f; // 1 second cooldown
 
     // Health
     private final float maxHealth;
@@ -26,6 +29,9 @@ public class Enemy extends GameCharacter {
     // Enemy borders
     float minX;
     float maxX;
+
+    // Last shot time
+    private long lastShotTime;
 
     /**
      * GameCharacter constructor.
@@ -123,6 +129,19 @@ public class Enemy extends GameCharacter {
             if (distance < minDistance) {
                 minDistance = distance;
                 foundPlayer = true;
+
+                // Check if enough time has passed since the last shot
+                if (TimeUtils.timeSinceNanos(lastShotTime) > SHOOT_COOLDOWN * 1_000_000_000L) {
+                    // Create bullet for shooting
+                    Bullet bullet = Bullet.createBullet(xPosition - width, yPosition,
+                            player.getxPosition(), player.getyPosition(), false);
+                    // Add to server world
+                    getWorld().addBullet(bullet);
+
+                    // Update the last shot time
+                    lastShotTime = TimeUtils.nanoTime();
+                }
+
                 if ((xPosition <= minX && player.getxPosition() < minX) || (xPosition >= maxX && player.getxPosition() > maxX)) {
                     currentState = State.IDLE;
                 } else {
