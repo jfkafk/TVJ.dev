@@ -11,6 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class GameClient extends Game {
 
@@ -54,18 +56,20 @@ public class GameClient extends Game {
      * Starts a game.
      */
     public void startGame(String path) {
+        Logger logger = Logger.getLogger(getClass().getName());
+
         // Create a new game screen and transition to it
         clientWorld = new ClientWorld(path);
-        System.out.println("path in start game GameClient -> " + path + "\n");
         gameScreen = new GameScreen(clientWorld);
         gameWon = false;
         setScreen(gameScreen);
+
         try {
             createClient(gameScreen);
         } catch (IOException e) {
-            System.out.println("something terrible happened in startGame GameClient" + "\n");
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "An error occurred in startGame of GameClient", e);
         }
+
         gameStart = false;
         Gdx.input.setInputProcessor(gameScreen);
     }
