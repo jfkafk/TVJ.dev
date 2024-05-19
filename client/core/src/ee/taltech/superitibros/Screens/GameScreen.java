@@ -243,7 +243,7 @@ public class GameScreen implements Screen, InputProcessor {
             GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
             ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
-            YouWonScreen youWonScreen = new YouWonScreen(clientConnection.getGameClient());
+            FinishScreen youWonScreen = new FinishScreen(clientConnection.getGameClient(), time);
             ((Game) Gdx.app.getApplicationListener()).setScreen(youWonScreen);
             clientConnection.getGameClient().setGameWon(false);
         }

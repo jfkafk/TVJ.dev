@@ -98,6 +98,7 @@ public class PacketCreator {
     public static PacketLobbyInfo createPacketLobbyInfo(String lobbyHash) {
         PacketLobbyInfo packetLobbyInfo = new PacketLobbyInfo();
         packetLobbyInfo.setLobbyHash(lobbyHash);
+        System.out.println("packetLobbyInfo in Creator -> " + packetLobbyInfo.getLobbyHash());
         return packetLobbyInfo;
     }
 

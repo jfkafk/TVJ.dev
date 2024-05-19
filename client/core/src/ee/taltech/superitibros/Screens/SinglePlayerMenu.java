@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
+import ee.taltech.superitibros.Packets.PacketConnect;
 
 
 public class SinglePlayerMenu implements Screen {
@@ -40,18 +41,6 @@ public class SinglePlayerMenu implements Screen {
     private TextureRegionDrawable desertDrawable;
     private ImageButton desertButton;
 
-    // Moon
-    private Texture moonTexture;
-    private TextureRegion moonRegion;
-    private TextureRegionDrawable moonDrawable;
-    private ImageButton moonButton;
-
-    // Castle
-    private Texture castleTexture;
-    private TextureRegion castleRegion;
-    private TextureRegionDrawable castleDrawable;
-    private ImageButton castleButton;
-
     // SuperMario Map.
     private Texture superMTexture;
     private TextureRegion superMRegion;
@@ -63,6 +52,25 @@ public class SinglePlayerMenu implements Screen {
     private TextureRegion backRegion;
     private TextureRegionDrawable backDrawable;
     private ImageButton backButton;
+
+    // Characters buttons.
+    // Goblin.
+    private Texture goblinTexture;
+    private TextureRegion goblinRegion;
+    private TextureRegionDrawable goblinDrawable;
+    private ImageButton goblinButton;
+
+    // Rambo.
+    private Texture ramboTexture;
+    private TextureRegion ramboRegion;
+    private TextureRegionDrawable ramboDrawable;
+    private ImageButton ramboButton;
+
+    // Wizard.
+    private Texture wizardTexture;
+    private TextureRegion wizardRegion;
+    private TextureRegionDrawable wizardDrawable;
+    private ImageButton wizardButton;
 
 
     /**
@@ -86,27 +94,18 @@ public class SinglePlayerMenu implements Screen {
 
         // Background.
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
+        createMapButtons();
+        createCharacterButtons();
+    }
 
+    private void createMapButtons() {
         // Map representation pictures.
-
         // Desert.
         desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
         desertRegion = new TextureRegion(desertTexture);
         desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
         desertButton.setSize(100, 100);
-
-        // Moon.
-        moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
-        moonRegion = new TextureRegion(moonTexture);
-        moonDrawable = new TextureRegionDrawable(moonRegion);
-        moonButton = new ImageButton(moonDrawable);
-
-        // Castle.
-        castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
-        castleRegion = new TextureRegion(castleTexture);
-        castleDrawable = new TextureRegionDrawable(castleRegion);
-        castleButton = new ImageButton(castleDrawable);
 
         // SuperMario Map.
         superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
@@ -122,6 +121,26 @@ public class SinglePlayerMenu implements Screen {
     }
 
     /**
+     * Creates buttons to handle choosing character.
+     */
+    private void createCharacterButtons() {
+        goblinTexture = new Texture(Gdx.files.internal("Characters/HeadShots/GoblinHeadshot.png"));
+        goblinRegion = new TextureRegion(goblinTexture);
+        goblinDrawable = new TextureRegionDrawable(goblinRegion);
+        goblinButton = new ImageButton(goblinDrawable);
+
+        ramboTexture = new Texture(Gdx.files.internal("Characters/HeadShots/RamboHeadshot.png"));
+        ramboRegion = new TextureRegion(ramboTexture);
+        ramboDrawable = new TextureRegionDrawable(ramboRegion);
+        ramboButton = new ImageButton(ramboDrawable);
+
+        wizardTexture = new Texture(Gdx.files.internal("Characters/HeadShots/WizardHeadshot.png"));
+        wizardRegion = new TextureRegion(wizardTexture);
+        wizardDrawable = new TextureRegionDrawable(wizardRegion);
+        wizardButton = new ImageButton(wizardDrawable);
+    }
+
+    /**
      * Show menu screen
      * Create table and add buttons to the table
      */
@@ -131,40 +150,42 @@ public class SinglePlayerMenu implements Screen {
         //Stage should check input:
         Gdx.input.setInputProcessor(stage);
 
-        // Big parent Table.
-        Table parentTable = new Table();
-        parentTable.setFillParent(true);
 
         // Create Table for maps.
         Table mapTable = new Table();
+        mapTable.setFillParent(true);
         Label mapLabel = new Label("Choose Map!", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
-        //Set alignment of contents in the table.
+        createClickableButtons();
 
-        // Buttons Table.
-        Table buttonTable = new Table();
-        buttonTable.right();
+        int buttonLocationPadding = 20;
+        int buttonImageSize = 300;
+        mapTable.add(backButton).padBottom(200).padRight(1000).size(40, 40);
+        mapTable.row();
+        mapTable.add(mapLabel).center().colspan(2);
+        mapTable.row();
+        mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding).center().uniform(true);
+        mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding).center().uniform(true);
+        mapTable.row();
+        mapTable.add(goblinButton).size(100, 100).left();
+        mapTable.add(wizardButton).size(100, 100).center();
+        mapTable.add(ramboButton).size(100, 100).right();
+        mapTable.setDebug(true);
+        stage.addActor(mapTable);
+    }
 
-
-        TextButton optionsButton = new TextButton("Options", skin);
-
-        //Add listeners to buttons.
-        moonButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                resume();
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-//                String mapPath = "Maps/level2/level2.tmx";
-//                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
-//                gameClient.startGame(mapPath);
-            }
-
-        });
+    /**
+     * Makes buttons clickable.
+     */
+    private void createClickableButtons() {
+        // Map choosing.
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 audioHelper.stopAllMusic();
                 String mapPath = "Maps/level1/level1.tmx";
+                String packetConnect = gameClient.getMyLobby().getLobbyHash();
+                System.out.println("packetConnect in SinglePlayerMenu -> " + packetConnect);
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
             }
@@ -179,24 +200,8 @@ public class SinglePlayerMenu implements Screen {
                 gameClient.startGame(mapPath);
             }
         });
-        castleButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                audioHelper.stopAllMusic();
-                String mapPath = "Maps/level3/MagicLand.tmx";
-                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
-                gameClient.startGame(mapPath);
-            }
-        });
-        optionsButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                audioHelper.stopAllMusic();
-                Options options = new Options(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(options);
-            }
-        });
+
+        // Back to the main menu.
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -205,19 +210,29 @@ public class SinglePlayerMenu implements Screen {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
-        int buttonLocationPadding = 20;
-        int buttonImageSize = 300;
-        mapTable.add(mapLabel);
-        mapTable.row();
-        mapTable.add(moonButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.row();
-        mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        parentTable.add(backButton).size(40, 40).padRight(1500);
-        parentTable.row();
-        parentTable.add(mapTable).padTop(200).padRight(800);
-        stage.addActor(parentTable);
+
+        // Choosing character.
+        goblinButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //TODO set character as goblin.
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+            }
+        });
+        wizardButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //TODO set character as wizard.
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+            }
+        });
+        ramboButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                //TODO set character as rambo.
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+            }
+        });
     }
     /**
      * Render (creates stage)

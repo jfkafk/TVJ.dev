@@ -39,18 +39,6 @@ public class HostLobby implements Screen {
     private TextureRegionDrawable desertDrawable;
     private final ImageButton desertButton;
 
-    // Moon
-    private Texture moonTexture;
-    private TextureRegion moonRegion;
-    private TextureRegionDrawable moonDrawable;
-    private final ImageButton moonButton;
-
-    // Castle
-    private Texture castleTexture;
-    private TextureRegion castleRegion;
-    private TextureRegionDrawable castleDrawable;
-    private final ImageButton castleButton;
-
     // SuperMario Map.
     private Texture superMTexture;
     private TextureRegion superMRegion;
@@ -86,18 +74,6 @@ public class HostLobby implements Screen {
         desertRegion = new TextureRegion(desertTexture);
         desertDrawable = new TextureRegionDrawable(desertRegion);
         desertButton = new ImageButton(desertDrawable);
-
-        // Moon.
-        moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
-        moonRegion = new TextureRegion(moonTexture);
-        moonDrawable = new TextureRegionDrawable(moonRegion);
-        moonButton = new ImageButton(moonDrawable);
-
-        // Castle.
-        castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
-        castleRegion = new TextureRegion(castleTexture);
-        castleDrawable = new TextureRegionDrawable(castleRegion);
-        castleButton = new ImageButton(castleDrawable);
 
         // SuperMario Map.
         superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
@@ -154,7 +130,6 @@ public class HostLobby implements Screen {
             }
         });
 
-
         //Add listeners to buttons
         superMButton.addListener(new ClickListener() {
             @Override
@@ -172,25 +147,6 @@ public class HostLobby implements Screen {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.updateMapPath(mapPath);
-                refreshPlayers();
-            }
-        });
-        moonButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                mapPath = "Maps/level2/level2.tmx";
-                gameClient.updateMapPath(mapPath);
-                refreshPlayers();
-            }
-        });
-        castleButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                mapPath = "Maps/level3/MagicLand.tmx";
-                gameClient.updateMapPath(mapPath);
-                System.out.println(gameClient.getMapPath());
                 refreshPlayers();
             }
         });
@@ -238,25 +194,24 @@ public class HostLobby implements Screen {
         int mapButtonSize = 150;
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(menuLabel).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(menuLabel).pad(buttonLocationPadding);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
-        mainTable.add(superMButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
-        mainTable.add(desertButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
-        mainTable.add(castleButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).center().uniform(true);
-        mainTable.add(moonButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform();
+        mainTable.add(superMButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding);
+        mainTable.add(desertButton).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding);
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(startGameButton).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(startGameButton).pad(buttonLocationPadding);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(refreshButton).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(refreshButton).pad(buttonLocationPadding);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
         mainTable.row();
         mainTable.add(placeholder).size(buttonLocationPadding).left();
-        mainTable.add(back).pad(buttonLocationPadding).colspan(2);
+        mainTable.add(back).pad(buttonLocationPadding);
         mainTable.add(placeholder).size(buttonLocationPadding).right();
+        mainTable.setDebug(true);
         //Add table to stage
         stage.addActor(mainTable);
     }
