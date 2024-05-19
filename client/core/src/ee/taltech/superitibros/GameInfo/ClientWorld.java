@@ -212,7 +212,8 @@ public class ClientWorld {
      * Check for bullet collisions with obstacles.
      */
     public void checkBulletCollisions() {
-        for (Bullet bullet : bullets.values()) {
+        List<Bullet> bulletsList = new ArrayList<>(bullets.values());
+        for (Bullet bullet : bulletsList) {
             for (MapObject object : mapLayer.getObjects()) {
                 if (object instanceof RectangleMapObject) {
                     RectangleMapObject rectangleObject = (RectangleMapObject) object;
@@ -234,7 +235,6 @@ public class ClientWorld {
         // Remove the bullet from the world
         bulletsToRemove.add(bullet);
         collidedBullets.add(bullet.getBulletId());
-        // Optionally, you can play a sound effect, spawn particles, etc.
     }
 
     /**
@@ -293,10 +293,8 @@ public class ClientWorld {
         enemy.updateHealth(-20);
 
         if (enemy.getHealth() <= 0) {
-
             // Remove enemy
             enemyMap.remove(enemy.getBotHash());
-
             // Remove enemies b2body
             enemy.removeBodyFromWorld();
         }
@@ -304,7 +302,8 @@ public class ClientWorld {
 
     public void checkPlayerEnemyCollisions() {
         MyPlayerGameCharacter playerCharacter = myPlayerGameCharacter;
-        for (Enemy enemy : enemyMap.values()) {
+        List<Enemy> enemies = new ArrayList<>(enemyMap.values());
+        for (Enemy enemy : enemies) {
             if (playerCharacter.getBoundingBox().overlaps(enemy.getBoundingBox())) {
                 // Collision detected between player character and enemy
                 handlePlayerEnemyCollision(playerCharacter);
