@@ -457,6 +457,11 @@ public class GameCharacter {
         this.health = health;
     }
 
+    public Body getB2body() {
+        return b2body;
+    }
+
+
     /**
      * Remove the Box2D body from the game world.
      */

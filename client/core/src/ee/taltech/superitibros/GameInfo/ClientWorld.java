@@ -545,4 +545,8 @@ public class ClientWorld {
             }, precision);
         }
     }
+
+    public ClientConnection getClientConnection() {
+        return clientConnection;
+    }
 }

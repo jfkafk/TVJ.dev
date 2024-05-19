@@ -12,13 +12,11 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
-import ee.taltech.superitibros.Packets.PacketConnect;
 
 import java.util.Objects;
 
@@ -88,9 +86,6 @@ public class SinglePlayerMenu implements Screen {
     private TextButton back;
 
     private final int buttonImageSize = 150;
-
-    private boolean characterAlreadyChosen = false;
-    private String currentChosenCharacter = "";
 
     /**
      * Constructor for the Menu class.
@@ -266,7 +261,6 @@ public class SinglePlayerMenu implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Goblin");
-                currentChosenCharacter = "Goblin";
                 if (wizardButton.isChecked()) wizardButton.toggle();
                 if (ramboButton.isChecked()) ramboButton.toggle();
             }
@@ -277,7 +271,6 @@ public class SinglePlayerMenu implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Wizard");
-                currentChosenCharacter = "Wizard";
                 if (goblinButton.isChecked()) goblinButton.toggle();
                 if (ramboButton.isChecked()) ramboButton.toggle();
             }
@@ -288,7 +281,6 @@ public class SinglePlayerMenu implements Screen {
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 gameClient.setCharacterName("Rambo");
-                currentChosenCharacter = "Rambo";
                 if (wizardButton.isChecked()) wizardButton.toggle();
                 if (goblinButton.isChecked()) goblinButton.toggle();
             }
