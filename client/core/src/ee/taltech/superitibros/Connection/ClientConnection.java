@@ -37,7 +37,7 @@ public class ClientConnection {
 	 */
 	public ClientConnection() {
 
-		String ip = "193.40.255.30";
+		String ip = "127.0.0.1";
 		// Server 193.40.255.30
 		// local 127.0.0.1
 		int tcpPort = 8089;
@@ -86,14 +86,18 @@ public class ClientConnection {
 							// Packet for adding player to game.
 							PacketAddCharacter packetAddCharacter = (PacketAddCharacter) object;
 							if (!clientWorld.getWorldGameCharactersMap().containsKey(packetAddCharacter.getId())) {
+
 								if (connection.getID() == ((PacketAddCharacter) object).getId()) {
-									MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter.createMyPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+									MyPlayerGameCharacter newGameCharacter = MyPlayerGameCharacter
+											.createMyPlayerGameCharacter(packetAddCharacter.getX(),
+													packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
 									// Add new PlayerGameCharacter to client's game.
 									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 								} else {
-									// System.out.println("packet ->< " + ((Packet) object).getMessage());
 									// Create a new PlayerGameCharacter instance from received info.
-									PlayerGameCharacter newGameCharacter = PlayerGameCharacter.createPlayerGameCharacter(packetAddCharacter.getX(), packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
+									PlayerGameCharacter newGameCharacter = PlayerGameCharacter
+											.createPlayerGameCharacter(packetAddCharacter.getX(),
+													packetAddCharacter.getY(), packetAddCharacter.getId(), clientWorld);
 									// Add new PlayerGameCharacter to client's game.
 									clientWorld.addGameCharacter(packetAddCharacter.getId(), newGameCharacter);
 								}
@@ -105,19 +109,19 @@ public class ClientConnection {
 						// Packet for updating player position.
 						PacketUpdateCharacterInformation packetUpdateCharacterInformation = (PacketUpdateCharacterInformation) object;
 
-						if (gameScreen != null && clientWorld.getWorldGameCharactersMap().containsKey(packetUpdateCharacterInformation.getId()) && connection.getID() != packetUpdateCharacterInformation.getId()) {
+						if (gameScreen != null && clientWorld.getWorldGameCharactersMap()
+								.containsKey(packetUpdateCharacterInformation.getId())
+								&& connection.getID() != packetUpdateCharacterInformation.getId()) {
 
-                            PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld.getGameCharacter(packetUpdateCharacterInformation.getId());
+                            PlayerGameCharacter gameCharacter = (PlayerGameCharacter) clientWorld
+									.getGameCharacter(packetUpdateCharacterInformation.getId());
                             if (packetUpdateCharacterInformation.isDead()) {
                                 clientWorld.removeClient(packetUpdateCharacterInformation.getId());
 								gameCharacter.removeBodyFromWorld();
 							} else {
 								// Update PlayerGameCharacter's coordinates.
                                 gameCharacter.state = packetUpdateCharacterInformation.getCurrentState();
-								// System.out.println(packetUpdateCharacterInformation.getCurrentState());
-								//System.out.println("Got y: " + packetUpdateCharacterInformation.getY());
 								gameCharacter.setFacingRight(packetUpdateCharacterInformation.getFacingRight());
-								//System.out.println("Got health: " + packetUpdateCharacterInformation.getHealth());
 								gameCharacter.setHealth(packetUpdateCharacterInformation.getHealth());
 								clientWorld.movePlayerGameCharacter(packetUpdateCharacterInformation.getId(),
 										packetUpdateCharacterInformation.getX(), packetUpdateCharacterInformation.getY());
@@ -136,12 +140,11 @@ public class ClientConnection {
 						System.out.println("Got packet new enemy");
 						// Packet for adding enemy to game.
 						PacketNewEnemy packetNewEnemy = (PacketNewEnemy) object;
-						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(), packetNewEnemy.getyPosition(), clientWorld);
-						// System.out.println("Got packet new enemy" + "\n");
+						Enemy enemy = Enemy.createEnemy(packetNewEnemy.getBotHash(), packetNewEnemy.getxPosition(),
+								packetNewEnemy.getyPosition(), clientWorld);
 						clientWorld.addEnemy(enemy);
 
 					} else if (object instanceof PacketUpdateEnemy && clientWorld != null) {
-						//System.out.println("Got packet update enemy");
 						// Packet for updating enemy position.
 						PacketUpdateEnemy packetUpdateEnemy = (PacketUpdateEnemy) object;
 						if (clientWorld.getEnemyMap().containsKey(packetUpdateEnemy.getBotHash())) {
@@ -149,11 +152,7 @@ public class ClientConnection {
 							enemy.xPosition = packetUpdateEnemy.getxPosition();
 							enemy.setCurrentState(packetUpdateEnemy.getCurrentState());
 							enemy.setFacingRight(packetUpdateEnemy.getFacingRight());
-							//System.out.println("Health from packet: " + packetUpdateEnemy.getHealth());
 							enemy.setHealth(packetUpdateEnemy.getHealth());
-
-							// clientWorld.getEnemy(packetUpdateEnemy.getBotHash()).yPosition = packetUpdateEnemy.getyPosition();
-							// System.out.println("Enemy Y: " + packetUpdateEnemy.getyPosition());
 						}
 					} else if (object instanceof PacketLobbyInfo) {
 						System.out.println("Got packet lobby info");
@@ -221,7 +220,8 @@ public class ClientConnection {
 							gameClient.refreshHostLobbyScreen();
 						}
 
-					} else if (object instanceof PacketBullet && clientWorld != null && clientWorld.getMyPlayerGameCharacter() != null) {
+					} else if (object instanceof PacketBullet && clientWorld != null
+							&& clientWorld.getMyPlayerGameCharacter() != null) {
 						// System.out.println("Got packet bullet");
 						PacketBullet packetBullet = (PacketBullet) object;
 
@@ -234,7 +234,8 @@ public class ClientConnection {
 							}
 						} else {
 							// Check if bullet is already in client world
-							if (clientWorld.isBulletInWorld(packetBullet.getBulletId()) && clientWorld.getMyPlayerGameCharacter() != null) {
+							if (clientWorld.isBulletInWorld(packetBullet.getBulletId())
+									&& clientWorld.getMyPlayerGameCharacter() != null) {
 								// System.out.println("got existing bullet");
 								// If is then update coordinates
 								Bullet bullet = clientWorld.getBulletById(packetBullet.getBulletId());

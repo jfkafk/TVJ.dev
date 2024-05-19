@@ -6,18 +6,17 @@ import com.mygdx.game.World.World;
 public class PlayerGameCharacter extends GameCharacter {
 
     private int playerGameCharacterId;
-    private World world;
 
     /**
      * Class PlayerGameCharacter constructor.
      *
-     * @param movementSpeed of the PlayerGameCharacter (float)
-     * @param boundingBox encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
-     * @param xPosition of the PlayerGameCharacter (float)
-     * @param yPosition of the PlayerGameCharacter (float)
-     * @param width of the PlayerGameCharacter (float)
-     * @param height of the PlayerGameCharacter (float)
-     * @param world where the PlayerGameCharacter is
+     * @param movementSpeed the movement speed of the PlayerGameCharacter (in world units per second)
+     * @param boundingBox the bounding box that encapsulates the PlayerGameCharacter (Rectangle)
+     * @param xPosition the initial x position of the PlayerGameCharacter (float)
+     * @param yPosition the initial y position of the PlayerGameCharacter (float)
+     * @param width the width of the PlayerGameCharacter (float)
+     * @param height the height of the PlayerGameCharacter (float)
+     * @param world the game world where the PlayerGameCharacter exists (World)
      */
     public PlayerGameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width,
                                float height, World world) {
@@ -28,14 +27,23 @@ public class PlayerGameCharacter extends GameCharacter {
         this.yPosition = yPosition;
         this.height = height;
         this.width = width;
-        this.world = world;
         this.health = 100;
     }
 
+    /**
+     * Sets the unique ID of the PlayerGameCharacter.
+     *
+     * @param playerGameCharacterId the unique ID of the PlayerGameCharacter (int)
+     */
     public void setPlayerGameCharacterId(int playerGameCharacterId) {
         this.playerGameCharacterId = playerGameCharacterId;
     }
 
+    /**
+     * Gets the unique ID of the PlayerGameCharacter.
+     *
+     * @return the unique ID of the PlayerGameCharacter (int)
+     */
     public int getPlayerGameCharacterId() {
         return playerGameCharacterId;
     }
@@ -43,11 +51,11 @@ public class PlayerGameCharacter extends GameCharacter {
     /**
      * PlayerGameCharacter static method for creating a new PlayerGameCharacter instance.
      *
-     * @param x coordinate of the PlayerGameCharacter (float)
-     * @param y coordinate of the PlayerGameCharacter (float)
-     * @param world where the PlayerGameCharacter is (World)
-     * @param id unique id (int)
-     * @return new PlayerGameCharacter instance
+     * @param x the initial x coordinate of the PlayerGameCharacter (float)
+     * @param y the initial y coordinate of the PlayerGameCharacter (float)
+     * @param world the game world where the PlayerGameCharacter exists (World)
+     * @param id the unique ID of the PlayerGameCharacter (int)
+     * @return a new PlayerGameCharacter instance
      */
     public static PlayerGameCharacter createPlayerGameCharacter(float x, float y, World world, int id) {
         Rectangle playerGameCharacterRectangle = new Rectangle(x, y, 10f, 10f);

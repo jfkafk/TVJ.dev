@@ -18,7 +18,6 @@ public class Enemy extends GameCharacter {
     String botHash;
     public Body b2body;
     private boolean bodyDefined = false;
-    private Integer playerSize = 50;
     private final AudioHelper audioHelper = AudioHelper.getInstance();
 
     /**
@@ -194,6 +193,7 @@ public class Enemy extends GameCharacter {
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
             batch.setColor(Color.WHITE); // Reset batch color to default (white)
+            Integer playerSize = 50;
             batch.draw(currentFrame, frameX, frameY, playerSize, playerSize);
         }
 

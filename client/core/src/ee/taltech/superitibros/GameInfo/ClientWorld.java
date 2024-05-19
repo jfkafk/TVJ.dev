@@ -1,6 +1,5 @@
 package ee.taltech.superitibros.GameInfo;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.maps.MapLayer;
@@ -260,7 +259,8 @@ public class ClientWorld {
             for (Enemy enemy : enemiesList) {
                 if (bullet.getBoundingBox().overlaps(enemy.getBoundingBox()) && bullet.isPlayerBullet()) {
                     // Collision detected, handle accordingly
-                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash(), bullet.getBulletId());
+                    clientConnection.sendEnemyHit(clientConnection.getGameClient().getMyLobby().getLobbyHash(),
+                            enemy.getBotHash(), bullet.getBulletId());
                 }
             }
 
@@ -270,7 +270,8 @@ public class ClientWorld {
                     collidedBullets.add(bullet.getBulletId());
                     bulletsToRemove.add(bullet);
                     player.setHealth(player.getHealth() - 10);
-                    clientConnection.sendPlayerInformation(player.getxPosition(), player.getyPosition(), player.getState(), player.getFacingRight(), player.getHealth());
+                    clientConnection.sendPlayerInformation(player.getxPosition(), player.getyPosition(),
+                            player.getState(), player.getFacingRight(), player.getHealth());
                 }
             }
         }

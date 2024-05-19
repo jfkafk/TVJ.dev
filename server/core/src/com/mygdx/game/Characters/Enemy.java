@@ -34,14 +34,14 @@ public class Enemy extends GameCharacter {
     private long lastShotTime;
 
     /**
-     * GameCharacter constructor.
+     * Constructs a new Enemy instance.
      *
-     * @param boundingBox   encapsulates a 2D rectangle(bounding box) for the PlayerGameCharacter (Rectangle)
-     * @param xPosition     of the PlayerGameCharacter (float)
-     * @param yPosition     of the PlayerGameCharacter (float)
-     * @param width         of the PlayerGameCharacter (float)
-     * @param height        of the PlayerGameCharacter (float)
-     * @param world         game world (World)
+     * @param boundingBox the bounding box that encapsulates the Enemy (Rectangle)
+     * @param xPosition the initial x position of the Enemy (float)
+     * @param yPosition the initial y position of the Enemy (float)
+     * @param width the width of the Enemy (float)
+     * @param height the height of the Enemy (float)
+     * @param world the game world where the Enemy exists (World)
      */
     public Enemy(Rectangle boundingBox, float xPosition, float yPosition, float width, float height, World world) {
         super(MOVEMENT_SPEED, boundingBox, xPosition, yPosition, width, height, world);
@@ -52,11 +52,14 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Enemy static method for creating a new Enemy instance.
+     * Creates a new Enemy instance.
      *
-     * @param x coordinate of the PlayerGameCharacter (float)
-     * @param y coordinate of the PlayerGameCharacter (float)
-     * @return new Enemy instance
+     * @param x the initial x coordinate of the Enemy (float)
+     * @param y the initial y coordinate of the Enemy (float)
+     * @param minX the minimum x coordinate the Enemy can move to (float)
+     * @param maxX the maximum x coordinate the Enemy can move to (float)
+     * @param world the game world where the Enemy exists (World)
+     * @return a new Enemy instance
      */
     public static Enemy createEnemy(float x, float y, float minX, float maxX, World world) {
         Rectangle enemyRectangle = new Rectangle(x, y, 10f, 20f);
@@ -66,9 +69,10 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Set min and max coordinate of enemy.
-     * @param minX minimum x coordinate.
-     * @param maxX maximum x coordinate.
+     * Sets the minimum and maximum x coordinates the Enemy can move to.
+     *
+     * @param minX the minimum x coordinate (float)
+     * @param maxX the maximum x coordinate (float)
      */
     public void setMinMax(float minX, float maxX) {
         this.minX = minX;
@@ -76,16 +80,18 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Get bot hash.
-     * @return bot hash.
+     * Gets the bot hash of the Enemy.
+     *
+     * @return the bot hash (String)
      */
     public String getBotHash() {
         return botHash;
     }
 
     /**
-     * Update enemy health.
-     * @param amount health.
+     * Updates the health of the Enemy.
+     *
+     * @param amount the amount to change the health by (float)
      */
     public void updateHealth(float amount) {
         health += amount;
@@ -102,15 +108,16 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Get enemy health.
-     * @return health.
+     * Gets the health of the Enemy.
+     *
+     * @return the current health (float)
      */
     public float getHealth() {
         return health;
     }
 
     /**
-     * Main method for looping.
+     * The main method for looping the Enemy's actions.
      */
     public void spin() {
         sense();
@@ -119,7 +126,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Sense method for npc sensing.
+     * The sensing method for the Enemy to detect players.
      */
     private void sense() {
         float minDistance = DETECTION_RANGE;
@@ -161,7 +168,7 @@ public class Enemy extends GameCharacter {
     }
 
     /**
-     * Act method for acting.
+     * The act method for the Enemy to perform actions based on its state.
      */
     private void act() {
         switch (currentState) {

@@ -201,30 +201,42 @@ public class GameScreen implements Screen, InputProcessor {
         checkIfGameOver();
     }
 
+    /**
+     * Checks if the game is over by examining the player's health and position, or if the game has been won.
+     */
     public void checkIfGameOver() {
-        if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getHealth() <= 0) {
-            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
-            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
-            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
-            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
-            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
-            clientWorld.setTimeZero();
-            System.out.println("game over in GameScreen" + "\n");
-        } else if (clientWorld.getMyPlayerGameCharacter() != null && clientWorld.getMyPlayerGameCharacter().getyPosition() <= 10) {
-            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
-            clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
-            clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
-            GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
-            ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+        if (clientWorld.getMyPlayerGameCharacter() != null && (clientWorld.getMyPlayerGameCharacter().getHealth() <= 0
+                || clientWorld.getMyPlayerGameCharacter().getyPosition() <= 10)) {
+            handlePlayerDeath();
         } else if (clientWorld.getMyPlayerGameCharacter() != null && clientConnection.getGameClient().isGameWon()) {
-            clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
-            double time = clientWorld.getTime();
-            clientWorld.setTimeZero();
-            FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
-            this.dispose();
-            ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
-            clientConnection.getGameClient().setGameWon(false);
+            handleVictory();
         }
+    }
+
+    /**
+     * Handles the events when the player dies.
+     */
+    public void handlePlayerDeath() {
+        clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
+        clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
+        clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+        GameOverScreen gameOverScreen = new GameOverScreen(clientConnection.getGameClient());
+        ((Game) Gdx.app.getApplicationListener()).setScreen(gameOverScreen);
+        clientWorld.setTimeZero();
+        System.out.println("game over in GameScreen" + "\n");
+    }
+
+    /**
+     * Handles the events when the player wins the game.
+     */
+    public void handleVictory() {
+        clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
+        double time = clientWorld.getTime();
+        clientWorld.setTimeZero();
+        FinishScreen finishScreen = new FinishScreen(clientConnection.getGameClient(), time);
+        this.dispose();
+        ((Game) Gdx.app.getApplicationListener()).setScreen(finishScreen);
+        clientConnection.getGameClient().setGameWon(false);
     }
 
     /**
@@ -233,8 +245,10 @@ public class GameScreen implements Screen, InputProcessor {
     private void updateCameraPosition() {
         if (clientWorld.getMyPlayerGameCharacter() != null || escPressed) {
             // Set the target position to the center of the player character's bounding box
-            float targetX = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getWidth() / 2;
-            float targetY = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY() + clientWorld.getMyPlayerGameCharacter().getBoundingBox().getHeight() / 2;
+            float targetX = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getX() + clientWorld
+                    .getMyPlayerGameCharacter().getBoundingBox().getWidth() / 2;
+            float targetY = clientWorld.getMyPlayerGameCharacter().getBoundingBox().getY() + clientWorld
+                    .getMyPlayerGameCharacter().getBoundingBox().getHeight() / 2;
 
             // Interpolate camera position towards the target position for smooth movement
             float lerp = 0.1f; // Adjust this value for the desired smoothness
@@ -242,8 +256,10 @@ public class GameScreen implements Screen, InputProcessor {
             float cameraY = MathUtils.lerp(camera.position.y, targetY, lerp);
 
             // Ensure that the camera stays within the bounds of the world
-            cameraX = MathUtils.clamp(cameraX, camera.viewportWidth / 2, WORLD_WIDTH - camera.viewportWidth / 2);
-            cameraY = MathUtils.clamp(cameraY, camera.viewportHeight / 2, WORLD_HEIGHT - camera.viewportHeight / 2);
+            cameraX = MathUtils.clamp(cameraX, camera.viewportWidth / 2,
+                    WORLD_WIDTH - camera.viewportWidth / 2);
+            cameraY = MathUtils.clamp(cameraY, camera.viewportHeight / 2,
+                    WORLD_HEIGHT - camera.viewportHeight / 2);
 
             // Update the camera's position
             camera.position.set(cameraX, cameraY, 0);
@@ -262,7 +278,8 @@ public class GameScreen implements Screen, InputProcessor {
                 buttonHasBeenPressed = true;
             }
 
-            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
+            if (Gdx.input.isKeyPressed(Input.Keys.W) || Gdx.input.isKeyPressed(Input.Keys.UP)
+                    || Gdx.input.isKeyPressed(Input.Keys.SPACE)) {
                 clientWorld.getMyPlayerGameCharacter().jump();
             }
             if (Gdx.input.isKeyPressed(Input.Keys.A) || Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
@@ -279,7 +296,8 @@ public class GameScreen implements Screen, InputProcessor {
             }
             if (escPressed) {
                 clientWorld.getMyPlayerGameCharacter().removeBodyFromWorld();
-                clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(), clientWorld.getMyPlayerId());
+                clientConnection.sendPlayerDead(clientConnection.getGameClient().getMyLobby().getLobbyHash(),
+                        clientWorld.getMyPlayerId());
                 clientConnection.sendRemovePlayerFromLobby(clientConnection.getGameClient().getMyLobby().getLobbyHash());
                 MenuScreen menuScreen = new MenuScreen(clientConnection.getGameClient());
                 clientWorld.setTimeZero();
@@ -362,7 +380,8 @@ public class GameScreen implements Screen, InputProcessor {
             for (Enemy enemy : enemyMap.values()) {
                 if (enemy != null) {
                     enemy.draw(batch, clientWorld.getHealthBarTexture());
-                    clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(), enemy.getBotHash());
+                    clientConnection.sendUpdatedEnemy(clientConnection.getGameClient().getMyLobby().getLobbyHash(),
+                            enemy.getBotHash());
                 }
             }
         }
@@ -372,38 +391,45 @@ public class GameScreen implements Screen, InputProcessor {
      * Draw bullets.
      */
     public void drawBullets() {
+        // Remove bullets
+        removeBullets();
+        // Add bullets
+        addBullets();
+        // Draw
+        List<Bullet> bullets = new ArrayList<>(clientWorld.getBullets());
+        for (Bullet bullet : bullets) {
+            // If bullet is beyond map borders, then remove it
+            if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299
+                    || bullet.getBulletY() < 0) {
+                clientWorld.addBulletToRemove(bullet);
+            }
+            bullet.draw(batch, clientWorld.getBulletSprite());
+        }
+    }
 
+    /**
+     * Removes bullets from the client's world.
+     */
+    public void removeBullets() {
         List<Bullet> bulletsToRemove = new ArrayList<>(clientWorld.getBulletsToRemove());
         if (!bulletsToRemove.isEmpty()) {
-            //System.out.println(clientWorld.getBulletsToRemove());
             for (Bullet bullet : bulletsToRemove) {
                 clientWorld.removeBullet(bullet);
-                //System.out.println("removed");
             }
             clientWorld.clearBulletsToRemove();
-            //System.out.println(clientWorld.getBulletsToRemove());
         }
+    }
 
+    /**
+     * Adds bullets to the client's world.
+     */
+    public void addBullets() {
         List<Bullet> bulletsToAdd = new ArrayList<>(clientWorld.getBulletsToAdd());
         if (!bulletsToAdd.isEmpty()) {
             for (Bullet bullet : bulletsToAdd) {
-                //System.out.println("added");
                 clientWorld.addBullet(bullet);
             }
             clientWorld.clearBulletsToAdd();
-        }
-
-        // System.out.println("Current bullets: " + clientWorld.getBullets());
-        List<Bullet> bullets = new ArrayList<>(clientWorld.getBullets());
-        for (Bullet bullet : bullets) {
-
-            // If bullet is beyond map borders, then remove it
-            if (bullet.getBulletX() > 3999 || bullet.getBulletX() < 0 || bullet.getBulletY() > 299 || bullet.getBulletY() < 0) {
-                clientWorld.addBulletToRemove(bullet);
-            }
-
-            // System.out.println("Bullet X: " + bullet.getBulletX() + " | Bullet Y: " + bullet.getBulletY() + " | Bullet ID: " + bullet.getBulletId());
-            bullet.draw(batch, clientWorld.getBulletSprite());
         }
     }
 
@@ -486,11 +512,13 @@ public class GameScreen implements Screen, InputProcessor {
             Vector3 worldCoordinates = camera.unproject(new Vector3(screenX, screenY, 0));
 
             // Player coordinates
-            float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter().getBoundingBox().width;
+            float playerX = clientWorld.getMyPlayerGameCharacter().xPosition - clientWorld.getMyPlayerGameCharacter()
+                    .getBoundingBox().width;
             float playerY = clientWorld.getMyPlayerGameCharacter().yPosition;
 
             // Send the bullet with the correct world coordinates
-            clientConnection.sendNewBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(), playerX, playerY, worldCoordinates.x, worldCoordinates.y);
+            clientConnection.sendNewBullet(clientConnection.getGameClient().getMyLobby().getLobbyHash(),
+                    playerX, playerY, worldCoordinates.x, worldCoordinates.y);
 
             // Start cooldown timer
             canShoot = false;

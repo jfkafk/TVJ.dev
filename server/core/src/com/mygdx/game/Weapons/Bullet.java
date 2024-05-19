@@ -87,24 +87,6 @@ public class Bullet {
     }
 
     /**
-     * Gets the x-component of the bullet's velocity.
-     *
-     * @return the x-component of the bullet's velocity.
-     */
-    public float getAddX() {
-        return addX;
-    }
-
-    /**
-     * Gets the y-component of the bullet's velocity.
-     *
-     * @return the y-component of the bullet's velocity.
-     */
-    public float getAddY() {
-        return addY;
-    }
-
-    /**
      * Gets the x-coordinate of the bullet.
      *
      * @return the x-coordinate of the bullet.
@@ -120,24 +102,6 @@ public class Bullet {
      */
     public float getBulletY() {
         return bulletY;
-    }
-
-    /**
-     * Sets the x-coordinate of the bullet.
-     *
-     * @param bulletX the new x-coordinate of the bullet.
-     */
-    public void setBulletX(float bulletX) {
-        this.bulletX = bulletX;
-    }
-
-    /**
-     * Sets the y-coordinate of the bullet.
-     *
-     * @param bulletY the new y-coordinate of the bullet.
-     */
-    public void setBulletY(float bulletY) {
-        this.bulletY = bulletY;
     }
 
     /**

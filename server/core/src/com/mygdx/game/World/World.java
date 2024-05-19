@@ -17,7 +17,7 @@ public class World {
     private final Map<String, Enemy> enemyMap = new HashMap<>();
     private final List<Bullet> bullets = new ArrayList<>();
     private final List<Bullet> bulletsToRemove = new ArrayList<>();
-    Coin coin;
+    protected Coin coin;
 
     /**
      * Constructor for World class.
