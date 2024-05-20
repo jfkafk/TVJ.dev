@@ -7,17 +7,12 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
@@ -42,6 +37,40 @@ public class LobbyScreen implements Screen {
     String mapPath;
     private final Sprite background;
 
+    private TextButton back;
+    private TextButton refreshButton;
+    private Label menuLabel;
+
+    // Characters buttons.
+    // Goblin.
+    private Texture goblinTexture;
+    private TextureRegion goblinRegion;
+    private TextureRegionDrawable goblinDrawable;
+    private ImageButton goblinButton;
+
+    private TextureRegionDrawable goblinPressedDrawable;
+    private TextureRegionDrawable goblinClick;
+
+    // Rambo.
+    private Texture ramboTexture;
+    private TextureRegion ramboRegion;
+    private TextureRegionDrawable ramboDrawable;
+    private ImageButton ramboButton;
+
+    private TextureRegionDrawable ramboPressedDrawable;
+    private TextureRegionDrawable ramboClick;
+
+    // Wizard.
+    private Texture wizardTexture;
+    private TextureRegion wizardRegion;
+    private TextureRegionDrawable wizardDrawable;
+    private ImageButton wizardButton;
+
+    private TextureRegionDrawable wizardPressedDrawable;
+    private TextureRegionDrawable wizardClick;
+
+    private int buttonImageSize = 150;
+
     private static final int BUTTON_PADDING = 10;
 
     public LobbyScreen(GameClient gameClient, Lobby currentLobby) {
@@ -59,7 +88,44 @@ public class LobbyScreen implements Screen {
         stage = new Stage(viewport, batch);
         font = new BitmapFont();
         this.currentLobby = currentLobby;
+        createCharacterButtons();
     }
+
+    /**
+     * Creates buttons to handle choosing character.
+     */
+    private void createCharacterButtons() {
+        // Goblin.
+        goblinPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/goblin_buttonGreen.png"))));
+        goblinClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/goblin_buttonGreen.png"))));
+        goblinClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        goblinTexture = new Texture(Gdx.files.internal("Images/goblin.png"));
+        goblinRegion = new TextureRegion(goblinTexture);
+        goblinDrawable = new TextureRegionDrawable(goblinRegion);
+        goblinButton = new ImageButton(goblinDrawable, goblinClick, goblinPressedDrawable);
+
+        // Rambo.
+        ramboPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/rambo_buttonGreen.png"))));
+        ramboClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/rambo_buttonGreen.png"))));
+        ramboClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        ramboTexture = new Texture(Gdx.files.internal("Images/rambo.png"));
+        ramboRegion = new TextureRegion(ramboTexture);
+        ramboDrawable = new TextureRegionDrawable(ramboRegion);
+        ramboButton = new ImageButton(ramboDrawable, ramboClick, ramboPressedDrawable);
+
+        // Wizard.
+        wizardPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/wizard_buttonGreen.png"))));
+        wizardClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/wizard_buttonGreen.png"))));
+        wizardClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        wizardTexture = new Texture(Gdx.files.internal("Images/wizard.png"));
+        wizardRegion = new TextureRegion(wizardTexture);
+        wizardDrawable = new TextureRegionDrawable(wizardRegion);
+        wizardButton = new ImageButton(wizardDrawable, wizardClick, wizardPressedDrawable);
+    }
+
 
     @Override
     public void show() {
@@ -72,12 +138,56 @@ public class LobbyScreen implements Screen {
         // Set alignment of contents in the table.
         mainTable.center();
 
+        if (hostLeft) {
+            TextButton startGameButton = new TextButton("Host Left, find new lobby", skin);
+            mainTable.add(startGameButton).pad(BUTTON_PADDING);
+            mainTable.row();
+        }
+
+        // Display players
+        for (Integer playerId : currentLobby.getPlayers()) {
+            // Create a button for each lobby
+            TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
+            // Add the lobby button to the table
+            mainTable.add(lobbyButton).pad(BUTTON_PADDING);
+            mainTable.row();
+        }
+        createClickableButtons();
+
+        // Create Table for characters.
+        Table charTable = new Table();
+        Label charLabel = new Label("Choose Character", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
+        charTable.add(charLabel).colspan(3);
+        charTable.row();
+        charTable.add(goblinButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50).padRight(20);
+        charTable.add(wizardButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50).padRight(20);
+        charTable.add(ramboButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50);
+
+        // Add existing components to the table
+        mainTable.add(menuLabel).pad(BUTTON_PADDING);
+        mainTable.row();
+        mainTable.add(charTable);
+        mainTable.row();
+        mainTable.add(refreshButton).pad(BUTTON_PADDING);
+        mainTable.row();
+        mainTable.add(back).pad(BUTTON_PADDING);
+        mainTable.row();
+
+        // Add table to stage
+        stage.addActor(mainTable);
+    }
+
+    /**
+     * Makes buttons clickable.
+     */
+    private void createClickableButtons() {
+
         // Create game title
-        Label menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
+        menuLabel = new Label("Multiplayer Lobby", skin, "title", Color.CYAN);
 
         // Create buttons
-        TextButton refreshButton = new TextButton("Refresh", skin);
-        TextButton back = new TextButton("Back", skin);
+        refreshButton = new TextButton("Refresh", skin);
+        back = new TextButton("Back", skin);
 
         refreshButton.addListener(new ClickListener() {
             @Override
@@ -102,32 +212,36 @@ public class LobbyScreen implements Screen {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(gameClient.getMultiplayerMenu());
             }
         });
+        // Choosing character.
+        goblinButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Goblin");
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
+            }
+        });
 
-        if (hostLeft) {
-            TextButton startGameButton = new TextButton("Host Left, find new lobby", skin);
-            mainTable.add(startGameButton).pad(BUTTON_PADDING);
-            mainTable.row();
-        }
+        wizardButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Wizard");
+                if (goblinButton.isChecked()) goblinButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
+            }
+        });
 
-        // Display players
-        for (Integer playerId : currentLobby.getPlayers()) {
-            // Create a button for each lobby
-            TextButton lobbyButton = new TextButton(("Player:" + playerId), skin);
-            // Add the lobby button to the table
-            mainTable.add(lobbyButton).pad(BUTTON_PADDING);
-            mainTable.row();
-        }
-
-        // Add existing components to the table
-        mainTable.add(menuLabel).pad(BUTTON_PADDING);
-        mainTable.row();
-        mainTable.add(refreshButton).pad(BUTTON_PADDING);
-        mainTable.row();
-        mainTable.add(back).pad(BUTTON_PADDING);
-        mainTable.row();
-
-        // Add table to stage
-        stage.addActor(mainTable);
+        ramboButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Rambo");
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (goblinButton.isChecked()) goblinButton.toggle();
+            }
+        });
     }
 
     public void setHostLeft(boolean hostLeft) {
