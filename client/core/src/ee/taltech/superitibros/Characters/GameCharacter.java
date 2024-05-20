@@ -7,20 +7,21 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Timer;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.ClientWorld;
 
 public class GameCharacter {
 
+    // Sounds.
     private final AudioHelper audioHelper = AudioHelper.getInstance();
-    public static CreateCharacterFrames skinCreator = new CreateCharacterFrames();
-    float stateTime;
 
     // Character characteristics.
     protected float movementSpeed; // world units per second
 
     public enum State {IDLE, WALKING, JUMPING, FALL}
     boolean facingRight;
+    private float stateTimer;
 
     // Position & dimension.
     public float xPosition;
@@ -28,20 +29,25 @@ public class GameCharacter {
 
     protected float width, height;
     protected Rectangle boundingBox;
+
     private Integer playerSize = 50;
 
     // Health bar properties
-    private final float maxHealth;
+    private float maxHealth;
     private float health;
-    private final float healthBarWidth;
-    private final float healthBarHeight;
+    private float healthBarWidth;
+    private float healthBarHeight;
     private Color healthBarColor;
+    private float healthBarX;
+    private float healthBarY;
 
     // World where physics are applied
     ClientWorld clientWorld;
     public Body b2body;
-    boolean bodyDefined = false;
+    private boolean bodyDefined = false;
     Vector2 newPosition;
+    private Integer mapHeight;
+    private Integer mapWidth;
 
     // Textures
     Animation<TextureRegion> walkAnimationRight; // Must declare frame type (TextureRegion)
@@ -57,6 +63,14 @@ public class GameCharacter {
     // Animation
     boolean animationCreated = false;
 
+    // Jumping sound cooldown.
+    private boolean canJump = true;
+    private float jumpCooldown = 0.75f;
+
+    public static CreateCharacterFrames skinCreator;
+    String nameOfSkin;
+    float stateTime;
+
     /**
      * GameCharacter constructor.
      *
@@ -69,6 +83,7 @@ public class GameCharacter {
      */
     public GameCharacter(float movementSpeed, Rectangle boundingBox, float xPosition, float yPosition, float width,
                          float height, ClientWorld clientWorld) {
+        skinCreator = new CreateCharacterFrames(clientWorld);
         this.movementSpeed = movementSpeed;
         this.xPosition = xPosition;
         this.yPosition = yPosition;
@@ -77,10 +92,9 @@ public class GameCharacter {
         this.boundingBox = boundingBox;
         this.clientWorld = clientWorld;
         this.facingRight = true;
-        if (clientWorld.getPath().equals("Maps/level4/gameart2d-desert.tmx")) {
-            playerSize = 256;
-            boundingBox.setSize(60, 105);
-        }
+        this.stateTimer = 0;
+        this.mapHeight = clientWorld.getMapHeight();
+        this.mapWidth = clientWorld.getMapWidth();
         defineCharacter();
         // Initialize health bar properties
         maxHealth = 100f;
@@ -90,6 +104,21 @@ public class GameCharacter {
         healthBarColor = Color.GREEN;
     }
 
+    /**
+     *
+     * @return the name of the skin
+     */
+    public String getNameOfSkin() {
+        return nameOfSkin;
+    }
+
+    /**
+     * sets parameter as name of skin
+     * @param nameOfSkin
+     */
+    public void setNameOfSkin(String nameOfSkin) {
+        this.nameOfSkin = nameOfSkin;
+    }
 
     /**
      * Making frames for character
@@ -144,18 +173,10 @@ public class GameCharacter {
         }
     }
 
-    /**
-     * Get character y coordinate.
-     * @return y coordinate.
-     */
     public float getyPosition() {
         return yPosition;
     }
 
-    /**
-     * Get character x coordinate.
-     * @return x coordinate.
-     */
     public float getxPosition() {
         return xPosition;
     }
@@ -193,21 +214,15 @@ public class GameCharacter {
         }
     }
 
-    /**
-     * Set character's current state.
-     * @param currentState current state.
-     */
+
     public void setCurrentState(GameCharacter.State currentState) {
         this.currentState = currentState;
     }
 
-    /**
-     * Set facing right boolean.
-     * @param facingRight boolean whether character facing right.
-     */
     public void setFacingRight(boolean facingRight) {
         this.facingRight = facingRight;
     }
+
 
     /**
      * Method for jumping.
@@ -215,7 +230,16 @@ public class GameCharacter {
     public void jump() {
         // Player can't jump if he is already in air
         if (isGrounded() && !clientWorld.getGdxWorld().isLocked()) {
-            audioHelper.playSound("MusicSounds/jump.mp3");
+            if (canJump) {
+                canJump = false;
+                Timer.schedule(new Timer.Task() {
+                    @Override
+                    public void run() {
+                        canJump = true;
+                    }
+                }, jumpCooldown);
+                audioHelper.playSound("MusicSounds/jump.mp3");
+            }
             // Apply an impulse upwards to simulate the jump
             this.b2body.applyLinearImpulse(0, 1000000000, this.b2body.getWorldCenter().x, this.b2body.getWorldCenter().y, true);
             // System.out.println("jumped");
@@ -301,25 +325,14 @@ public class GameCharacter {
         stateTime += Gdx.graphics.getDeltaTime();
 
         // Get which state is player currently in
-        State currentState = getState();
-
-        // Reset x-axis velocity
-        b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
-
-        drawCurrentFrame(batch, whiteTexture, currentState);
-    }
-
-    /**
-     * Get and draw current frame of character animation.
-     * @param batch batch.
-     * @param whiteTexture white texture.
-     * @param currentState current state.
-     */
-    public void drawCurrentFrame(Batch batch, Texture whiteTexture, State currentState) {
+        State currentState = getState(); // Muuda olekut vastavalt vajadusele
 
         if (currentState == null) {
             currentState = State.IDLE;
         }
+
+        // Reset x-axis velocity
+        b2body.setLinearVelocity(0, clientWorld.getMyPlayerGameCharacter().b2body.getLinearVelocity().y);
 
         switch (currentState) {
             case IDLE:
@@ -352,17 +365,26 @@ public class GameCharacter {
                 break;
         }
 
-        // Update coordinates
-        xPosition = b2body.getPosition().x;
-        yPosition = b2body.getPosition().y;
-
         // Set the position of the current frame to match the position of the Box2D body
-        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() * 1.5);
+        float frameX = (float) (b2body.getPosition().x - boundingBox.getWidth() - 0.1 * playerSize); // Somehow needed -4 to match the sprite.
         float frameY = (b2body.getPosition().y - boundingBox.getHeight());
+        //System.out.println("Bounding box height: " + boundingBox.getHeight());
+        //System.out.println("Bounding box width: " + boundingBox.getWidth());
+        //System.out.println("Position y: " + b2body.getPosition().y);
+        //System.out.println("Frame x: " + frameX + " | Frame y: " + frameY);
+
+        // Calculate health bar position
+        healthBarX = frameX + boundingBox.width / 2;
+        healthBarY = frameY + boundingBox.height;
 
         // Bounding box
         boundingBox.x = b2body.getPosition().x ;
         boundingBox.y = b2body.getPosition().y;
+
+        // Update coordinates
+        xPosition = b2body.getPosition().x;
+        yPosition = b2body.getPosition().y;
+
 
         // Draw the current frame at the Box2D body position
         if (currentFrame != null) {
@@ -374,11 +396,7 @@ public class GameCharacter {
         drawHealthBar(batch, whiteTexture);
     }
 
-    /**
-     * Method for drawing health bar.
-     * @param batch batch.
-     * @param whiteTexture white texture.
-     */
+    // Draw health bar method
     public void drawHealthBar(Batch batch, Texture whiteTexture) {
         // Calculate health bar fill percentage
         float healthPercentage = health / maxHealth;
@@ -408,10 +426,7 @@ public class GameCharacter {
         batch.draw(whiteTexture, healthBarX, healthBarY, filledWidth, healthBarHeight);
     }
 
-    /**
-     * Update player health.
-     * @param amount amount to add/subtract
-     */
+    // Update health method (call this when player takes damage or heals)
     public void updateHealth(float amount) {
         health += amount;
 
@@ -445,6 +460,7 @@ public class GameCharacter {
     public Body getB2body() {
         return b2body;
     }
+
 
     /**
      * Remove the Box2D body from the game world.

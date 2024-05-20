@@ -18,25 +18,74 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import ee.taltech.superitibros.Helpers.AudioHelper;
 import ee.taltech.superitibros.GameInfo.GameClient;
 
+import java.util.Objects;
+
 
 public class SinglePlayerMenu implements Screen {
 
     // Sound.
-    private final AudioHelper audioHelper = AudioHelper.getInstance();
-    private final SpriteBatch batch;
+    private AudioHelper audioHelper = AudioHelper.getInstance();
+    private SpriteBatch batch;
     protected Stage stage;
-    private final Viewport viewport;
-    private final OrthographicCamera camera;
-    private final TextureAtlas atlas;
+    private Viewport viewport;
+    private OrthographicCamera camera;
+    private TextureAtlas atlas;
     protected Skin skin;
     GameClient gameClient;
-    private final Sprite background;
-    private final ImageButton desertButton;
-    private final ImageButton moonButton;
-    private final ImageButton castleButton;
-    private final ImageButton superMButton;
-    private final ImageButton backButton;
 
+    private final Sprite background;
+    // ImageButton.
+    // Desert.
+    private Texture desertTexture;
+    private TextureRegion desertRegion;
+    private TextureRegionDrawable desertDrawable;
+    private ImageButton desertButton;
+
+    private TextureRegionDrawable desertPressedDrawable;
+    private TextureRegionDrawable desertClick;
+
+    // SuperMario Map.
+    private Texture superMTexture;
+    private TextureRegion superMRegion;
+    private TextureRegionDrawable superMDrawable;
+    private ImageButton superMButton;
+
+    private TextureRegionDrawable superMPressedDrawable;
+    private TextureRegionDrawable superMClick;
+
+    // Characters buttons.
+    // Goblin.
+    private Texture goblinTexture;
+    private TextureRegion goblinRegion;
+    private TextureRegionDrawable goblinDrawable;
+    private ImageButton goblinButton;
+
+    private TextureRegionDrawable goblinPressedDrawable;
+    private TextureRegionDrawable goblinClick;
+
+    // Rambo.
+    private Texture ramboTexture;
+    private TextureRegion ramboRegion;
+    private TextureRegionDrawable ramboDrawable;
+    private ImageButton ramboButton;
+
+    private TextureRegionDrawable ramboPressedDrawable;
+    private TextureRegionDrawable ramboClick;
+
+    // Wizard.
+    private Texture wizardTexture;
+    private TextureRegion wizardRegion;
+    private TextureRegionDrawable wizardDrawable;
+    private ImageButton wizardButton;
+
+    private TextureRegionDrawable wizardPressedDrawable;
+    private TextureRegionDrawable wizardClick;
+
+    // Other buttons.
+    // Back.
+    private TextButton back;
+
+    private final int buttonImageSize = 150;
 
     /**
      * Constructor for the Menu class.
@@ -59,41 +108,72 @@ public class SinglePlayerMenu implements Screen {
 
         // Background.
         background = new Sprite(new Texture(Gdx.files.internal("Images/forest2.png")));
+        createMapButtons();
+        createCharacterButtons();
+    }
 
+    /**
+     * Creates map button visuals.
+     */
+    private void createMapButtons() {
         // Map representation pictures.
-
         // Desert.
-        // ImageButton.
-        // Desert.
-        Texture desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
-        TextureRegion desertRegion = new TextureRegion(desertTexture);
-        TextureRegionDrawable desertDrawable = new TextureRegionDrawable(desertRegion);
-        desertButton = new ImageButton(desertDrawable);
-        desertButton.setSize(100, 100);
+        desertPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/desert_pressed.png"))));
+        desertClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/desert_pressed.png"))));
+        desertClick.setMinSize(buttonImageSize - 10, buttonImageSize -10);
 
-        // Moon
-        Texture moonTexture = new Texture(Gdx.files.internal("Images/moon.png"));
-        TextureRegion moonRegion = new TextureRegion(moonTexture);
-        TextureRegionDrawable moonDrawable = new TextureRegionDrawable(moonRegion);
-        moonButton = new ImageButton(moonDrawable);
-
-        // Castle
-        Texture castleTexture = new Texture(Gdx.files.internal("Images/castle.png"));
-        TextureRegion castleRegion = new TextureRegion(castleTexture);
-        TextureRegionDrawable castleDrawable = new TextureRegionDrawable(castleRegion);
-        castleButton = new ImageButton(castleDrawable);
+        desertTexture = new Texture(Gdx.files.internal("Images/desert.png"));
+        desertRegion = new TextureRegion(desertTexture);
+        desertDrawable = new TextureRegionDrawable(desertRegion);
+        desertButton = new ImageButton(desertDrawable, desertClick, desertPressedDrawable);
 
         // SuperMario Map.
-        Texture superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
-        TextureRegion superMRegion = new TextureRegion(superMTexture);
-        TextureRegionDrawable superMDrawable = new TextureRegionDrawable(superMRegion);
-        superMButton = new ImageButton(superMDrawable);
+        superMPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/superM_pressed.png"))));
+        superMClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/superM_pressed.png"))));
+        superMClick.setMinSize(buttonImageSize - 10, buttonImageSize - 10);
 
-        // Back Button.
-        Texture backTexture = new Texture(Gdx.files.internal("Images/back.jpeg"));
-        TextureRegion backRegion = new TextureRegion(backTexture);
-        TextureRegionDrawable backDrawable = new TextureRegionDrawable(backRegion);
-        backButton = new ImageButton(backDrawable);
+        superMTexture = new Texture(Gdx.files.internal("Images/superM.png"));
+        superMRegion = new TextureRegion(superMTexture);
+        superMDrawable = new TextureRegionDrawable(superMRegion);
+        superMButton = new ImageButton(superMDrawable, superMClick, superMPressedDrawable);
+
+        back = new TextButton("Back", skin);
+
+    }
+
+    /**
+     * Creates buttons to handle choosing character.
+     */
+    private void createCharacterButtons() {
+        // Goblin.
+        goblinPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/goblin_buttonGreen.png"))));
+        goblinClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/goblin_buttonGreen.png"))));
+        goblinClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        goblinTexture = new Texture(Gdx.files.internal("Images/goblin.png"));
+        goblinRegion = new TextureRegion(goblinTexture);
+        goblinDrawable = new TextureRegionDrawable(goblinRegion);
+        goblinButton = new ImageButton(goblinDrawable, goblinClick, goblinPressedDrawable);
+
+        // Rambo.
+        ramboPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/rambo_buttonGreen.png"))));
+        ramboClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/rambo_buttonGreen.png"))));
+        ramboClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        ramboTexture = new Texture(Gdx.files.internal("Images/rambo.png"));
+        ramboRegion = new TextureRegion(ramboTexture);
+        ramboDrawable = new TextureRegionDrawable(ramboRegion);
+        ramboButton = new ImageButton(ramboDrawable, ramboClick, ramboPressedDrawable);
+
+        // Wizard.
+        wizardPressedDrawable = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/wizard_buttonGreen.png"))));
+        wizardClick = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("Images/wizard_buttonGreen.png"))));
+        wizardClick.setMinSize(buttonImageSize - 15, buttonImageSize - 15);
+
+        wizardTexture = new Texture(Gdx.files.internal("Images/wizard.png"));
+        wizardRegion = new TextureRegion(wizardTexture);
+        wizardDrawable = new TextureRegionDrawable(wizardRegion);
+        wizardButton = new ImageButton(wizardDrawable, wizardClick, wizardPressedDrawable);
     }
 
     /**
@@ -106,40 +186,51 @@ public class SinglePlayerMenu implements Screen {
         //Stage should check input:
         Gdx.input.setInputProcessor(stage);
 
-        // Big parent Table.
-        Table parentTable = new Table();
-        parentTable.setFillParent(true);
-
         // Create Table for maps.
         Table mapTable = new Table();
         Label mapLabel = new Label("Choose Map!", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
-        //Set alignment of contents in the table.
 
-        // Buttons Table.
-        Table buttonTable = new Table();
-        buttonTable.right();
+        // Create Table for characters.
+        Table charTable = new Table();
+        Label charLabel = new Label("Choose Character", skin, "subtitle", new Color(0f, 66f, 64f, 100f));
 
+        // Create parent table.
+        Table parentTable = new Table();
+        parentTable.setFillParent(true);
 
-        TextButton optionsButton = new TextButton("Options", skin);
+        createClickableButtons();
+        mapTable.add(mapLabel).uniform(true).colspan(3);
+        mapTable.row();
+        mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).colspan(2).padRight(50).padTop(50);
+        mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).colspan(2).padTop(50);
 
-        //Add listeners to buttons.
-        moonButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                resume();
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-//                String mapPath = "Maps/level2/level2.tmx";
-//                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
-//                gameClient.startGame(mapPath);
-            }
+        charTable.add(charLabel).colspan(3);
+        charTable.row();
+        charTable.add(goblinButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50).padRight(20);
+        charTable.add(wizardButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50).padRight(20);
+        charTable.add(ramboButton).size(buttonImageSize, buttonImageSize).uniform(true).padTop(50);
 
-        });
+        parentTable.add(mapTable).padRight(200);
+        parentTable.add(charTable).padLeft(200);
+        parentTable.row();
+        parentTable.add(back).colspan(4).padTop(200);
+
+        stage.addActor(parentTable);
+    }
+
+    /**
+     * Makes buttons clickable.
+     */
+    private void createClickableButtons() {
+        // Map choosing.
         superMButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
                 audioHelper.stopAllMusic();
                 String mapPath = "Maps/level1/level1.tmx";
+                String packetConnect = gameClient.getMyLobby().getLobbyHash();
+                System.out.println("packetConnect in SinglePlayerMenu -> " + packetConnect);
                 gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
                 gameClient.startGame(mapPath);
             }
@@ -154,25 +245,9 @@ public class SinglePlayerMenu implements Screen {
                 gameClient.startGame(mapPath);
             }
         });
-        castleButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                audioHelper.stopAllMusic();
-                String mapPath = "Maps/level3/MagicLand.tmx";
-                gameClient.getClientConnection().sendLobbyStartGame(gameClient.getMyLobby().getLobbyHash(), mapPath);
-                gameClient.startGame(mapPath);
-            }
-        });
-        optionsButton.addListener(new ClickListener() {
-            public void clicked(InputEvent event, float x, float y) {
-                audioHelper.playSound("MusicSounds/buttonClick.mp3");
-                audioHelper.stopAllMusic();
-                Options options = new Options(gameClient);
-                ((Game) Gdx.app.getApplicationListener()).setScreen(options);
-            }
-        });
-        backButton.addListener(new ClickListener() {
+
+        // Back to the main menu.
+        back.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 audioHelper.playSound("MusicSounds/buttonClick.mp3");
@@ -180,19 +255,36 @@ public class SinglePlayerMenu implements Screen {
                 ((Game) Gdx.app.getApplicationListener()).setScreen(menuScreen);
             }
         });
-        int buttonLocationPadding = 20;
-        int buttonImageSize = 300;
-        mapTable.add(mapLabel);
-        mapTable.row();
-        mapTable.add(moonButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.row();
-        mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        mapTable.add(castleButton).size(buttonImageSize, buttonImageSize).pad(buttonLocationPadding);
-        parentTable.add(backButton).size(40, 40).padRight(1500);
-        parentTable.row();
-        parentTable.add(mapTable).padTop(200).padRight(800);
-        stage.addActor(parentTable);
+        // Choosing character.
+        goblinButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Goblin");
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
+            }
+        });
+
+        wizardButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Wizard");
+                if (goblinButton.isChecked()) goblinButton.toggle();
+                if (ramboButton.isChecked()) ramboButton.toggle();
+            }
+        });
+
+        ramboButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                audioHelper.playSound("MusicSounds/buttonClick.mp3");
+                gameClient.setCharacterName("Rambo");
+                if (wizardButton.isChecked()) wizardButton.toggle();
+                if (goblinButton.isChecked()) goblinButton.toggle();
+            }
+        });
     }
     /**
      * Render (creates stage)
