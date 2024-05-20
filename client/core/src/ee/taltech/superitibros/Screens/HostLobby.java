@@ -146,14 +146,12 @@ public class HostLobby implements Screen {
         mapTable.row();
         mapTable.add(superMButton).size(buttonImageSize, buttonImageSize).colspan(2).padRight(50);
         mapTable.add(desertButton).size(buttonImageSize, buttonImageSize).colspan(2);
-        mapTable.setDebug(true);
 
         charTable.add(charLabel).colspan(3);
         charTable.row();
         charTable.add(goblinButton).size(buttonImageSize, buttonImageSize).uniform(true).padRight(20);
         charTable.add(wizardButton).size(buttonImageSize, buttonImageSize).uniform(true).padRight(20);
         charTable.add(ramboButton).size(buttonImageSize, buttonImageSize).uniform(true);
-        charTable.setDebug(true);
 
         createClickableButtons();
 
@@ -168,7 +166,6 @@ public class HostLobby implements Screen {
         parentTable.add(refreshButton).colspan(4).padTop(10);
         parentTable.row();
         parentTable.add(back).colspan(4).padTop(10);
-        parentTable.setDebug(true);
 
 
         //Stage should check input:
