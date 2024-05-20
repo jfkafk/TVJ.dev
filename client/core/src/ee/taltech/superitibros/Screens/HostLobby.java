@@ -157,26 +157,17 @@ public class HostLobby implements Screen {
 
         createClickableButtons();
 
-        int mapButtonSize = 150;
         parentTable.row();
-        parentTable.add(placeholder).size(buttonLocationPadding).left();
-        parentTable.add(menuLabel).pad(buttonLocationPadding).colspan(3);
-        parentTable.add(placeholder).size(buttonLocationPadding).right();
+        parentTable.add(menuLabel).colspan(4);
         parentTable.row();
-        parentTable.add(mapTable).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).uniform().padRight(50).padTop(50);
-        parentTable.add(charTable).size(mapButtonSize, mapButtonSize).pad(buttonLocationPadding).padLeft(50).center().uniform(true).padTop(50);
+        parentTable.add(mapTable).colspan(2);
+        parentTable.add(charTable).colspan(2);
         parentTable.row();
-        parentTable.add(placeholder).size(buttonLocationPadding).left();
-        parentTable.add(startGameButton).pad(buttonLocationPadding).colspan(3);
-        parentTable.add(placeholder).size(buttonLocationPadding).right();
+        parentTable.add(startGameButton).colspan(4).padTop(10);
         parentTable.row();
-        parentTable.add(placeholder).size(buttonLocationPadding).left();
-        parentTable.add(refreshButton).pad(buttonLocationPadding).colspan(3);
-        parentTable.add(placeholder).size(buttonLocationPadding).right();
+        parentTable.add(refreshButton).colspan(4).padTop(10);
         parentTable.row();
-        parentTable.add(placeholder).size(buttonLocationPadding).left();
-        parentTable.add(back).pad(buttonLocationPadding).colspan(3);
-        parentTable.add(placeholder).size(buttonLocationPadding).right();
+        parentTable.add(back).colspan(4).padTop(10);
         parentTable.setDebug(true);
 
 
@@ -262,6 +253,7 @@ public class HostLobby implements Screen {
                 mapPath = "Maps/level1/level1.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
+                if (desertButton.isChecked()) desertButton.toggle();
             }
 
         });
@@ -272,6 +264,7 @@ public class HostLobby implements Screen {
                 mapPath = "Maps/level4/destestsmaller.tmx";
                 gameClient.updateMapPath(mapPath);
                 refreshPlayers();
+                if (superMButton.isChecked()) superMButton.toggle();
             }
         });
 
