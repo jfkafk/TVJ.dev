@@ -28,7 +28,9 @@ public class CreateCharacterFrames {
     private String characterName = "Goblin";
 
     public CreateCharacterFrames(ClientWorld clientWorld) {
-        characterName =  clientWorld.getClientConnection().getGameClient().getCharacterName();
+        String charName = clientWorld.getClientConnection().getGameClient().getCharacterName();
+        if (!Objects.equals(charName, "")) characterName = charName;
+        System.out.println(characterName);
     }
 
     public void makeFrames(GameCharacter character) {
@@ -60,7 +62,7 @@ public class CreateCharacterFrames {
                 fallAnimationPath = "Characters/Enemy sprites/FALL.png";
                 playerSize = 50;
             }
-            if (Objects.equals(characterName, "Wizard")) {
+                if (Objects.equals(characterName, "Wizard")) {
                 System.out.println("Creating frames for -> " + characterName);
                 walkAnimationPath = "Characters/Wizard sprites/Wizard WALK.png";
                 idleAnimationPath = "Characters/Wizard sprites/Wizard IDLE.png";
@@ -68,7 +70,7 @@ public class CreateCharacterFrames {
                 fallAnimationPath = "Characters/Wizard sprites/Wizard FALL.png";
                 playerSize = 50;
             }
-            if (Objects.equals(characterName, "Goblin")) {
+            else if (Objects.equals(characterName, "Goblin")) {
                 System.out.println("Creating frames for -> " + characterName);
                 walkAnimationPath = "Characters/Goblin Sprites/Goblin WALK.png";
                 idleAnimationPath = "Characters/Goblin Sprites/Goblin IDLE.png";
