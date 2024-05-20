@@ -665,7 +665,7 @@ public class ServerConnection {
 			if (lobby.getPlayers().isEmpty()) {
 				isEmpty = false;
 			}
-			if (isEmpty) {
+			if (isEmpty && lobby.getServerUpdateThread() != null) {
 				lobby.getServerUpdateThread().setGameOn(false);
 				sendRemoveLobby(lobby.getLobbyHash());
 			}
